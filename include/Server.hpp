@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:04:30 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 14:42:09 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/07 16:41:51 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,26 @@ class				Server
 {
 	private:
 	std::string		pass;
-	int				mainSocket;
+	int				*mainSocket;
 	public:
 					Server(char *pass);
 	virtual			~Server(void);
 
-	virtual void	init(void);
-	virtual void	listen(int port);
-
+	virtual void	init(char *port);
+	virtual void	start(void);
 	void			connectServer(std::string address);
 
 	std::string		getPass(void) const;
-	int				getSocket(void) const;
+	int*			getSocket(void) const;
+
+	class GetProtocolFailException: public std::exception
+	{
+		virtual const char* what() const throw();
+	};
+		class SocketOpenFailException: public std::exception
+	{
+		virtual const char* what() const throw();
+	};
 };
 
 #endif

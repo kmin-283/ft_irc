@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:16:49 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 14:51:54 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/07 16:57:32 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int main(int argc, char *argv[])
 {
-	int			port;
 	Server		*server;
 	int			portIndex;
 	int			passIndex;
@@ -27,16 +26,15 @@ int main(int argc, char *argv[])
 		passIndex = argc - 1;
 		if (ft_isdigit(argv[portIndex]))
 		{
-			port = ft_atoi(argv[portIndex]);
-			if (port == SSL_PORT)
+			if (std::string(argv[portIndex]) == std::string(SSL_PORT))
 				server = new TLSServer(argv[passIndex]);
 			else
 				server = new Server(argv[passIndex]);
-			server->init();
+			server->init(argv[portIndex]);
 			if (argc == 4)
 				server->connectServer(argv[networkIndex]);
 			// TODO 달라질수도 있음
-			server->listen(port);
+			server->start();
 			delete server;
 		}
 		else
