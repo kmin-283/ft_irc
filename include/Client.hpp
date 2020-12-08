@@ -1,21 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_irc.hpp                                         :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:12:38 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 14:05:23 by kmin             ###   ########.fr       */
+/*   Created: 2020/12/08 17:02:52 by dakim             #+#    #+#             */
+/*   Updated: 2020/12/08 17:20:12 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_IRC
-# define FT_IRC
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
 
-# include "Server.hpp"
-# include "TLSServer.hpp"
 # include "utils.hpp"
 
-# define __DEBUG__ true
+class				Client
+{
+private:
+	size_t			fd;
+public:
+					Client(const size_t fd);
+					~Client(void);
+	int				getFd(void) const;
+};
+
 #endif

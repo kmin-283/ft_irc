@@ -1,21 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_irc.hpp                                         :+:      :+:    :+:   */
+/*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:12:38 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 14:05:23 by kmin             ###   ########.fr       */
+/*   Created: 2020/12/08 17:05:37 by dakim             #+#    #+#             */
+/*   Updated: 2020/12/08 17:07:08 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_IRC
-# define FT_IRC
+#include "Client.hpp"
 
-# include "Server.hpp"
-# include "TLSServer.hpp"
-# include "utils.hpp"
+Client::Client(const size_t fd) : fd(fd)
+{
+}
 
-# define __DEBUG__ true
-#endif
+Client::~Client(void)
+{
+}
+
+int				Client::getFd(void) const
+{
+	return (this->fd);
+}

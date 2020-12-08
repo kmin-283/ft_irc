@@ -1,11 +1,9 @@
 CC = clang++
 CFLAGS = -Wall -Werror -Wextra -std=c++98
-DFLAGS = -Wall -Werror -Wextra -std=c++98 -D __DEBUG__=100
 NAME = ircserv
-DEBUGNAME = debug_ircserv
 INCLUDE = -I ./include/
 
-SRC = Server.cpp TLSServer.cpp utils.cpp
+SRC = Server.cpp TLSServer.cpp Client.cpp utils.cpp
 SRC_DIR = ./src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
@@ -25,9 +23,6 @@ OBJS_T = $(TESTS:%.cpp=%.o)
 # TEST_LIB = -lCppUTest -lCppUTestExt
 
 all : $(NAME)
-
-debug : $(SRC_LIB) $(OBJS_M)
-	$(CC) $(DFLAGS) $(INCLUDE) $(OBJS_M) $(SRC_LIB) -o $(DEBUGNAME)
 
 $(NAME) : $(SRC_LIB) $(OBJS_M)
 	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS_M) $(SRC_LIB) -o $(NAME)

@@ -13,8 +13,9 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass)
-	: pass(std::string(pass)), mainSocket(0)
+	: pass(std::string(pass)), mainSocket(0), maxFd(0)
 {
+	FD_ZERO(&this->readFds);
 }
 
 Server::~Server(void)
@@ -29,6 +30,13 @@ std::string		Server::getPass(void) const
 int				Server::getSocket(void) const
 {
 	return (this->mainSocket);
+}
+
+void			Server::renewFd(const size_t fd)
+{
+	FD_SET(fd, &this->readFds);
+	if (this->maxFd < fd)
+		this->maxFd = fd;
 }
 
 void		Server::init(char *port)
@@ -49,51 +57,51 @@ void		Server::init(char *port)
 	{
 		if (addrInfoIterator->ai_family == AF_INET6)
 		{
-			if (SOCKET_FAIL == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+			if (CONNECT_FAIL == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 				throw Server::SocketOpenFailException();
-			setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
-			if (SOCKET_FAIL == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
+			// setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
+			if (CONNECT_FAIL == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
 				throw Server::SocketBindFailException();
-			if (SOCKET_FAIL == (listen(this->mainSocket, SOMAXCONN)))
+			if (CONNECT_FAIL == (listen(this->mainSocket, SOMAXCONN)))
 				throw Server::SocketListenFailException();
 		}
 	}
+	this->renewFd(this->mainSocket);
 	freeaddrinfo(addrInfo);
 }
 
 void		Server::start(void)
 {
-	int listenFd;
-	int fdNum;
-	int maxfd = 0;
-	int readn;
-	fd_set readfds, allfds;
-
 	// while(42)
 	// {
-	// 	serv_select();
-	// 	for (int i = 3; i <= fdmax; ++i)
-	// 	{
-	// 		// 파일디스크립터에 변화가 생긴경우
-	// 		if (FD_ISSET(i, &read_fds))
-	// 		{
-	// 			// listener의 경우 처음 소켓을 열었을 때 얻은 파일디스크립터임
-	// 			// getIP함수에 socket으로부터 파일디스트립터를 listener에 저장하는 부분 있음
-	// 			if (i == listener)
-	// 			{
-	// 				// listener의 fd에 변경이 있는경우
-	// 				// => 새로 연결하는 경우
-	// 				new_connection();
-	// 			}
-	// 			else
-	// 			{
-	// 				// listener가 아닌 다른 fd에 변경이 있는경우
-	// 				// => 새로운 연결이 아닌경우
-	// 				receive(i);
-	// 			}
-	// 		}
-	// 	}
+		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, NULL))
+			throw Server::SelectFailException();
+		for (size_t listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
+		{
+			if (FD_ISSET(listenFd, &this->readFds))
+			{
+				if (listenFd == this->mainSocket)
+					this->acceptConnection();
+				// else
+					// this->receiveMessage(listenFd);
+			}
+		}
 	// }
+}
+
+void		Server::acceptConnection(void)
+{
+	int					newFd;
+	struct sockaddr_in6	remoteAddress;
+	socklen_t			addressLen;
+
+	addressLen = sizeof(struct sockaddr_in);
+	if (CONNECT_FAIL == (newFd = accept(this->mainSocket, (struct sockaddr*)&remoteAddress, &addressLen)))
+		throw Server::AcceptFailException();
+	fcntl(newFd, F_SETFL, O_NONBLOCK);
+	this->renewFd(newFd);
+	Client *newClient = new Client(newFd);
+	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
 }
 
 void		Server::connectServer(std::string address)
@@ -119,4 +127,14 @@ const char		*Server::SocketBindFailException::what() const throw()
 const char		*Server::SocketListenFailException::what() const throw()
 {
 	return ("ServerException:: Socket listen fail");
+}
+
+const char		*Server::SelectFailException::what() const throw()
+{
+	return ("ServerException:: Select fail");
+}
+
+const char		*Server::AcceptFailException::what() const throw()
+{
+	return ("ServerException:: Accept fail");
 }

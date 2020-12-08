@@ -2,5 +2,3 @@ libirc.a
 *.o
 irserv
 a.out
-reference
-bircd
