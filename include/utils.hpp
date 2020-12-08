@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:07:51 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 16:40:19 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/08 13:46:32 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,5 +44,6 @@
 
 int				ft_atoi(char *str);
 bool			ft_isdigit(char *str);
+void            *ft_memset(void *s, int c, size_t n);
 
 #endif

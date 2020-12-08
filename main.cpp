@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:16:49 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 17:53:09 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/08 13:50:32 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
 			else
 				server = new Server(argv[passIndex]);
 			server->init(argv[portIndex]);
-			// if (argc == 4)
+			if (argc == 4)
 			// 	server->connectServer(argv[networkIndex]);
 			// // TODO 달라질수도 있음
-			// server->start();
+				server->start();
 			delete server;
 		}
 		else

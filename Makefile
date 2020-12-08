@@ -1,7 +1,8 @@
 CC = clang++
 CFLAGS = -Wall -Werror -Wextra -std=c++98
+DFLAGS = -Wall -Werror -Wextra -std=c++98 -D __DEBUG__=100
 NAME = ircserv
-
+DEBUGNAME = debug_ircserv
 INCLUDE = -I ./include/
 
 SRC = Server.cpp TLSServer.cpp utils.cpp
@@ -25,6 +26,9 @@ OBJS_T = $(TESTS:%.cpp=%.o)
 
 all : $(NAME)
 
+debug : $(SRC_LIB) $(OBJS_M)
+	$(CC) $(DFLAGS) $(INCLUDE) $(OBJS_M) $(SRC_LIB) -o $(DEBUGNAME)
+
 $(NAME) : $(SRC_LIB) $(OBJS_M)
 	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS_M) $(SRC_LIB) -o $(NAME)
 
@@ -43,7 +47,7 @@ clean:
 	rm -rf $(OBJS) $(OBJS_T) $(SRC_LIB) $(OBJS_M)
 
 fclean : clean
-	rm -rf $(TEST_NAME) $(NAME)
+	rm -rf $(TEST_NAME) $(NAME) $(DEBUGNAME)
 
 re: fclean all
 

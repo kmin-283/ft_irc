@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:15:12 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 14:46:33 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/08 13:46:25 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,17 @@ bool			ft_isdigit(char *str)
 			return (false);
 	}
 	return (true);
+}
+
+void			*ft_memset(void *s, int c, size_t n)
+{
+		size_t	i;
+		char	*str;
+
+		str = (char *)s;
+		i = -1;
+		while (++i < n)
+			*(str + i) = c;
+		s = str;
+		return (s);
 }
