@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:07:51 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 16:56:34 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/09 16:18:26 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 # include <signal.h>
 # include <unistd.h>
 # include <limits.h>
+# include <errno.h>
+# include <error.h>
 
 # define SSL_PORT "6669"
 # define CONNECT_FAIL -1
@@ -41,6 +43,7 @@
 # define ERROR_PORT "Error: Port must be numeric."
 # define ERROR_SOCKET_OPEN_FAIL "Error: Socket open fail."
 # define ERROR_GET_PROTO_FAIL "Error: Get protocol fail."
+# define ERROR_CONNECT_FAIL "Error: Socket connect fail."
 
 
 int				ft_atoi(char *str);

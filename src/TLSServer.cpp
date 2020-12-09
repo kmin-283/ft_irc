@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:10:31 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 17:33:27 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/09 16:53:59 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,19 @@ TLSServer::~TLSServer(void)
 
 void		TLSServer::init(const char *port)
 {
+	std::cout << "TLS server" << std::endl;
 	Server::init(port);
 	/*tls설정*/
 }
 
-void		TLSServer::start(void)
+void		TLSServer::acceptConnection(void)
 {
+	std::cout << "TLS server" << std::endl;
+	Server::acceptConnection();
+}
+
+void		TLSServer::receiveMessage(const size_t fd)
+{
+	std::cout << "TLS server" << std::endl;
+	Server::receiveMessage(fd);
 }

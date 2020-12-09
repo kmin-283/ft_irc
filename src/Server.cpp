@@ -20,6 +20,7 @@ Server::Server(const char *pass)
 
 Server::~Server(void)
 {
+	this->clearClient();
 }
 
 std::string		Server::getPass(void) const
@@ -39,14 +40,14 @@ void			Server::renewFd(const size_t fd)
 		this->maxFd = fd;
 }
 
-void		Server::init(const char *port)
+void			Server::init(const char *port)
 {
-	int				flag;
+	// int				flag;
 	struct addrinfo	hints;
 	struct addrinfo	*addrInfo;
 	struct addrinfo	*addrInfoIterator;
 
-	flag = 1;
+	// flag = 1;
 	ft_memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
@@ -70,7 +71,7 @@ void		Server::init(const char *port)
 	freeaddrinfo(addrInfo);
 }
 
-void		Server::start(void)
+void			Server::start(void)
 {
 	while(42)
 	{
@@ -89,7 +90,7 @@ void		Server::start(void)
 	}
 }
 
-void		Server::acceptConnection(void)
+void			Server::acceptConnection(void)
 {
 	int					newFd;
 	struct sockaddr_in6	remoteAddress;
@@ -102,57 +103,117 @@ void		Server::acceptConnection(void)
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
 	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
-	std::cout << "accept Connection" << std::endl;
 }
 
-void		Server::receiveMessage(const size_t fd)
+
+void			Server::receiveMessage(const size_t fd)
 {
 	char		buffer;
 	int			readResult;
-	std::string	message("");
+	std::string	message;
 	Client 		*sender;
 
+	message = "";
+	readResult = 0;
 	sender = this->acceptClients[fd];
-	while (CONNECT_FAIL > (readResult = recv(sender->getFd(), &buffer, 1, 0)))
+	while (0 < (readResult = recv(sender->getFd(), &buffer, 1, 0)))
 	{
 		message += buffer;
-		if ("/r/n" == message.substr(message.length() - 2, message.length()))
+		if (2 <= message.length() && "\r\n" == message.substr(message.length() - 2, message.length()))
 		{
-			std::cout << "in" << std::endl;
+			// TODO 커멘트 파싱 필요
+			// TODO 커멘드 처리하는 부분 필요
+			message = "";
 		}
-		message = "";
-		std::cout << "message = " << message << std::endl;
 	}
-	if (readResult == -1)
+	if (readResult == -1 && errno != EAGAIN)
 		throw Server::ReceiveMessageFailException();
-	// else if (readResult == 0)
-	// {
-	// 	// recv함수의 리턴값이 0인경우는 소켓연결이 끊어진것을 의미함
-	// 	std::cerr << "Error: socket " << socket << " disconnected\n";
-	// 	close(socket);
-	// 	// fd를 닫음
-	// 	deleteClient(socket);
-	// 	// 소켓에 해당하는 client객체를 삭제함
-	// 	FD_CLR(socket, &master);
-	// 	// 소켓을 master그룹에서 삭제
-	// }
-	// if (std::string(sender->buff).find("\n") != std::string::npos || sender->count >= 512)
-	// {
-	// 	std::cout << "Received " << sender->buff << " from " << sender->socket << "\n";
-	// 	// 위의 cout 코드 때문에 메시지 길이가 개행 포함 479이상인 경우 프로그램이 멈춤
-	// 	Message msg(sender->buff, sender);
-	// 	// string을 Message로 파싱함
-	// 	exec(msg);
-	// 	// 파싱된 메시지 처리
-	// 	sender->resetBuffer();
-	// 	// client의 buffer 및 count초기화
-	// }
+	else if (readResult == 0)
+	{
+		close(sender->getFd());
+		this->acceptClients.erase(sender->getFd());
+		// TODO sendClients map에서 삭제할 필요 있음
+		FD_CLR(sender->getFd(), &this->readFds);
+		delete sender;
+	}
 }
 
-void		Server::connectServer(std::string address)
+struct addrinfo	*Server::getAddrInfo(std::string info)
 {
-	std::cout <<"addr = " << address << std::endl;
+	int				i;
+	int				j;
+	std::string		port;
+	std::string		address;
+	struct addrinfo	hints;
+	struct addrinfo	*addrInfo;
+
+	std::cout << "get addr info" << std::endl;
+
+	i = info.rfind(":");
+	j = info.rfind(":", i - 1);
+	port = info.substr(j + 1, i - j - 1);
+	address = info.substr(0, j);
+	ft_memset(&hints, 0x00, sizeof(struct addrinfo));
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo(address.c_str(), port.c_str(), &hints, &addrInfo) != 0)
+		throw Server::GetAddressFailException();
+	return (addrInfo);
 }
+
+void			Server::connectServer(std::string address)
+{
+	int					newFd;
+	int					ipVersion;
+	struct addrinfo		*addrInfo;
+	struct addrinfo		*addrInfoIterator;
+
+	ipVersion = AF_INET;
+	addrInfo = this->getAddrInfo(address);
+	for (addrInfoIterator = addrInfo; addrInfoIterator != NULL ; addrInfoIterator = addrInfoIterator->ai_next)
+	{
+		if (addrInfoIterator->ai_family == AF_INET6)
+			ipVersion = AF_INET6;
+	}
+	for (addrInfoIterator = addrInfo; addrInfoIterator != NULL ; addrInfoIterator = addrInfoIterator->ai_next)
+	{
+		if (addrInfoIterator->ai_family == ipVersion)
+		{
+			if (CONNECT_FAIL == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+				throw Server::SocketOpenFailException();
+			if (CONNECT_FAIL == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
+			{
+				close(newFd);
+				std::cerr << ERROR_CONNECT_FAIL << std::endl;
+			}
+		}
+	}
+	freeaddrinfo(addrInfo);
+	fcntl(newFd, F_SETFL, O_NONBLOCK);
+	this->renewFd(newFd);
+	Client *newClient = new Client(newFd);
+	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
+
+	// TODO 서버 등록관련 커멘드 전송 필요
+	// PASS 123 /r/n SERVER 12312
+	std::string password;
+
+	password = address.substr(address.rfind(":") + 1, address.length() - 1);
+	std::cout << "password = " << password << std::endl;
+}
+
+void			Server::clearClient(void)
+{
+	std::map<size_t, Client*>::iterator acceptIter = this->acceptClients.begin();
+	std::map<std::string, Client*>::iterator senderIter = this->sendClients.begin();
+
+	for (;acceptIter != this->acceptClients.end(); acceptIter++)
+		delete acceptIter->second;
+	for (;senderIter != this->sendClients.end(); senderIter++)
+		delete senderIter->second;
+}
+
 
 const char		*Server::GetAddressFailException::what() const throw()
 {
@@ -188,5 +249,3 @@ const char		*Server::ReceiveMessageFailException::what() const throw()
 {
 	return ("ServerException:: Receive message fail");
 }
-
-

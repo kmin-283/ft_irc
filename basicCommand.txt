@@ -1,0 +1,3 @@
+PASS 123
+NICK dakim 
+USER dakim 123 123 

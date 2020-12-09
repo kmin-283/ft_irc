@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:04:30 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/09 13:03:45 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/09 17:00:46 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,23 @@ private:
 	fd_set							readFds;
 	std::map<size_t, Client*>		acceptClients;
 	std::map<std::string, Client*>	sendClients;
+
+	struct addrinfo					*getAddrInfo(std::string info);
+	void							clearClient(void);
+	void							renewFd(const size_t fd);
 public:
-					Server(const char *pass);
-	virtual			~Server(void);
+									Server(const char *pass);
 
-	virtual void	init(const char *port);
-	virtual void	start(void);
-	void			connectServer(const std::string address);
-	void			acceptConnection(void);
-	void			receiveMessage(const size_t fd);
+	virtual							~Server(void);
+	virtual void					init(const char *port);
+	virtual void					acceptConnection(void);
+	virtual void					receiveMessage(const size_t fd);
 
-	std::string		getPass(void) const;
-	int				getSocket(void) const;
-	void			renewFd(const size_t fd);
+	void							start(void);
+	void							connectServer(const std::string address);
+
+	std::string						getPass(void) const;
+	int								getSocket(void) const;
 
 	class GetAddressFailException: public std::exception
 	{

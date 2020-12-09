@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dakim <dakim@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:16:49 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 17:22:08 by dakim            ###   ########.fr       */
+/*   Updated: 2020/12/09 16:53:28 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,9 @@ int main(int argc, char *argv[])
 			else
 				server = new Server(argv[passIndex]);
 			server->init(argv[portIndex]);
-			// if (argc == 4)
-			// 	server->connectServer(argv[networkIndex]);
-			// // TODO 달라질수도 있음
-			server->start();
+			if (argc == 4)
+				server->connectServer(argv[networkIndex]);
+			// server->start();
 			delete server;
 		}
 		else

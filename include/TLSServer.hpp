@@ -6,7 +6,7 @@
 /*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:07:24 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/08 17:33:16 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/09 16:44:53 by kmin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ class				TLSServer : public Server
 					TLSServer(const char *pass);
 	virtual			~TLSServer(void);
 	virtual void	init(const char *port);
-	virtual void	start(void);
+	virtual void	acceptConnection(void);
+	virtual void	receiveMessage(const size_t fd);
+
+
 };
 
 #endif
