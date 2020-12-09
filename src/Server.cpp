@@ -39,7 +39,7 @@ void			Server::renewFd(const size_t fd)
 		this->maxFd = fd;
 }
 
-void		Server::init(char *port)
+void		Server::init(const char *port)
 {
 	int				flag;
 	struct addrinfo	hints;
@@ -72,8 +72,8 @@ void		Server::init(char *port)
 
 void		Server::start(void)
 {
-	// while(42)
-	// {
+	while(42)
+	{
 		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, NULL))
 			throw Server::SelectFailException();
 		for (size_t listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
@@ -82,11 +82,11 @@ void		Server::start(void)
 			{
 				if (listenFd == this->mainSocket)
 					this->acceptConnection();
-				// else
-					// this->receiveMessage(listenFd);
+				else
+					this->receiveMessage(listenFd);
 			}
 		}
-	// }
+	}
 }
 
 void		Server::acceptConnection(void)
@@ -102,6 +102,51 @@ void		Server::acceptConnection(void)
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
 	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
+	std::cout << "accept Connection" << std::endl;
+}
+
+void		Server::receiveMessage(const size_t fd)
+{
+	char		buffer;
+	int			readResult;
+	std::string	message("");
+	Client 		*sender;
+
+	sender = this->acceptClients[fd];
+	while (CONNECT_FAIL > (readResult = recv(sender->getFd(), &buffer, 1, 0)))
+	{
+		message += buffer;
+		if ("/r/n" == message.substr(message.length() - 2, message.length()))
+		{
+			std::cout << "in" << std::endl;
+		}
+		message = "";
+		std::cout << "message = " << message << std::endl;
+	}
+	if (readResult == -1)
+		throw Server::ReceiveMessageFailException();
+	// else if (readResult == 0)
+	// {
+	// 	// recv함수의 리턴값이 0인경우는 소켓연결이 끊어진것을 의미함
+	// 	std::cerr << "Error: socket " << socket << " disconnected\n";
+	// 	close(socket);
+	// 	// fd를 닫음
+	// 	deleteClient(socket);
+	// 	// 소켓에 해당하는 client객체를 삭제함
+	// 	FD_CLR(socket, &master);
+	// 	// 소켓을 master그룹에서 삭제
+	// }
+	// if (std::string(sender->buff).find("\n") != std::string::npos || sender->count >= 512)
+	// {
+	// 	std::cout << "Received " << sender->buff << " from " << sender->socket << "\n";
+	// 	// 위의 cout 코드 때문에 메시지 길이가 개행 포함 479이상인 경우 프로그램이 멈춤
+	// 	Message msg(sender->buff, sender);
+	// 	// string을 Message로 파싱함
+	// 	exec(msg);
+	// 	// 파싱된 메시지 처리
+	// 	sender->resetBuffer();
+	// 	// client의 buffer 및 count초기화
+	// }
 }
 
 void		Server::connectServer(std::string address)
@@ -138,3 +183,10 @@ const char		*Server::AcceptFailException::what() const throw()
 {
 	return ("ServerException:: Accept fail");
 }
+
+const char		*Server::ReceiveMessageFailException::what() const throw()
+{
+	return ("ServerException:: Receive message fail");
+}
+
+
