@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils.hpp                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:07:51 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/09 16:18:26 by kmin             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
@@ -34,7 +22,6 @@
 # include <unistd.h>
 # include <limits.h>
 # include <errno.h>
-# include <error.h>
 
 # define SSL_PORT "6669"
 # define CONNECT_FAIL -1

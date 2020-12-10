@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: seunkim <seunkim@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/07 14:04:30 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/09 17:00:46 by kmin             ###   ########.fr       */
+/*   Updated: 2020/12/10 15:43:03 by seunkim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "utils.hpp"
 # include "Client.hpp"
+# include "Message.hpp"
 
 class				Server
 {

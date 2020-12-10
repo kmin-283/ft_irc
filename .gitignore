@@ -3,4 +3,8 @@ libirc.a
 irserv
 a.out
 bircd
-reference
+reference_mardrid
+reference_paris
+irserv
+.vscode
+test

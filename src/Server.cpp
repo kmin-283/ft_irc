@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:09:56 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/07 16:44:248 by kmin             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
 
 Server::Server(const char *pass)
@@ -103,38 +91,45 @@ void			Server::acceptConnection(void)
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
 	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
+	std::cout << "accept connection success" << std::endl;
 }
-
 
 void			Server::receiveMessage(const size_t fd)
 {
 	char		buffer;
 	int			readResult;
-	std::string	message;
+	std::string	messageStr;
 	Client 		*sender;
 
-	message = "";
+	messageStr = "";
 	readResult = 0;
 	sender = this->acceptClients[fd];
 	while (0 < (readResult = recv(sender->getFd(), &buffer, 1, 0)))
 	{
-		message += buffer;
-		if (2 <= message.length() && "\r\n" == message.substr(message.length() - 2, message.length()))
+		messageStr += buffer;
+		if (2 <= messageStr.length() && "\r\n" == messageStr.substr(messageStr.length() - 2, messageStr.length()))
 		{
+			Message message(messageStr);
+
 			// TODO 커멘트 파싱 필요
 			// TODO 커멘드 처리하는 부분 필요
-			message = "";
+			messageStr = "";
 		}
 	}
 	if (readResult == -1 && errno != EAGAIN)
+	{
+		// TODO에러메시지
 		throw Server::ReceiveMessageFailException();
+	}
 	else if (readResult == 0)
 	{
+		std::cout << "connection fail" << std::endl;
 		close(sender->getFd());
 		this->acceptClients.erase(sender->getFd());
 		// TODO sendClients map에서 삭제할 필요 있음
 		FD_CLR(sender->getFd(), &this->readFds);
 		delete sender;
+		// TODO 테스트 필요
 	}
 }
 
@@ -147,8 +142,7 @@ struct addrinfo	*Server::getAddrInfo(std::string info)
 	struct addrinfo	hints;
 	struct addrinfo	*addrInfo;
 
-	std::cout << "get addr info" << std::endl;
-
+	// TODO address가 제대로 들어왔는지 체크하는 함수필요 할 수 있음
 	i = info.rfind(":");
 	j = info.rfind(":", i - 1);
 	port = info.substr(j + 1, i - j - 1);
@@ -186,6 +180,8 @@ void			Server::connectServer(std::string address)
 			{
 				close(newFd);
 				std::cerr << ERROR_CONNECT_FAIL << std::endl;
+				freeaddrinfo(addrInfo);
+				return ;
 			}
 		}
 	}
@@ -197,6 +193,8 @@ void			Server::connectServer(std::string address)
 
 	// TODO 서버 등록관련 커멘드 전송 필요
 	// PASS 123 /r/n SERVER 12312
+	char buffer[100] ="connect\r\n";
+	send(newClient->getFd(), buffer, 9, 0);
 	std::string password;
 
 	password = address.substr(address.rfind(":") + 1, address.length() - 1);
@@ -247,5 +245,5 @@ const char		*Server::AcceptFailException::what() const throw()
 
 const char		*Server::ReceiveMessageFailException::what() const throw()
 {
-	return ("ServerException:: Receive message fail");
+	return ("ServerException:: Receive messageStr fail");
 }

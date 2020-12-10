@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kmin <kmin@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:16:49 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/09 16:53:28 by kmin             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "ft_irc.hpp"
 
 int main(int argc, char *argv[])
@@ -30,10 +18,17 @@ int main(int argc, char *argv[])
 				server = new TLSServer(argv[passIndex]);
 			else
 				server = new Server(argv[passIndex]);
-			server->init(argv[portIndex]);
-			if (argc == 4)
-				server->connectServer(argv[networkIndex]);
-			// server->start();
+			try
+			{
+				server->init(argv[portIndex]);
+				if (argc == 4)
+					server->connectServer(argv[networkIndex]);
+				server->start();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
 			delete server;
 		}
 		else
