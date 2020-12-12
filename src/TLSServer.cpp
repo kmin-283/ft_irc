@@ -21,7 +21,7 @@ void		TLSServer::acceptConnection(void)
 	Server::acceptConnection();
 }
 
-void		TLSServer::receiveMessage(const size_t fd)
+void		TLSServer::receiveMessage(const int fd)
 {
 	std::cout << "TLS server" << std::endl;
 	Server::receiveMessage(fd);

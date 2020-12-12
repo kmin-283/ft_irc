@@ -2,9 +2,9 @@ libirc.a
 *.o
 irserv
 a.out
-bircd
-reference_mardrid
 reference_paris
+reference_mardrid
+birdc
 irserv
 .vscode
 test

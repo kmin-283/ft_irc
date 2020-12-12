@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: seunkim <seunkim@student.42seoul.kr>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/07 14:04:30 by dakim             #+#    #+#             */
-/*   Updated: 2020/12/10 15:43:03 by seunkim          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
@@ -17,32 +5,35 @@
 # include "Client.hpp"
 # include "Message.hpp"
 
-class				Server
+class														Server
 {
 private:
-	std::string						pass;
-	size_t							mainSocket;
-	size_t							maxFd;
-	fd_set							readFds;
-	std::map<size_t, Client*>		acceptClients;
-	std::map<std::string, Client*>	sendClients;
+	std::string												pass;
+	int														mainSocket;
+	int														maxFd;
+	fd_set													readFds;
+	std::map<int, Client*>								acceptClients;
+	std::map<std::string, Client*>							sendClients;
+	// std::map<std::string, void (*)(Message &, Client &)>	commands;
 
-	struct addrinfo					*getAddrInfo(std::string info);
-	void							clearClient(void);
-	void							renewFd(const size_t fd);
+	struct addrinfo											*getAddrInfo(std::string info);
+	void													clearClient(void);
+	void													renewFd(const int fd);
+	
+	void													passHandler(Message &message, Client &client);
 public:
-									Server(const char *pass);
+															Server(const char *pass);
 
-	virtual							~Server(void);
-	virtual void					init(const char *port);
-	virtual void					acceptConnection(void);
-	virtual void					receiveMessage(const size_t fd);
+	virtual													~Server(void);
+	virtual void											init(const char *port);
+	virtual void											acceptConnection(void);
+	virtual void											receiveMessage(const int fd);
 
-	void							start(void);
-	void							connectServer(const std::string address);
+	void													start(void);
+	void													connectServer(const std::string address);
 
-	std::string						getPass(void) const;
-	int								getSocket(void) const;
+	std::string												getPass(void) const;
+	int														getSocket(void) const;
 
 	class GetAddressFailException: public std::exception
 	{

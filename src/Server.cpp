@@ -21,7 +21,7 @@ int				Server::getSocket(void) const
 	return (this->mainSocket);
 }
 
-void			Server::renewFd(const size_t fd)
+void			Server::renewFd(const int fd)
 {
 	FD_SET(fd, &this->readFds);
 	if (this->maxFd < fd)
@@ -65,7 +65,7 @@ void			Server::start(void)
 	{
 		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, NULL))
 			throw Server::SelectFailException();
-		for (size_t listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
+		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
@@ -90,11 +90,11 @@ void			Server::acceptConnection(void)
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
-	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
+	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
 	std::cout << "accept connection success" << std::endl;
 }
 
-void			Server::receiveMessage(const size_t fd)
+void			Server::receiveMessage(const int fd)
 {
 	char		buffer;
 	int			readResult;
@@ -110,9 +110,8 @@ void			Server::receiveMessage(const size_t fd)
 		if (2 <= messageStr.length() && "\r\n" == messageStr.substr(messageStr.length() - 2, messageStr.length()))
 		{
 			Message message(messageStr);
-
-			// TODO 커멘트 파싱 필요
-			// TODO 커멘드 처리하는 부분 필요
+			// std::cout << message.getPrefix() << " " << message.getCommand() << " " <<  message.getParameter() << std::endl;
+			// this->command()(message, client);
 			messageStr = "";
 		}
 	}
@@ -189,61 +188,26 @@ void			Server::connectServer(std::string address)
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
-	this->acceptClients.insert(std::pair<size_t, Client*>(newFd, newClient));
+	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
 
 	// TODO 서버 등록관련 커멘드 전송 필요
 	// PASS 123 /r/n SERVER 12312
-	char buffer[100] ="connect\r\n";
-	send(newClient->getFd(), buffer, 9, 0);
+	char buffer[100] ="SERVER server 1 1 :2123\r\n";
+	send(newClient->getFd(), buffer, 25, 0);
+
 	std::string password;
 
 	password = address.substr(address.rfind(":") + 1, address.length() - 1);
-	std::cout << "password = " << password << std::endl;
+	// std::cout << "password = " << password << std::endl;
 }
 
 void			Server::clearClient(void)
 {
-	std::map<size_t, Client*>::iterator acceptIter = this->acceptClients.begin();
+	std::map<int, Client*>::iterator acceptIter = this->acceptClients.begin();
 	std::map<std::string, Client*>::iterator senderIter = this->sendClients.begin();
 
 	for (;acceptIter != this->acceptClients.end(); acceptIter++)
 		delete acceptIter->second;
 	for (;senderIter != this->sendClients.end(); senderIter++)
 		delete senderIter->second;
-}
-
-
-const char		*Server::GetAddressFailException::what() const throw()
-{
-	return ("ServerException:: Get address info fail");
-}
-
-const char		*Server::SocketOpenFailException::what() const throw()
-{
-	return ("ServerException:: Socket open fail");
-}
-
-const char		*Server::SocketBindFailException::what() const throw()
-{
-	return ("ServerException:: Socket bind fail");
-}
-
-const char		*Server::SocketListenFailException::what() const throw()
-{
-	return ("ServerException:: Socket listen fail");
-}
-
-const char		*Server::SelectFailException::what() const throw()
-{
-	return ("ServerException:: Select fail");
-}
-
-const char		*Server::AcceptFailException::what() const throw()
-{
-	return ("ServerException:: Accept fail");
-}
-
-const char		*Server::ReceiveMessageFailException::what() const throw()
-{
-	return ("ServerException:: Receive messageStr fail");
 }

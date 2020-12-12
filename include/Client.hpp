@@ -3,14 +3,25 @@
 
 # include "utils.hpp"
 
+enum				ClientStatus
+{
+	UNKNOWN,
+	SERVER,
+	USER,
+	SERVICE
+};
+
 class				Client
 {
 private:
-	size_t			fd;
+	
+	int				fd;
+	ClientStatus	status;
 public:
-					Client(const size_t fd);
+					Client(const int fd);
 					~Client(void);
 	int				getFd(void) const;
+	ClientStatus	getStatus(void) const;
 };
 
 #endif
