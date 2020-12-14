@@ -1,9 +1,12 @@
 #include "Server.hpp"
 
-Server::Server(const char *pass)
-	: pass(std::string(pass)), mainSocket(0), maxFd(0)
+
+Server::Server(const char *pass, const char *port)
+	: pass(std::string(pass)), port(port), mainSocket(0), maxFd(0)
 {
 	FD_ZERO(&this->readFds);
+	this->prefix = std::string(":localhost.") + std::string(this->port);
+	this->commands["PASS"] = &Server::passHandler;
 }
 
 Server::~Server(void)
@@ -28,7 +31,7 @@ void			Server::renewFd(const int fd)
 		this->maxFd = fd;
 }
 
-void			Server::init(const char *port)
+void			Server::init(void)
 {
 	int				flag;
 	struct addrinfo	hints;
@@ -40,7 +43,7 @@ void			Server::init(const char *port)
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	if (getaddrinfo(NULL, port, &hints, &addrInfo) != 0)
+	if (getaddrinfo(NULL, this->port, &hints, &addrInfo) != 0)
 		throw Server::GetAddressFailException();
 	for (addrInfoIterator = addrInfo; addrInfoIterator != NULL ; addrInfoIterator = addrInfoIterator->ai_next)
 	{
@@ -97,10 +100,9 @@ void			Server::acceptConnection(void)
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
 	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
-	std::cout << "connection success" << std::endl;
+	std::cout << "connection success " << std::endl;
 }
 
-#include <stdio.h>
 void			Server::receiveMessage(const int fd)
 {
 	char		buffer;
@@ -117,9 +119,7 @@ void			Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			std::cout << messageStr << std::endl;
-			// std::cout << message.getPrefix() << " " << message.getCommand() << " " <<  message.getParameter() << std::endl;
-			// this->command()(message, client);
+			(this->*(this->commands["PASS"]))(message, *sender);
 			messageStr = "";
 		}
 	}

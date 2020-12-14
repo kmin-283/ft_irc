@@ -1,6 +1,6 @@
 #include "TLSServer.hpp"
 
-TLSServer::TLSServer(const char *pass): Server(pass)
+TLSServer::TLSServer(const char *pass, const char *port): Server(pass, port)
 {
 }
 
@@ -8,10 +8,10 @@ TLSServer::~TLSServer(void)
 {
 }
 
-void		TLSServer::init(const char *port)
+void		TLSServer::init(void)
 {
 	std::cout << "TLS server" << std::endl;
-	Server::init(port);
+	Server::init();
 	/*tls설정*/
 }
 

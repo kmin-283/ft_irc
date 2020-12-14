@@ -32,6 +32,7 @@
 # define ERROR_GET_PROTO_FAIL "Error: Get protocol fail."
 # define ERROR_CONNECT_FAIL "Error: Socket connect fail."
 # define ERROR_SELECT_FAIL "Error: Select fail."
+# define ERROR_PASS_FAIL "Error: Password invalid."
 
 
 int				ft_atoi(char *str);

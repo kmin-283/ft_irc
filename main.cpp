@@ -15,12 +15,12 @@ int main(int argc, char *argv[])
 		if (ft_isdigit(argv[portIndex]))
 		{
 			if (std::string(argv[portIndex]) == std::string(SSL_PORT))
-				server = new TLSServer(argv[passIndex]);
+				server = new TLSServer(argv[passIndex], argv[portIndex]);
 			else
-				server = new Server(argv[passIndex]);
+				server = new Server(argv[passIndex], argv[portIndex]);
 			try
 			{
-				server->init(argv[portIndex]);
+				server->init();
 				if (argc == 4)
 					server->connectServer(argv[networkIndex]);
 				server->start();
