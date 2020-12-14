@@ -30,12 +30,12 @@ void			Server::renewFd(const int fd)
 
 void			Server::init(const char *port)
 {
-	// int				flag;
+	int				flag;
 	struct addrinfo	hints;
 	struct addrinfo	*addrInfo;
 	struct addrinfo	*addrInfoIterator;
 
-	// flag = 1;
+	flag = 1;
 	ft_memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
@@ -48,7 +48,7 @@ void			Server::init(const char *port)
 		{
 			if (CONNECT_FAIL == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 				throw Server::SocketOpenFailException();
-			// setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
+			setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
 			if (CONNECT_FAIL == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
 				throw Server::SocketBindFailException();
 			if (CONNECT_FAIL == (listen(this->mainSocket, SOMAXCONN)))
@@ -61,10 +61,16 @@ void			Server::init(const char *port)
 
 void			Server::start(void)
 {
+	struct timeval timeout;
+
+	timeout.tv_sec = 2;
+	timeout.tv_usec = 0;
 	while(42)
 	{
-		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, NULL))
-			throw Server::SelectFailException();
+		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
+			this->renewFd(listenFd);
+		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
+			std::cerr << ERROR_SELECT_FAIL << std::endl;
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
@@ -91,9 +97,10 @@ void			Server::acceptConnection(void)
 	this->renewFd(newFd);
 	Client *newClient = new Client(newFd);
 	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
-	std::cout << "accept connection success" << std::endl;
+	std::cout << "connection success" << std::endl;
 }
 
+#include <stdio.h>
 void			Server::receiveMessage(const int fd)
 {
 	char		buffer;
@@ -107,20 +114,23 @@ void			Server::receiveMessage(const int fd)
 	while (0 < (readResult = recv(sender->getFd(), &buffer, 1, 0)))
 	{
 		messageStr += buffer;
-		if (2 <= messageStr.length() && "\r\n" == messageStr.substr(messageStr.length() - 2, messageStr.length()))
+		if (buffer == '\n')
 		{
 			Message message(messageStr);
+			std::cout << messageStr << std::endl;
 			// std::cout << message.getPrefix() << " " << message.getCommand() << " " <<  message.getParameter() << std::endl;
 			// this->command()(message, client);
 			messageStr = "";
 		}
 	}
+	
 	if (readResult == -1 && errno != EAGAIN)
 	{
 		// TODO에러메시지
+		// close(sender->getFd());
 		throw Server::ReceiveMessageFailException();
 	}
-	else if (readResult == 0)
+	if (readResult == 0)
 	{
 		std::cout << "connection fail" << std::endl;
 		close(sender->getFd());
@@ -192,8 +202,11 @@ void			Server::connectServer(std::string address)
 
 	// TODO 서버 등록관련 커멘드 전송 필요
 	// PASS 123 /r/n SERVER 12312
-	char buffer[100] ="SERVER server 1 1 :2123\r\n";
-	send(newClient->getFd(), buffer, 25, 0);
+	std::cout << "send" << std::endl;
+	char buffer[100] ="PASS my\r\n";
+	send(newClient->getFd(), buffer, 9, 0);
+	char buffer1[100] ="SERVER localhost.6670 1 :2123\r\n";
+	send(newClient->getFd(), buffer1, 31, 0);
 
 	std::string password;
 

@@ -12,7 +12,7 @@ private:
 	int														mainSocket;
 	int														maxFd;
 	fd_set													readFds;
-	std::map<int, Client*>								acceptClients;
+	std::map<int, Client*>									acceptClients;
 	std::map<std::string, Client*>							sendClients;
 	// std::map<std::string, void (*)(Message &, Client &)>	commands;
 

@@ -26,6 +26,15 @@ TEST_GROUP(MessageParsing)
 	}
 };
 
+TEST(MessageParsing, OnlyNewLine)
+{
+	std::vector<std::string> vector;
+
+	vector.push_back("123");
+	expect("command 123\n");
+	given("", "command", vector);
+}
+
 TEST(MessageParsing, NotPrefix)
 {
 	std::vector<std::string> vector;

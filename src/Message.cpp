@@ -24,7 +24,7 @@ void						Message::skipSpace(std::string::const_iterator &iterator, const std::s
 void						Message::setString(std::string &target, std::string::const_iterator &iterator, const std::string &message)
 {
 	target = "";
-	while (*iterator != ' ' && *iterator != '\r' && iterator != message.end())
+	while (*iterator != ' ' && *iterator != '\r' && *iterator != '\n' && iterator != message.end())
 	{
 		target += *iterator;
 		++iterator;
@@ -36,12 +36,12 @@ void						Message::setParameters(std::string::const_iterator &iterator, const st
 {
 	std::string parameter;
 
-	while (*iterator != '\r')
+	while (*iterator != '\r' && *iterator != '\n')
 	{
 		if (*iterator == ':')
 		{
 			parameter = "";
-			while (*iterator != '\r' && iterator != message.end())
+			while (*iterator != '\r' && *iterator != '\n' && iterator != message.end())
 			{
 				parameter += *iterator;
 				++iterator;

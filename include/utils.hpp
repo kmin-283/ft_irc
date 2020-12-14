@@ -31,6 +31,7 @@
 # define ERROR_SOCKET_OPEN_FAIL "Error: Socket open fail."
 # define ERROR_GET_PROTO_FAIL "Error: Get protocol fail."
 # define ERROR_CONNECT_FAIL "Error: Socket connect fail."
+# define ERROR_SELECT_FAIL "Error: Select fail."
 
 
 int				ft_atoi(char *str);
