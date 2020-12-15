@@ -20,6 +20,10 @@ private:
 	std::string		originNick;
 	std::string		currentNick;
 	std::string		prefix;
+	std::string		userName;
+	std::string		hostName;
+	std::string		serverName;
+	std::string		realName;
 public:
 					Client(const int fd, const bool isAuthorized = false);
 					~Client(void);
@@ -32,6 +36,8 @@ public:
 	void			setOriginNick(const std::string &originNick);
 	std::string		getCurrentNick(void) const;
 	void			setCurrentNick(const std::string &currentNick);
+	void			registerUser(const std::vector<std::string> &parameters);
+	bool			isClientRegistered(void);
 };
 
 #endif

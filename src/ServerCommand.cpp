@@ -12,6 +12,7 @@ void				Server::sendNumericReplies(const std::string &numericReplies, const std:
 	if (ERROR == send(client.getFd(), returnMessage.c_str(), returnMessage.length(), 0))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
 }
+
 void				Server::passHandler(const Message &message, Client &client)
 {
 
@@ -24,6 +25,7 @@ void				Server::passHandler(const Message &message, Client &client)
 		// TODO privmsg함수로 바꿔야함
 		send(client.getFd(), "Password accepted\r\n", 20, 0);
 		client.setIsAuthorized(true);
+
 	}
 }
 
@@ -80,11 +82,29 @@ void				Server::nickHandler(const Message &message, Client &client)
 		if (client.getOriginNick() == "")
 			client.setOriginNick(message.getParameter(0));
 		client.setCurrentNick(message.getParameter(0));
+		if (client.isClientRegistered())
+			client.setStatus(USER);
+		// TODO pass가두번째 또는 세번째 오는경우 처리해야함
+		if (client.getStatus() == USER)
+			std::cout << "client status = client" << std::endl;
 	}
 }
 
-// void				Server::userHandler(const Message &message, Client &client)
-// {
+void				Server::userHandler(const Message &message, Client &client)
+{
+	std::string		userNick;
 
-
-// }
+	userNick = client.getCurrentNick() == "" ? "*" : client.getCurrentNick();
+	if (message.getParameters().size() != 4)
+		this->sendNumericReplies(ERR_NEEDMOREPARAMS, std::string(" ") + userNick + std::string(" USER :Syntax error"), client);
+	// else if ()
+		// this->sendNumericReplies(ERR_ALREADYREGISTRED, std::string(" ") + userNick + std::string(" :Connection already registered"), client);
+	else
+	{
+		client.registerUser(message.getParameters());
+		if (client.isClientRegistered())
+			client.setStatus(USER);
+		if (client.getStatus() == USER)
+			std::cout << "client status = client" << std::endl;
+	}
+}

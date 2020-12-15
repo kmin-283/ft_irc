@@ -8,6 +8,8 @@ Server::Server(const char *pass, const char *port)
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 	this->commands["PASS"] = &Server::passHandler;
 	this->commands["NICK"] = &Server::nickHandler;
+	this->commands["USER"] = &Server::userHandler;
+
 }
 
 Server::~Server(void)
@@ -120,11 +122,11 @@ void			Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			(this->*(this->commands[message.getCommand()]))(message, *sender);
+			if (this->commands.find(message.getCommand()) != this->commands.end())
+				(this->*(this->commands[message.getCommand()]))(message, *sender);
 			messageStr = "";
 		}
 	}
-
 	if (readResult == -1 && errno != EAGAIN)
 	{
 		// TODO에러메시지
