@@ -7,6 +7,7 @@ Server::Server(const char *pass, const char *port)
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 	this->commands["PASS"] = &Server::passHandler;
+	this->commands["NICK"] = &Server::nickHandler;
 }
 
 Server::~Server(void)
@@ -49,12 +50,12 @@ void			Server::init(void)
 	{
 		if (addrInfoIterator->ai_family == AF_INET6)
 		{
-			if (CONNECT_FAIL == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+			if (ERROR == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 				throw Server::SocketOpenFailException();
 			setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
-			if (CONNECT_FAIL == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
+			if (ERROR == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
 				throw Server::SocketBindFailException();
-			if (CONNECT_FAIL == (listen(this->mainSocket, SOMAXCONN)))
+			if (ERROR == (listen(this->mainSocket, SOMAXCONN)))
 				throw Server::SocketListenFailException();
 		}
 	}
@@ -72,7 +73,7 @@ void			Server::start(void)
 	{
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
 			this->renewFd(listenFd);
-		if (CONNECT_FAIL == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
+		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cerr << ERROR_SELECT_FAIL << std::endl;
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
 		{
@@ -94,7 +95,7 @@ void			Server::acceptConnection(void)
 	socklen_t			addressLen;
 
 	addressLen = sizeof(struct sockaddr_in);
-	if (CONNECT_FAIL == (newFd = accept(this->mainSocket, (struct sockaddr*)&remoteAddress, &addressLen)))
+	if (ERROR == (newFd = accept(this->mainSocket, (struct sockaddr*)&remoteAddress, &addressLen)))
 		throw Server::AcceptFailException();
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
@@ -119,11 +120,11 @@ void			Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			(this->*(this->commands["PASS"]))(message, *sender);
+			(this->*(this->commands[message.getCommand()]))(message, *sender);
 			messageStr = "";
 		}
 	}
-	
+
 	if (readResult == -1 && errno != EAGAIN)
 	{
 		// TODO에러메시지
@@ -142,7 +143,7 @@ void			Server::receiveMessage(const int fd)
 	}
 }
 
-struct addrinfo	*Server::getAddrInfo(std::string info)
+struct addrinfo	*Server::getAddrInfo(const std::string info)
 {
 	int				i;
 	int				j;
@@ -183,9 +184,9 @@ void			Server::connectServer(std::string address)
 	{
 		if (addrInfoIterator->ai_family == ipVersion)
 		{
-			if (CONNECT_FAIL == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+			if (ERROR == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 				throw Server::SocketOpenFailException();
-			if (CONNECT_FAIL == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
+			if (ERROR == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
 			{
 				close(newFd);
 				std::cerr << ERROR_CONNECT_FAIL << std::endl;

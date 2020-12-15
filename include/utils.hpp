@@ -23,8 +23,16 @@
 # include <limits.h>
 # include <errno.h>
 
+# include "Message.hpp"
+
+# define LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWYZ"
+# define DIGIT "0123456789"
+# define SPECIAL "-[]\\`^{|}"
+
 # define SSL_PORT "6669"
-# define CONNECT_FAIL -1
+# define ERROR -1
+
+# define CR_LF "\r\n"
 
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
@@ -33,10 +41,13 @@
 # define ERROR_CONNECT_FAIL "Error: Socket connect fail."
 # define ERROR_SELECT_FAIL "Error: Select fail."
 # define ERROR_PASS_FAIL "Error: Password invalid."
+# define ERROR_SEND_FAIL "Error: Send message fail."
 
+class			Message;
 
-int				ft_atoi(char *str);
 bool			ft_isdigit(char *str);
 void			*ft_memset(void *s, int c, size_t n);
+bool			isValidFormat(const std::string &key, const char &message);
+bool			isValidNickname(const Message &message);
 
 #endif

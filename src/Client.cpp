@@ -1,10 +1,10 @@
 #include "Client.hpp"
 
 Client::Client(const int fd, const bool isAuthorized)
-	: fd(fd), status(UNKNOWN), isAuthorized(isAuthorized)
+	: fd(fd), status(UNKNOWN), isAuthorized(isAuthorized), originNick(""), currentNick("")
 {
 }
- 
+
 Client::~Client(void)
 {
 }
@@ -33,4 +33,24 @@ bool			Client::getIsAuthorized(void) const
 void			Client::setIsAuthorized(bool isAuthorized)
 {
 	this->isAuthorized = isAuthorized;
+}
+
+std::string		Client::getOriginNick(void) const
+{
+	return (this->originNick);
+}
+
+void			Client::setOriginNick(const std::string &originNick)
+{
+	this->originNick = originNick;
+}
+
+std::string		Client::getCurrentNick(void) const
+{
+	return (this->currentNick);
+}
+
+void			Client::setCurrentNick(const std::string &currentNick)
+{
+	this->currentNick = currentNick;
 }
