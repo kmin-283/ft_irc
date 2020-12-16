@@ -31,6 +31,7 @@
 
 # define SSL_PORT "6669"
 # define ERROR -1
+# define ERROR_STR "ERROR"
 
 # define CR_LF "\r\n"
 

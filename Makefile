@@ -10,7 +10,7 @@ OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
 TEST_NAME = test
-TEST = AllTests.cpp MessageParsingTest.cpp
+TEST = AllTests.cpp MessageParsingTest.cpp MessageConstructTest.cpp
 TEST_DIR = ./tests/
 TESTS = $(addprefix $(TEST_DIR), $(TEST))
 OBJS_T = $(TESTS:%.cpp=%.o)

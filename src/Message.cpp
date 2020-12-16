@@ -1,14 +1,33 @@
 #include "Message.hpp"
 
-Message::Message(const std::string message)
+/**
+ *
+ *  :prefix command param :param param
+ *
+ **/
+
+Message::Message(const std::string &message)
+ : totalMessage(message)
 {
 	std::string::const_iterator		messageIterator;
-    // :prefix command param :param param
 	messageIterator = message.begin();
 	if (*messageIterator == ':')
 		this->setString(this->prefix, messageIterator, message);
 	this->setString(this->command, messageIterator, message);
 	this->setParameters(messageIterator, message);
+}
+
+Message::Message(const std::string &prefix, const std::string &command, const std::string &parameters)
+ : prefix(prefix), command(command)
+{
+	std::string	tmpParameters;
+	std::string::const_iterator	iterator;
+
+	tmpParameters = parameters;
+	tmpParameters += CR_LF;
+	iterator = tmpParameters.begin();
+	this->setTotalMessage(prefix, command, parameters);
+	this->setParameters(iterator, tmpParameters);
 }
 
 Message::~Message(void)
@@ -19,6 +38,18 @@ void						Message::skipSpace(std::string::const_iterator &iterator, const std::s
 {
 	while (*iterator == ' ' && iterator != message.end())
 		++iterator;
+}
+
+void						Message::setTotalMessage(const std::string &prefix, const std::string &command, const std::string &parameters)
+{
+	this->totalMessage = "";
+	this->totalMessage += prefix;
+	if (prefix != "")
+		this->totalMessage += " ";
+	this->totalMessage += command;
+	this->totalMessage += " ";
+	this->totalMessage += parameters;
+	this->totalMessage += CR_LF;
 }
 
 void						Message::setString(std::string &target, std::string::const_iterator &iterator, const std::string &message)
@@ -81,6 +112,11 @@ std::string					Message::getParameter(int index) const
 std::vector<std::string>	Message::getParameters(void) const
 {
 	return (this->parameters);
+}
+
+const std::string			&Message::getTotalMessage(void) const
+{
+	return (this->totalMessage);
 }
 
 void		printData(Message message)

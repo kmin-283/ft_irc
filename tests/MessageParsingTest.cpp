@@ -16,6 +16,7 @@ TEST_GROUP(MessageParsing)
 
 		i = -1;
 		index = parameters.size();
+		CHECK_EQUAL(message.getTotalMessage(), messageStr);
 		CHECK_EQUAL(message.getPrefix(), prefix);
 		CHECK_EQUAL(message.getCommand(), command);
 		CHECK_EQUAL(message.getParameters().size(), parameters.size());

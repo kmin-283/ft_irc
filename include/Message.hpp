@@ -6,6 +6,7 @@
 class							Message
 {
 private:
+	std::string					totalMessage;
 	std::string					prefix;
 	std::string					command;
 	std::vector<std::string>	parameters;
@@ -13,13 +14,16 @@ private:
 	void						setString(std::string &target, std::string::const_iterator &iterator, const std::string &message);
 	void						setParameters(std::string::const_iterator &iterator, const std::string &message);
 	void						setVector(std::vector<std::string> &vector, std::string &parameter);
+	void						setTotalMessage(const std::string &prefix, const std::string &message, const std::string &parameters);
 public:
-									Message(const std::string message);
+									Message(const std::string &message);
+									Message(const std::string &prefix, const std::string &command, const std::string &parameters);
 									~Message(void);
 	std::string						getPrefix(void) const;
 	std::string						getCommand(void) const;
 	std::string						getParameter(int index) const;
 	std::vector<std::string>		getParameters(void) const;
+	const std::string				&getTotalMessage(void) const;
 };
 
 #endif

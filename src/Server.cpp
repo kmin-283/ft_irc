@@ -127,22 +127,14 @@ void			Server::receiveMessage(const int fd)
 			messageStr = "";
 		}
 	}
-	if (readResult == -1 && errno != EAGAIN)
-	{
-		// TODO에러메시지
-		// close(sender->getFd());
-		throw Server::ReceiveMessageFailException();
-	}
+	// if (readResult == -1 && errno != EAGAIN)
+	// {
+	// 	// TODO에러메시지
+	// 	// close(sender->getFd());
+	// 	throw Server::ReceiveMessageFailException();
+	// }
 	if (readResult == 0)
-	{
-		std::cout << "connection fail" << std::endl;
-		close(sender->getFd());
-		this->acceptClients.erase(sender->getFd());
-		// TODO sendClients map에서 삭제할 필요 있음
-		FD_CLR(sender->getFd(), &this->readFds);
-		delete sender;
-		// TODO 테스트 필요
-	}
+		this->disconnectClient(sender);
 }
 
 struct addrinfo	*Server::getAddrInfo(const std::string info)
@@ -226,4 +218,16 @@ void			Server::clearClient(void)
 		delete acceptIter->second;
 	for (;senderIter != this->sendClients.end(); senderIter++)
 		delete senderIter->second;
+}
+
+void			Server::disconnectClient(Client *&client)
+{
+	std::cout << "connection fail" << std::endl;
+	close(client->getFd());
+	this->acceptClients.erase(client->getFd());
+	// this->sendClients.erase(client->getCurrentNick());
+	// TODO sendClients map에서 삭제할 필요 있음
+	FD_CLR(client->getFd(), &this->readFds);
+	delete client;
+	// TODO 테스트 필요
 }

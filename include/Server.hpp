@@ -6,6 +6,10 @@
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 
+/**
+ *
+ **/
+
 class																	Server
 {
 private:
@@ -27,7 +31,9 @@ private:
 	void																nickHandler(const Message &message, Client &client);
 	void																userHandler(const Message &message, Client &client);
 
-	void																sendNumericReplies(const std::string &numericReplies, const std::string &replyString, Client &client);
+	void																sendNumericReplies(const Message &message, Client &client);
+
+	void																disconnectClient(Client *&client);
 public:
 																		Server(const char *pass, const char *port);
 	virtual																~Server(void);
