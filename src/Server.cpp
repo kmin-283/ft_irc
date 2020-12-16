@@ -9,7 +9,7 @@ Server::Server(const char *pass, const char *port)
 	this->commands["PASS"] = &Server::passHandler;
 	this->commands["NICK"] = &Server::nickHandler;
 	this->commands["USER"] = &Server::userHandler;
-
+	this->commands["SERVER"] = &Server::serverHandler;
 }
 
 Server::~Server(void)
@@ -123,7 +123,7 @@ void			Server::receiveMessage(const int fd)
 		{
 			Message message(messageStr);
 			if (this->commands.find(message.getCommand()) != this->commands.end())
-				(this->*(this->commands[message.getCommand()]))(message, *sender);
+				(this->*(this->commands[message.getCommand()]))(message, sender);
 			messageStr = "";
 		}
 	}
@@ -206,7 +206,6 @@ void			Server::connectServer(std::string address)
 	std::string password;
 
 	password = address.substr(address.rfind(":") + 1, address.length() - 1);
-	// std::cout << "password = " << password << std::endl;
 }
 
 void			Server::clearClient(void)
@@ -220,14 +219,13 @@ void			Server::clearClient(void)
 		delete senderIter->second;
 }
 
-void			Server::disconnectClient(Client *&client)
+void			Server::disconnectClient(Client *client)
 {
-	std::cout << "connection fail" << std::endl;
+	std::cout << "disconnect " << std::endl;
 	close(client->getFd());
 	this->acceptClients.erase(client->getFd());
 	// this->sendClients.erase(client->getCurrentNick());
 	// TODO sendClients map에서 삭제할 필요 있음
 	FD_CLR(client->getFd(), &this->readFds);
 	delete client;
-	// TODO 테스트 필요
 }

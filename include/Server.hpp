@@ -3,10 +3,12 @@
 
 # include "utils.hpp"
 # include "Client.hpp"
+# include "Host.hpp"
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 
 /**
+ *
  *
  **/
 
@@ -21,19 +23,20 @@ private:
 	fd_set																readFds;
 	std::map<int, Client*>												acceptClients;
 	std::map<std::string, Client*>										sendClients;
-	std::map<std::string, void (Server::*)(const Message &, Client &)>	commands;
+	std::map<std::string, void (Server::*)(const Message &, Client *)>	commands;
 
 	struct addrinfo														*getAddrInfo(const std::string info);
 	void																clearClient(void);
 	void																renewFd(const int fd);
 
-	void																passHandler(const Message &message, Client &client);
-	void																nickHandler(const Message &message, Client &client);
-	void																userHandler(const Message &message, Client &client);
+	void																passHandler(const Message &message, Client *client);
+	void																nickHandler(const Message &message, Client *client);
+	void																userHandler(const Message &message, Client *client);
+	void																serverHandler(const Message &message, Client *client);
 
-	void																sendNumericReplies(const Message &message, Client &client);
+	void																sendNumericReplies(const Message &message, Client *client);
 
-	void																disconnectClient(Client *&client);
+	void																disconnectClient(Client *client);
 public:
 																		Server(const char *pass, const char *port);
 	virtual																~Server(void);
