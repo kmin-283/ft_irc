@@ -1,3 +1,0 @@
-PASS 123
-NICK seungwookim
-USER seungwookim seungwookim 127.0.0.1 :seungwoo kim
