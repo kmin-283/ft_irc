@@ -101,32 +101,30 @@ void			Server::acceptConnection(void)
 		throw Server::AcceptFailException();
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
-	Client *newClient = new Client(newFd);
-	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
-	std::cout << "connection success " << std::endl;
+	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd, false)));
+	std::cout << "accept connection" << std::endl;
 }
 
 void			Server::receiveMessage(const int fd)
 {
+	int			ret;
 	char		buffer;
 	int			readResult;
 	std::string	messageStr;
-	Client 		*sender;
+	Client 		&sender = this->acceptClients[fd];
 
 	messageStr = "";
 	readResult = 0;
-	sender = this->acceptClients[fd];
-	while (0 < (readResult = recv(sender->getFd(), &buffer, 1, 0)))
+	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
 	{
 		messageStr += buffer;
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
 			if (this->commands.find(message.getCommand()) != this->commands.end())
-			{
-				(this->*(this->commands[message.getCommand()]))(message, sender);
+				ret = (this->*(this->commands[message.getCommand()]))(message, &sender);
+			if (ret == ERROR)
 				return ;
-			}
 			messageStr = "";
 		}
 	}
@@ -137,7 +135,7 @@ void			Server::receiveMessage(const int fd)
 	// 	throw Server::ReceiveMessageFailException();
 	// }
 	if (readResult == 0)
-		this->disconnectClient(sender);
+		this->disconnectClient(&sender);
 }
 
 struct addrinfo	*Server::getAddrInfo(const std::string info)
@@ -195,16 +193,16 @@ void			Server::connectServer(std::string address)
 	freeaddrinfo(addrInfo);
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
-	Client *newClient = new Client(newFd);
-	this->acceptClients.insert(std::pair<int, Client*>(newFd, newClient));
+	Client newClient(newFd);
+	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 
 	// TODO 서버 등록관련 커멘드 전송 필요
 	// PASS 123 /r/n SERVER 12312
 	std::cout << "send" << std::endl;
 	char buffer[100] ="PASS my\r\n";
-	send(newClient->getFd(), buffer, 9, 0);
+	send(newClient.getFd(), buffer, 9, 0);
 	char buffer1[100] ="SERVER localhost.6670 1 :2123\r\n";
-	send(newClient->getFd(), buffer1, 31, 0);
+	send(newClient.getFd(), buffer1, 31, 0);
 
 	std::string password;
 
@@ -213,23 +211,29 @@ void			Server::connectServer(std::string address)
 
 void			Server::clearClient(void)
 {
-	std::map<int, Client*>::iterator acceptIter = this->acceptClients.begin();
-	std::map<std::string, Client*>::iterator senderIter = this->sendClients.begin();
+	// std::map<int, Client>::iterator acceptIter = this->acceptClients.begin();
+	// std::map<std::string, Client>::iterator senderIter = this->sendClients.begin();
 
-	for (;acceptIter != this->acceptClients.end(); acceptIter++)
-		delete acceptIter->second;
-	for (;senderIter != this->sendClients.end(); senderIter++)
-		delete senderIter->second;
+	// for (;acceptIter != this->acceptClients.end(); acceptIter++)
+	// 	delete acceptIter->second;
+	// for (;senderIter != this->sendClients.end(); senderIter++)
+	// 	delete senderIter->second;
 }
 
 void			Server::disconnectClient(Client *client)
 {
 	std::cout << "disconnect " << std::endl;
 	close(client->getFd());
-	this->acceptClients.erase(client->getFd());
-	// if (client->status == USER)
-	// 	this->sendClients.erase(client->getCurrentNick());
-	// TODO sendClients map에서 삭제할 필요 있음
 	FD_CLR(client->getFd(), &this->readFds);
-	delete client;
+	this->acceptClients.erase(client->getFd());
+	// this->sendClients.erase(client->getCurrentNick());
+	// TODO sendClients map에서 삭제할 필요 있음
+	
+}
+
+void				Server::sendNumericReplies(const Message &message, Client *client)
+{
+	// if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
+	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
+		std::cerr << ERROR_SEND_FAIL << std::endl;
 }

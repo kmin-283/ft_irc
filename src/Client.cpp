@@ -1,10 +1,9 @@
 #include "Client.hpp"
-
+Client::Client()
+{}
 Client::Client(const int fd, const bool isAuthorized)
-	: fd(fd), isAuthorized(isAuthorized)
-{
-}
-
+	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN)
+{}
 Client::~Client(void)
 {
 }
@@ -87,4 +86,13 @@ bool			Client::isClientRegistered(void)
 	return (true);
 }
 
+void			Client::setInfo(const Message &message)
+{
+	this->setStatus(SERVER);
+	this->Info.assign(4, "");
+	this->Info[SERVERNAME] = message.getParameter(0);
+	this->Info[HOPCOUNT] = message.getParameter(1);
+	this->Info[SERVERINFO] = message.getParameter(2);
+	// client->Info[PARENTSERVER] = message. //????
+}
 

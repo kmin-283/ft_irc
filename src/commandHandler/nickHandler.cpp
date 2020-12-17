@@ -1,28 +1,4 @@
 #include "Server.hpp"
-
-
-void				Server::sendNumericReplies(const Message &message, Client *client)
-{
-	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
-		std::cerr << ERROR_SEND_FAIL << std::endl;
-}
-
-void				Server::passHandler(const Message &message, Client *client)
-{
-	if (message.getParameters().empty())
-		this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, " :Not enough parameters"), client);
-	else if (client->getIsAuthorized())
-		this->sendNumericReplies(Message(this->prefix, ERR_ALREADYREGISTRED, " :You already reregistered"), client);
-	else if (this->pass == message.getParameter(0))
-	{
-		// TODO privmsg함수로 바꿔야함
-		send(client->getFd(), "Password accepted\r\n", 20, 0);
-		client->setIsAuthorized(true);
-	}
-	else
-		this->sendNumericReplies(Message("", ERROR_STR, ": You put a wrong Password"), client);
-}
-
 /**
  * NICK 중복처리 케이스
  *
@@ -88,7 +64,7 @@ void				Server::passHandler(const Message &message, Client *client)
  * 		=> server에서 client관리하는 자료구조 갱신
 */
 
-void				Server::nickHandler(const Message &message, Client *client)
+int					Server::nickHandler(const Message &message, Client *client)
 {
 	(void)message;
 	(void)client;
@@ -133,66 +109,6 @@ void				Server::nickHandler(const Message &message, Client *client)
 	// 	if (client->getStatus() == USER)
 	// 		std::cout << "client status = client" << std::endl;
 	// }
+	return (0);
 }
 
-void				Server::userHandler(const Message &message, Client *client)
-{
-	(void)message;
-	(void)client;
-	// std::string		userNick;
-
-	// userNick = client->getCurrentNick() == "" ? "*" : client->getCurrentNick();
-	// if (message.getParameters().size() != 4)
-		// this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, std::string(" ") + userNick + std::string(" USER :Syntax error")), client);
-	// else if ()
-		// this->sendNumericReplies(ERR_ALREADYREGISTRED, std::string(" ") + userNick + std::string(" :Connection already registered"), client);
-	// else if (!client->getIsAuthorized())
-	// 	this->sendNumericReplies(Message(this->prefix, ERROR_STR, std::string(" ") + userNick + std::string(":Bad password")), client);
-	// else
-	// {
-	// 	client->registerUser(message.getParameters());
-	// 	if (client->isClientRegistered())
-	// 		client->setStatus(USER);
-	// 	if (client->getStatus() == USER)
-	// 		std::cout << "client status = client" << std::endl;
-	// }
-}
-
-/**
- * 1. PASS 인증 한 경우
- * 	1-1. 인자가 제대로 들어온 경우
- * 		1-1-1. 서버 명 중복
- * 		=> ERROR :ID "localhost.6670" already registered
- * 		=> 연결 해제
- * 		1-1-2. 서버 명 중복 x
- * 			1-1-2-1. 직접 연결된 서버인 경우
- * 			=> :irc.example.net SERVER irc.example.net 1 :Server Info Text
- * 			1-1-2-2. 직접 연결되지 않은 서버인 경우
- * 			=> :irc.example.net SERVER localhost.6671 2 3 :123123
- * 	1-2. 인자가 제대로 들어오지 않은 경우
- * 	=> 461에러 리턴
- * 2. PASS 인증 하지 않은 경우 v
- * => 461
- * => 함수 종료
- **/
-
-
-void				Server::serverHandler(const Message &message, Client *client)
-{
-	if (!client->getIsAuthorized() || 3 > message.getParameters().size()
-	|| message.getParameter(0).find('.') == std::string::npos)
-	{
-		this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
-		return ;
-	}	
-	if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
-	|| (this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
-	{
-		std::cout << "server haneler2" << std::endl;
-		this->sendNumericReplies(Message("", "ERROR", " :ID " + message.getParameter(0) + " already registered"), client);
-		this->disconnectClient(client);
-		return ;
-	}
-	this->sendClients[message.getParameter(0)] = client;
-	// 연결된 다른 서버에 서버 알리기
-}

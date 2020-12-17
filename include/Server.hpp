@@ -20,18 +20,18 @@ private:
 	int																	mainSocket;
 	int																	maxFd;
 	fd_set																readFds;
-	std::map<int, Client*>												acceptClients;
-	std::map<std::string, Client*>										sendClients;
-	std::map<std::string, void (Server::*)(const Message &, Client *)>	commands;
+	std::map<int, Client>												acceptClients;
+	std::map<std::string, Client>										sendClients;
+	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 
 	struct addrinfo														*getAddrInfo(const std::string info);
 	void																clearClient(void);
 	void																renewFd(const int fd);
 
-	void																passHandler(const Message &message, Client *client);
-	void																nickHandler(const Message &message, Client *client);
-	void																userHandler(const Message &message, Client *client);
-	void																serverHandler(const Message &message, Client *client);
+	int																	passHandler(const Message &message, Client *client);
+	int																	nickHandler(const Message &message, Client *client);
+	int																	userHandler(const Message &message, Client *client);
+	int																	serverHandler(const Message &message, Client *client);
 
 	void																sendNumericReplies(const Message &message, Client *client);
 
@@ -48,6 +48,7 @@ public:
 
 	std::string															getPass(void) const;
 	int																	getSocket(void) const;
+
 
 	class GetAddressFailException: public std::exception
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dakim <dakim@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: seunkim <seunkim@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/12 16:09:45 by dakim             #+#    #+#             */
-/*   Updated: 2020/06/07 17:37:48 by dakim            ###   ########.fr       */
+/*   Updated: 2020/12/17 10:52:06 by seunkim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,17 +65,17 @@ t_g_list	*ft_g_lstlast(t_g_list *lst)
 	return (lst);
 }
 
-int			ft_g_lstadd_back(t_g_list **lst, t_g_list *new)
+int			ft_g_lstadd_back(t_g_list **lst, t_g_list *new_list)
 {
-	if (new && lst)
+	if (new_list && lst)
 	{
 		if (ft_g_lstlast(*lst))
-			ft_g_lstlast(*lst)->next = new;
+			ft_g_lstlast(*lst)->next = new_list;
 		else
-			(*lst) = new;
+			(*lst) = new_list;
 		return (0);
 	}
-	else if (new)
-		free(new);
+	else if (new_list)
+		free(new_list);
 	return (1);
 }

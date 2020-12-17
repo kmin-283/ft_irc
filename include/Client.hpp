@@ -13,13 +13,36 @@ enum				ClientStatus
 
 enum				UserIndex
 {
-
+	PREFIX,
+	ORIGINNICK,
+	CURRENTNICK,
+	USERNAME
 };
 
 enum				ServerIndex
 {
-
+	PARENTSERVER,
+	SERVERNAME,
+	HOPCOUNT,
+	SERVERINFO,
 };
+
+// Ng - Sa - Sb
+// Sa - Ng - Sb
+
+// Sa - Sb - Sc - Sd - Se
+//		|
+// 		Sf
+// (Sc)
+// Sc fd(Sb = fd)
+// Sc Sb prefix, Hostname,ServerName
+
+// Sa 
+//  |
+// / \
+// Sb Sc
+// /
+// Sd
 // Client(fd)	-> User -> User
 // 			-> Host -> Host
 
@@ -42,8 +65,6 @@ private:
 	bool			isAuthorized;
 	ClientStatus	status;
 
-	std::vector<int>	clientInfo;
-
 	std::string		prefix;
 	std::string		originNick;
 	std::string		currentNick;
@@ -51,7 +72,11 @@ private:
 	std::string		hostName;
 	std::string		serverName;
 	std::string		realName;
+
+	std::vector<std::string>	Info;
+
 public:
+					Client();
 					Client(const int fd, const bool isAuthorized = false);
 					~Client(void);
 	int				getFd(void) const;
@@ -65,6 +90,8 @@ public:
 	void			setCurrentNick(const std::string &currentNick);
 	void			registerUser(const std::vector<std::string> &parameters);
 	bool			isClientRegistered(void);
+	void			setInfo(const Message &message);
+
 };
 
 #endif
