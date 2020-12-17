@@ -19,6 +19,8 @@ void				Server::passHandler(const Message &message, Client *client)
 		send(client->getFd(), "Password accepted\r\n", 20, 0);
 		client->setIsAuthorized(true);
 	}
+	else
+		this->sendNumericReplies(Message("", ERROR_STR, ": You put a wrong Password"), client);
 }
 
 /**
@@ -177,16 +179,12 @@ void				Server::userHandler(const Message &message, Client *client)
 
 void				Server::serverHandler(const Message &message, Client *client)
 {
-	Host			*newHost;
-
-	std::cout << "server handler1" << std::endl;
 	if (!client->getIsAuthorized() || 3 > message.getParameters().size()
 	|| message.getParameter(0).find('.') == std::string::npos)
 	{
 		this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
 		return ;
-	}
-	std::cout << "if out" << std::endl;
+	}	
 	if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
 	|| (this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
 	{
@@ -195,12 +193,6 @@ void				Server::serverHandler(const Message &message, Client *client)
 		this->disconnectClient(client);
 		return ;
 	}
-	std::cout << "last out" << std::endl;
-	newHost = new Host(message, client->getFd(), client->getIsAuthorized());
-	delete client;
-	std::cout << "server end" << std::endl;
-	this->acceptClients[client->getFd()] = newHost;
-	this->sendClients[newHost->getServerName()] = newHost;
-	// this->serverMap[newHost->getServerName()] = newHost;
+	this->sendClients[message.getParameter(0)] = client;
 	// 연결된 다른 서버에 서버 알리기
 }

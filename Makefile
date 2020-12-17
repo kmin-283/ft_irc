@@ -1,9 +1,9 @@
 CC = clang++
-CFLAGS = -Wall -Werror -Wextra -std=c++98
+CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra -std=c++98
 NAME = ircserv
 INCLUDE = -I ./include/
 
-SRC = Server.cpp ServerException.cpp ServerCommand.cpp TLSServer.cpp Client.cpp Host.cpp utils.cpp Message.cpp
+SRC = Server.cpp ServerException.cpp ServerCommand.cpp TLSServer.cpp Client.cpp utils.cpp Message.cpp
 SRC_DIR = ./src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)

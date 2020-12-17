@@ -1,6 +1,4 @@
-#include "CppUTest/TestHarness.h"
-#include "Message.hpp"
-
+#include "ft_hpp.hpp"
 TEST_GROUP(MessageConstructTest)
 {
 	std::string prefixStr;

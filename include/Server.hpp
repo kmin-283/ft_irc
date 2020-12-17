@@ -3,7 +3,6 @@
 
 # include "utils.hpp"
 # include "Client.hpp"
-# include "Host.hpp"
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 

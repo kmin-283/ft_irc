@@ -123,7 +123,10 @@ void			Server::receiveMessage(const int fd)
 		{
 			Message message(messageStr);
 			if (this->commands.find(message.getCommand()) != this->commands.end())
+			{
 				(this->*(this->commands[message.getCommand()]))(message, sender);
+				return ;
+			}
 			messageStr = "";
 		}
 	}
@@ -224,7 +227,8 @@ void			Server::disconnectClient(Client *client)
 	std::cout << "disconnect " << std::endl;
 	close(client->getFd());
 	this->acceptClients.erase(client->getFd());
-	// this->sendClients.erase(client->getCurrentNick());
+	// if (client->status == USER)
+	// 	this->sendClients.erase(client->getCurrentNick());
 	// TODO sendClients map에서 삭제할 필요 있음
 	FD_CLR(client->getFd(), &this->readFds);
 	delete client;
