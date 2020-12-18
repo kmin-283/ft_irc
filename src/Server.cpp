@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-
 Server::Server(const char *pass, const char *port)
 	: pass(std::string(pass)), info(": kmin seunkim dakim made this server."), port(port), mainSocket(0), maxFd(0)
 {
@@ -15,14 +14,14 @@ Server::Server(const char *pass, const char *port)
 Server::~Server(void)
 {}
 
-void			Server::renewFd(const int fd)
+void					Server::renewFd(const int fd)
 {
 	FD_SET(fd, &this->readFds);
 	if (this->maxFd < fd)
 		this->maxFd = fd;
 }
 
-void			Server::init(void)
+void					Server::init(void)
 {
 	int				flag;
 	struct addrinfo	hints;
@@ -53,7 +52,7 @@ void			Server::init(void)
 	freeaddrinfo(addrInfo);
 }
 
-void			Server::start(void)
+void					Server::start(void)
 {
 	struct timeval timeout;
 
@@ -78,7 +77,7 @@ void			Server::start(void)
 	}
 }
 
-void			Server::connectClient(void)
+void					Server::connectClient(void)
 {
 	int					newFd;
 	struct sockaddr_in6	remoteAddress;
@@ -93,7 +92,7 @@ void			Server::connectClient(void)
 	std::cout << "Connect client." << std::endl;
 }
 
-void			Server::receiveMessage(const int fd)
+void					Server::receiveMessage(const int fd)
 {
 	char		buffer;
 	int			readResult;
@@ -109,8 +108,8 @@ void			Server::receiveMessage(const int fd)
 		messageStr += buffer;
 		if (buffer == '\n')
 		{
-			std::cout << messageStr << std::endl;
 			Message message(messageStr);
+			std::cout << "Reveive message = " << messageStr;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr = "";
@@ -142,10 +141,12 @@ static struct addrinfo	*getAddrInfo(const std::string info)
 	hints.ai_socktype = SOCK_STREAM;
 	if (getaddrinfo(address.c_str(), port.c_str(), &hints, &addrInfo) != 0)
 		throw Server::GetAddressFailException();
+	if (addrInfo == NULL)
+		std::cout << "addrinfo NULL" << std::endl;
 	return (addrInfo);
 }
 
-void			Server::connectServer(std::string address)
+void					Server::connectServer(std::string address)
 {
 	int					newFd;
 	int					ipVersion;
@@ -164,10 +165,8 @@ void			Server::connectServer(std::string address)
 		if (addrInfoIterator->ai_family == ipVersion)
 		{
 			if (ERROR == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
-			{
 				throw Server::SocketOpenFailException();
-			}
-			if (ERROR == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
+			if (connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen) < 0)
 			{
 				close(newFd);
 				std::cerr << ERROR_CONNECT_FAIL << std::endl;
@@ -189,7 +188,7 @@ void			Server::connectServer(std::string address)
 	std::cout << "Connect other server." << std::endl;
 }
 
-void			Server::disconnectClient(Client *client)
+void					Server::disconnectClient(Client *client)
 {
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
@@ -205,18 +204,13 @@ void			Server::disconnectClient(Client *client)
 	std::cout << "Disconnect client." << std::endl;
 }
 
-void				Server::sendMessage(const Message &message, Client *client)
+void					Server::sendMessage(const Message &message, Client *client)
 {
-	std::cout << "send message" << std::endl;
 	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
-	{
-		std::cout << "in" << std::endl;
 		std::cerr << ERROR_SEND_FAIL << std::endl;
-	}
-	std::cout << "send message end" << std::endl;
 }
 
-void				Server::broadcastMessage(const Message &message, Client *client)
+void					Server::broadcastMessage(const Message &message, Client *client)
 {
 	std::map<std::string, Client *>::iterator	iterator;
 
