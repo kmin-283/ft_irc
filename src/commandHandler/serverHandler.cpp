@@ -39,6 +39,10 @@ static void			broadcasting(const std::map<std::string, Client*> &serverList, con
 
 int					Server::serverHandler(const Message &message, Client *client)
 {
+	client->setInfo(SERVERNAME, "123123");
+	std::cout << client->getInfo(SERVERNAME);
+
+	
 	if (!client->getIsAuthorized()) // 얘를 어떻게 처리할 것인가
 		std::cout << "111\n";
 	
@@ -48,7 +52,7 @@ int					Server::serverHandler(const Message &message, Client *client)
 	|| (message.getParameter(0).find('.') == std::string::npos))
 	// || (message.getPrefix() != client->getPrefix()))
 	{
-		this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
+		this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
 		return (ERROR);
 	}
 	if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
@@ -56,12 +60,12 @@ int					Server::serverHandler(const Message &message, Client *client)
 	this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
 	{
 		std::cout << "server haneler2" << std::endl;
-		this->sendNumericReplies(Message("", "ERROR", " :ID " + message.getParameter(0) + " already registered"), client);
+		this->sendMessage(Message("", "ERROR", " :ID " + message.getParameter(0) + " already registered"), client);
 		// this->disconnectClient(client);
-		return (ERROR);
+		return (DISCONNECT);
 	}
 	// 클라이언트가 이미 존재하나, hopcount가 다른 경우 새로운 클라이언트를 생성해서 맵에 추가
-	client->setInfo(message, this->prefix);
+	// client->setInfo(message, this->prefix);
 	this->sendClients[message.getParameter(0)] = *client;
 	if (client->getInfo(HOPCOUNT) == "1")
 		this->serverList[message.getParameter(0)] = client; // 추가함

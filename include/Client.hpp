@@ -61,40 +61,28 @@ enum				ServerIndex
 class				Client
 {
 private:
-	int				fd;
-	bool			isAuthorized;
-	ClientStatus	status;
-
-	std::string		prefix;
-	std::string		originNick;
-	std::string		currentNick;
-	std::string		userName;
-	std::string		hostName;
-	std::string		serverName;
-	std::string		realName;
-
-	std::vector<std::string>	Info;
-
+	int							fd;
+	bool						isAuthorized;
+	ClientStatus				status;
+	std::vector<std::string>	info;
 public:
-					Client();
-					Client(const int fd, const bool isAuthorized = false);
-					~Client(void);
-	int				getFd(void) const;
-	ClientStatus	getStatus(void) const;
-	void			setStatus(const ClientStatus &status);
-	bool			getIsAuthorized(void) const;
-	void			setIsAuthorized(bool isAuthorized);
-	std::string		getOriginNick(void) const;
-	void			setOriginNick(const std::string &originNick);
-	std::string		getCurrentNick(void) const;
-	void			setCurrentNick(const std::string &currentNick);
-	void			registerUser(const std::vector<std::string> &parameters);
-	bool			isClientRegistered(void);
+								Client(void);
+								Client(const int fd, const bool isAuthorized = false);
+								~Client(void);
+					
+	int							getFd(void) const;
+	ClientStatus				getStatus(void) const;
+	void						setStatus(const ClientStatus &status);
+	bool						getIsAuthorized(void) const;
+	void						setIsAuthorized(bool isAuthorized);
 
-	void			setInfo(const Message &message, const std::string &myPrefix);
-	std::string		getInfo(const int &index) const;
 
-	std::string		getPrefix(void) const;
+	// void						setInfo(const Message &message, const std::string &myPrefix);
+	void						setInfo(const int &index, const std::string &myPrefix);
+
+
+	std::string					getInfo(const int &index) const;
+	std::vector<std::string>	getInfo(void) const;
 };
 
 #endif

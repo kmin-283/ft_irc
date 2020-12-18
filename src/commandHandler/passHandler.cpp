@@ -3,9 +3,9 @@
 int					Server::passHandler(const Message &message, Client *client)
 {
 	if (message.getParameters().empty())
-		this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, " :Not enough parameters"), client);
+		this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, " :Not enough parameters"), client);
 	else if (client->getIsAuthorized())
-		this->sendNumericReplies(Message(this->prefix, ERR_ALREADYREGISTRED, " :You already reregistered"), client);
+		this->sendMessage(Message(this->prefix, ERR_ALREADYREGISTRED, " :You already reregistered"), client);
 	else if (this->pass == message.getParameter(0))
 	{
 		// TODO privmsg함수로 바꿔야함
@@ -13,6 +13,6 @@ int					Server::passHandler(const Message &message, Client *client)
 		client->setIsAuthorized(true);
 	}
 	else
-		this->sendNumericReplies(Message("", ERROR_STR, ": You put a wrong Password"), client);
+		this->sendMessage(Message("", ERROR_STR, ": You put a wrong Password"), client);
 	return (0);
 }

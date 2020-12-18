@@ -13,19 +13,7 @@ Server::Server(const char *pass, const char *port)
 }
 
 Server::~Server(void)
-{
-	this->clearClient();
-}
-
-std::string		Server::getPass(void) const
-{
-	return (this->pass);
-}
-
-int				Server::getSocket(void) const
-{
-	return (this->mainSocket);
-}
+{}
 
 void			Server::renewFd(const int fd)
 {
@@ -81,6 +69,7 @@ void			Server::start(void)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
+				std::cout << "fd_isset" << std::endl;
 				if (listenFd == this->mainSocket)
 					this->acceptConnection();
 				else
@@ -107,15 +96,16 @@ void			Server::acceptConnection(void)
 
 void			Server::receiveMessage(const int fd)
 {
-	int			ret = 0;
 	char		buffer;
 	int			readResult;
 	std::string	messageStr;
+	int			connectionStatus;
 	Client 		&sender = this->acceptClients[fd];
 
 	messageStr = "";
 	readResult = 0;
-	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)) && ret != ERROR)
+	connectionStatus = CONNECT;
+	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
 	{
 		messageStr += buffer;
 		if (buffer == '\n')
@@ -123,21 +113,17 @@ void			Server::receiveMessage(const int fd)
 			Message message(messageStr);
 			std::cout << messageStr << std::endl;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
-				ret = (this->*(this->commands[message.getCommand()]))(message, &sender);
+				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr = "";
 		}
+		if (connectionStatus == DISCONNECT)
+			break ;
 	}
-	// if (readResult == -1 && errno != EAGAIN)
-	// {
-	// 	// TODO에러메시지
-	// 	// close(sender->getFd());
-	// 	throw Server::ReceiveMessageFailException();
-	// }
-	if (readResult == 0)
+	if (connectionStatus == DISCONNECT || readResult == 0)
 		this->disconnectClient(&sender);
 }
 
-struct addrinfo	*Server::getAddrInfo(const std::string info)
+static struct addrinfo	*getAddrInfo(const std::string info)
 {
 	int				i;
 	int				j;
@@ -168,7 +154,7 @@ void			Server::connectServer(std::string address)
 	struct addrinfo		*addrInfoIterator;
 
 	ipVersion = AF_INET;
-	addrInfo = this->getAddrInfo(address);
+	addrInfo = getAddrInfo(address);
 	for (addrInfoIterator = addrInfo; addrInfoIterator != NULL ; addrInfoIterator = addrInfoIterator->ai_next)
 	{
 		if (addrInfoIterator->ai_family == AF_INET6)
@@ -209,31 +195,22 @@ void			Server::connectServer(std::string address)
 	password = address.substr(address.rfind(":") + 1, address.length() - 1);
 }
 
-void			Server::clearClient(void)
-{
-	// std::map<int, Client>::iterator acceptIter = this->acceptClients.begin();
-	// std::map<std::string, Client>::iterator senderIter = this->sendClients.begin();
-
-	// for (;acceptIter != this->acceptClients.end(); acceptIter++)
-	// 	delete acceptIter->second;
-	// for (;senderIter != this->sendClients.end(); senderIter++)
-	// 	delete senderIter->second;
-}
-
 void			Server::disconnectClient(Client *client)
 {
 	std::cout << "disconnect " << std::endl;
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
+	if (this->acceptClients.find(client->getFd()) != this->acceptClients.end())
 	this->acceptClients.erase(client->getFd());
-	this->sendClients.erase(client->getCurrentNick());
+	// if (this->sendClients.find(client->getCurrentNick()) != this->sendClients.end())
+	// 	this->sendClients.erase(client->getCurrentNick());
+	// if (this->serverList.find(client->getCurrentNick()))
 	// TODO sendClients map에서 삭제할 필요 있음
 	
 }
 
-void				Server::sendNumericReplies(const Message &message, Client *client)
+void				Server::sendMessage(const Message &message, Client *client)
 {
-	// if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
-	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
+	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
 }

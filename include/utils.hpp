@@ -30,10 +30,13 @@
 # define SPECIAL "-[]\\`^{|}"
 
 # define SSL_PORT "6669"
-# define ERROR -1
+# define ERROR -2
 # define ERROR_STR "ERROR"
 
 # define CR_LF "\r\n"
+
+# define CONNECT 1
+# define DISCONNECT -1
 
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
