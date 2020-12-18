@@ -107,7 +107,7 @@ void			Server::acceptConnection(void)
 
 void			Server::receiveMessage(const int fd)
 {
-	int			ret;
+	int			ret = 0;
 	char		buffer;
 	int			readResult;
 	std::string	messageStr;
@@ -115,16 +115,15 @@ void			Server::receiveMessage(const int fd)
 
 	messageStr = "";
 	readResult = 0;
-	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
+	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)) && ret != ERROR)
 	{
 		messageStr += buffer;
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
+			std::cout << messageStr << std::endl;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				ret = (this->*(this->commands[message.getCommand()]))(message, &sender);
-			if (ret == ERROR)
-				return ;
 			messageStr = "";
 		}
 	}
@@ -197,13 +196,14 @@ void			Server::connectServer(std::string address)
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 
 	// TODO 서버 등록관련 커멘드 전송 필요
-	// PASS 123 /r/n SERVER 12312
 	std::cout << "send" << std::endl;
 	char buffer[100] ="PASS my\r\n";
 	send(newClient.getFd(), buffer, 9, 0);
-	char buffer1[100] ="SERVER localhost.6670 1 :2123\r\n";
-	send(newClient.getFd(), buffer1, 31, 0);
 
+	std::string sn("SERVER ");
+	sn += this->prefix.substr(1, this->prefix.length());
+	sn += " 1 :123\r\n";
+	send(newClient.getFd(), sn.c_str(), sn.length(), 0);
 	std::string password;
 
 	password = address.substr(address.rfind(":") + 1, address.length() - 1);
@@ -226,7 +226,7 @@ void			Server::disconnectClient(Client *client)
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
 	this->acceptClients.erase(client->getFd());
-	// this->sendClients.erase(client->getCurrentNick());
+	this->sendClients.erase(client->getCurrentNick());
 	// TODO sendClients map에서 삭제할 필요 있음
 	
 }

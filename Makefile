@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra -std=c++98
+CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra
 NAME = ircserv
 INCLUDE = -I ./include/
 

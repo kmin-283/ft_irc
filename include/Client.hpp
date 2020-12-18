@@ -21,7 +21,7 @@ enum				UserIndex
 
 enum				ServerIndex
 {
-	PARENTSERVER,
+	UPLINKSERVER,
 	SERVERNAME,
 	HOPCOUNT,
 	SERVERINFO,
@@ -90,8 +90,11 @@ public:
 	void			setCurrentNick(const std::string &currentNick);
 	void			registerUser(const std::vector<std::string> &parameters);
 	bool			isClientRegistered(void);
-	void			setInfo(const Message &message);
 
+	void			setInfo(const Message &message, const std::string &myPrefix);
+	std::string		getInfo(const int &index) const;
+
+	std::string		getPrefix(void) const;
 };
 
 #endif

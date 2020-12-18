@@ -3,6 +3,9 @@
 /**
  *
  *  :prefix command param :param param
+ * 
+ * 
+ * 	:irc.example.net SERVER localhost.6671 2 3 :!23
  *
  **/
 

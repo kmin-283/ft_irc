@@ -24,6 +24,10 @@ private:
 	std::map<std::string, Client>										sendClients;
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 
+	//추가//
+	std::string															uplink;
+	std::map<std::string, Client *>									serverList;
+
 	struct addrinfo														*getAddrInfo(const std::string info);
 	void																clearClient(void);
 	void																renewFd(const int fd);

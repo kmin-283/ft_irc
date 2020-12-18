@@ -86,13 +86,34 @@ bool			Client::isClientRegistered(void)
 	return (true);
 }
 
-void			Client::setInfo(const Message &message)
+void			Client::setInfo(const Message &message, const std::string &myPrefix)
 {
 	this->setStatus(SERVER);
 	this->Info.assign(4, "");
+	
+	// 최 상위 uplink인 경우 irc.example.net 이면 uplink를 ""으로 할 것인가?
+		
+	this->Info[UPLINKSERVER] = message.getPrefix();
+	
+	if (message.getPrefix() == "")
+		this->Info[UPLINKSERVER] = myPrefix;
 	this->Info[SERVERNAME] = message.getParameter(0);
 	this->Info[HOPCOUNT] = message.getParameter(1);
 	this->Info[SERVERINFO] = message.getParameter(2);
-	// client->Info[PARENTSERVER] = message. //????
+
+	// std::cout <<this->Info[UPLINKSERVER] << " " << this->Info[SERVERNAME]
+	// << " " << this->Info[HOPCOUNT] << " " << this->Info[SERVERINFO] << std::endl;
 }
 
+std::string		Client::getInfo(const int &index) const
+{
+	return (this->Info[index]);
+}
+
+
+std::string		Client::getPrefix(void) const
+{
+	if (this->status == SERVER)
+		return (this->Info[SERVERNAME]);
+	return "";
+}
