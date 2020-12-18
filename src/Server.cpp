@@ -165,7 +165,6 @@ void			Server::connectServer(std::string address)
 		{
 			if (ERROR == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 			{
-				std::cout << "socket open fail" << std::endl;
 				throw Server::SocketOpenFailException();
 			}
 			if (ERROR == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
@@ -208,8 +207,13 @@ void			Server::disconnectClient(Client *client)
 
 void				Server::sendMessage(const Message &message, Client *client)
 {
+	std::cout << "send message" << std::endl;
 	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
+	{
+		std::cout << "in" << std::endl;
 		std::cerr << ERROR_SEND_FAIL << std::endl;
+	}
+	std::cout << "send message end" << std::endl;
 }
 
 void				Server::broadcastMessage(const Message &message, Client *client)
