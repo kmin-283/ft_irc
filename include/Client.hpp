@@ -14,8 +14,8 @@ enum				ClientStatus
 enum				UserIndex
 {
 	PREFIX,
-	ORIGINNICK,
 	CURRENTNICK,
+	ORIGINNICK,
 	USERNAME
 };
 
@@ -37,7 +37,7 @@ enum				ServerIndex
 // Sc fd(Sb = fd)
 // Sc Sb prefix, Hostname,ServerName
 
-// Sa 
+// Sa
 //  |
 // / \
 // Sb Sc
@@ -69,18 +69,13 @@ public:
 								Client(void);
 								Client(const int fd, const bool isAuthorized = false);
 								~Client(void);
-					
+
 	int							getFd(void) const;
 	ClientStatus				getStatus(void) const;
 	void						setStatus(const ClientStatus &status);
 	bool						getIsAuthorized(void) const;
 	void						setIsAuthorized(bool isAuthorized);
-
-
-	// void						setInfo(const Message &message, const std::string &myPrefix);
 	void						setInfo(const int &index, const std::string &myPrefix);
-
-
 	std::string					getInfo(const int &index) const;
 	std::vector<std::string>	getInfo(void) const;
 };

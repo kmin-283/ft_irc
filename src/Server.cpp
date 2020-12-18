@@ -2,7 +2,7 @@
 
 
 Server::Server(const char *pass, const char *port)
-	: pass(std::string(pass)), port(port), mainSocket(0), maxFd(0)
+	: pass(std::string(pass)), info(": kmin seunkim dakim made this server."), port(port), mainSocket(0), maxFd(0)
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
@@ -69,9 +69,8 @@ void			Server::start(void)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
-				std::cout << "fd_isset" << std::endl;
 				if (listenFd == this->mainSocket)
-					this->acceptConnection();
+					this->connectClient();
 				else
 					this->receiveMessage(listenFd);
 			}
@@ -79,7 +78,7 @@ void			Server::start(void)
 	}
 }
 
-void			Server::acceptConnection(void)
+void			Server::connectClient(void)
 {
 	int					newFd;
 	struct sockaddr_in6	remoteAddress;
@@ -91,7 +90,7 @@ void			Server::acceptConnection(void)
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd, false)));
-	std::cout << "accept connection" << std::endl;
+	std::cout << "Connect client." << std::endl;
 }
 
 void			Server::receiveMessage(const int fd)
@@ -110,8 +109,8 @@ void			Server::receiveMessage(const int fd)
 		messageStr += buffer;
 		if (buffer == '\n')
 		{
-			Message message(messageStr);
 			std::cout << messageStr << std::endl;
+			Message message(messageStr);
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr = "";
@@ -165,7 +164,10 @@ void			Server::connectServer(std::string address)
 		if (addrInfoIterator->ai_family == ipVersion)
 		{
 			if (ERROR == (newFd = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+			{
+				std::cout << "socket open fail" << std::endl;
 				throw Server::SocketOpenFailException();
+			}
 			if (ERROR == connect(newFd, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen))
 			{
 				close(newFd);
@@ -180,37 +182,43 @@ void			Server::connectServer(std::string address)
 	this->renewFd(newFd);
 	Client newClient(newFd);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
-
-	// TODO 서버 등록관련 커멘드 전송 필요
-	std::cout << "send" << std::endl;
-	char buffer[100] ="PASS my\r\n";
-	send(newClient.getFd(), buffer, 9, 0);
-
-	std::string sn("SERVER ");
-	sn += this->prefix.substr(1, this->prefix.length());
-	sn += " 1 :123\r\n";
-	send(newClient.getFd(), sn.c_str(), sn.length(), 0);
-	std::string password;
-
-	password = address.substr(address.rfind(":") + 1, address.length() - 1);
+	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
+	Message passMessage("PASS " + password + "\r\n");
+	Message serverMessage("SERVER " + this->prefix.substr(1, this->prefix.length()) + " 1 " + this->info + "\r\n");
+	this->sendMessage(passMessage, &newClient);
+	this->sendMessage(serverMessage, &newClient);
+	std::cout << "Connect other server." << std::endl;
 }
 
 void			Server::disconnectClient(Client *client)
 {
-	std::cout << "disconnect " << std::endl;
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
+	if (client->getStatus() != UNKNOWN)
+	{
+		if (this->sendClients.find(client->getInfo(1)) != this->sendClients.end())
+			this->sendClients.erase(client->getInfo(1));
+		if (this->serverList.find(client->getInfo(1)) != this->serverList.end())
+			this->serverList.erase(client->getInfo(1));
+	}
 	if (this->acceptClients.find(client->getFd()) != this->acceptClients.end())
-	this->acceptClients.erase(client->getFd());
-	// if (this->sendClients.find(client->getCurrentNick()) != this->sendClients.end())
-	// 	this->sendClients.erase(client->getCurrentNick());
-	// if (this->serverList.find(client->getCurrentNick()))
-	// TODO sendClients map에서 삭제할 필요 있음
-	
+		this->acceptClients.erase(client->getFd());
+	std::cout << "Disconnect client." << std::endl;
 }
 
 void				Server::sendMessage(const Message &message, Client *client)
 {
 	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
+}
+
+void				Server::broadcastMessage(const Message &message, Client *client)
+{
+	std::map<std::string, Client *>::iterator	iterator;
+
+	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
+	{
+		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+			this->sendMessage(message, iterator->second);
+	}
 }

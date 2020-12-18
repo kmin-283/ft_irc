@@ -3,8 +3,8 @@
 /**
  *
  *  :prefix command param :param param
- * 
- * 
+ *
+ *
  * 	:irc.example.net SERVER localhost.6671 2 3 :!23
  *
  **/
@@ -50,7 +50,8 @@ void						Message::setTotalMessage(const std::string &prefix, const std::string 
 	if (prefix != "")
 		this->totalMessage += " ";
 	this->totalMessage += command;
-	this->totalMessage += " ";
+	if (parameters != "")
+		this->totalMessage += " ";
 	this->totalMessage += parameters;
 	this->totalMessage += CR_LF;
 }

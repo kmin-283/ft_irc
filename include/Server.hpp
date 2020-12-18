@@ -6,16 +6,12 @@
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 
-/**
- *
- *
- **/
-
 class																	Server
 {
 private:
 	std::string															prefix;
 	std::string															pass;
+	std::string															info;
 	const char															*port;
 	int																	mainSocket;
 	int																	maxFd;
@@ -34,13 +30,12 @@ private:
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 
-	void																acceptConnection(void);
-	// void																connectClient(void);
+	void																connectClient(void);
 	void																disconnectClient(Client *client);
-	
+
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);
-	// void																broadcastMessage(const Message &message, Client *client);
+	void																broadcastMessage(const Message &message, Client *client);
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);

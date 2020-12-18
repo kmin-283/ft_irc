@@ -38,6 +38,8 @@
 # define CONNECT 1
 # define DISCONNECT -1
 
+# define DEFAULT_SIZE 10
+
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
 # define ERROR_SOCKET_OPEN_FAIL "Error: Socket open fail."

@@ -1,9 +1,15 @@
 #include "Client.hpp"
+
 Client::Client()
-{}
+	: fd(0), isAuthorized(false), status(UNKNOWN)
+{
+	this->info.assign(DEFAULT_SIZE, "");
+}
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN)
-{}
+{
+	this->info.assign(DEFAULT_SIZE, "");
+}
 Client::~Client(void)
 {}
 
@@ -32,19 +38,15 @@ void						Client::setIsAuthorized(bool isAuthorized)
 	this->isAuthorized = isAuthorized;
 }
 
-// void						Client::setInfo(const Message &message, const std::string &myPrefix)
-// void						Client::setInfo(const Message &message, const std::string &myPrefix)
 void						Client::setInfo(const int &index, const std::string &value)
 {
 	this->info[index] = value;
-	std::cout << "set INFO" << this->info[index] << std::endl;
 	// this->setStatus(SERVER);
-	// this->Info.assign(4, "");
-	
+
 	// // 최 상위 uplink인 경우 irc.example.net 이면 uplink를 ""으로 할 것인가?
-		
+
 	// this->Info[UPLINKSERVER] = message.getPrefix();
-	
+
 	// if (message.getPrefix() == "")
 	// 	this->Info[UPLINKSERVER] = myPrefix;
 	// this->Info[SERVERNAME] = message.getParameter(0);
