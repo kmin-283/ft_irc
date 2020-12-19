@@ -5,10 +5,15 @@ Server::Server(const char *pass, const char *port)
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
-	this->commands["PASS"] = &Server::passHandler;
-	this->commands["NICK"] = &Server::nickHandler;
-	this->commands["USER"] = &Server::userHandler;
-	this->commands["SERVER"] = &Server::serverHandler;
+	// this->serverName
+	// this->version
+	// this->startTime
+	// this->userMode
+	// this->channelMode;
+
+
+	this->registerCommands();
+	this->registerReplies();
 }
 
 Server::~Server(void)
@@ -182,7 +187,7 @@ void					Server::connectServer(std::string address)
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + "\r\n");
-	Message serverMessage("SERVER " + this->prefix.substr(1, this->prefix.length()) + " 1 " + this->info + "\r\n");
+	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + "\r\n");
 	this->sendMessage(passMessage, &newClient);
 	this->sendMessage(serverMessage, &newClient);
 	std::cout << "Connect other server." << std::endl;
@@ -206,7 +211,9 @@ void					Server::disconnectClient(Client *client)
 
 void					Server::sendMessage(const Message &message, Client *client)
 {
-	if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
+	//TODO 512자가 넘은 경우 나누어 전송해야함
+	// if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
+	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
 }
 

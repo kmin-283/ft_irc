@@ -3,6 +3,7 @@
 
 # include "utils.hpp"
 # include "Client.hpp"
+# include "Channel.hpp"
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 
@@ -10,6 +11,12 @@ class																	Server
 {
 private:
 	std::string															prefix;
+	std::string															serverName;
+	std::string															version;
+	std::string															startTime;
+	std::string															userMode;
+	std::string															channelMode;
+	std::string															motdDir;
 	std::string															pass;
 	std::string															info;
 	const char															*port;
@@ -20,15 +27,37 @@ private:
 	std::map<int, Client>												acceptClients;
 	std::map<std::string, Client>										sendClients;
 	std::map<std::string, Client *>										serverList;
+	std::map<std::string, Client *>										clientList;
+	std::map<std::string, Client *>										serviceList;
+	std::map<std::string, Channel>										channelList;
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
-
-	void																renewFd(const int fd);
-
+	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
 	int																	nickHandler(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
+
+	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
+	void																registerReplies(void);
+	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
+	int																	eNeedMoreParamsHandler(const Message &message, Client *client);
+	int																	eErroneusNickNameHandler(const Message &message, Client *client);
+	int																	eNickNameInUseHandler(const Message &message, Client *client);
+	int																	rRegisterUserHandler(const Message &message, Client *client);
+	int																	rWelcomeHandler(const Message &message, Client *client);
+	int																	rYourHostHandler(const Message &message, Client *client);
+	int																	rCreatedHandler(const Message &message, Client *client);
+	int																	rMyInfoHandler(const Message &message, Client *client);
+	int																	rLUserClientHandler(const Message &message, Client *client);
+	int																	rLUserChannelHandler(const Message &message, Client *client);
+	int																	rLUserMeHandler(const Message &message, Client *client);
+	int																	rMOTDHandler(const Message &message, Client *client);
+	int																	rMOTDContentHandler(const Message &message, Client *client);
+	int																	rMOTDStartHandler(const Message &message, Client *client);
+	int																	rEndOfMOTDHandler(const Message &message, Client *client);
+
+	void																renewFd(const int fd);
 
 	void																connectClient(void);
 	void																disconnectClient(Client *client);
