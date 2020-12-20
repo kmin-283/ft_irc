@@ -12,15 +12,37 @@ static bool			isValidNickName(const Message &message)
 	return true;
 }
 
+static std::string	getHopCount(const Message &message)
+{
+	int					hopCount;
+	std::stringstream	stream;
+	std::string			hopCountStr;
+
+	hopCountStr = std::string("1");
+	if (message.getParameters().size() == 2)
+	{
+		stream << message.getParameter(1)
+		.substr(1, message.getParameter(1).length());
+		stream >> hopCount;
+		stream << (++hopCount);
+		hopCountStr = stream.str();
+	}
+	return (hopCountStr);
+}
+
 static void			setNick(Client *client, const Message &message,
 					std::map<std::string, Client> &sendClients,
 					std::map<std::string, Client *> &clientList)
 {
+	std::stringstream	stream;
+	std::string			hopCount;
+
 	if (client->getInfo(NICK) != "")
 	{
 		sendClients.erase(client->getInfo(NICK));
 		clientList.erase(client->getInfo(NICK));
 	}
+	client->setInfo(HOPCOUNT, getHopCount(message));
 	client->setInfo(NICK, message.getParameter(0));
 	sendClients[message.getParameter(0)] = *client;
 	clientList[message.getParameter(0)] = client;
@@ -68,19 +90,18 @@ static bool			isVaildUserName(const Message &message)
 static void			setUser(const Message &message, Client *client, std::string address,
 					std::map<std::string, Client> &sendClients, std::string serverName)
 {
-	std::string realName;
+	std::string			realName;
+	std::string			hopCount;
 
 	realName = (*(message.getParameter(3).begin()) == ':'
 	? message.getParameter(3).substr(1, message.getParameter(3).length())
 	: message.getParameter(3));
-	client->setInfo(HOPCOUNT, "1");
 	client->setInfo(USERNAME, message.getParameter(0));
 	client->setInfo(HOSTNAME, serverName);
 	client->setInfo(ADDRESS, address);
 	client->setInfo(REALNAME, realName);
 	if (client->getInfo(NICK) != "")
 	{
-		(sendClients[client->getInfo(NICK)]).setInfo(HOPCOUNT, "1");
 		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, message.getParameter(0));
 		(sendClients[client->getInfo(NICK)]).setInfo(HOSTNAME, serverName);
 		(sendClients[client->getInfo(NICK)]).setInfo(ADDRESS, address);

@@ -150,13 +150,15 @@ TEST_GROUP(NickHandlerTest)
 			client->setInfo(NICK, nick);
 		}
 	}
-	void		given(Server &server, int expectConnection, std::string nick, ClientStatus status)
+	void		given(Server &server, int expectConnection, std::string nick,
+									std::string hopCount, ClientStatus status)
 	{
 		if (message != NULL && client != NULL)
 		{
 			connectStatus = server.nickHandler(*message, client);
 			CHECK_EQUAL(connectStatus, expectConnection);
 			CHECK_EQUAL(client->getInfo(NICK), nick);
+			CHECK_EQUAL(client->getInfo(HOPCOUNT), hopCount);
 			CHECK_EQUAL(client->getStatus(), status);
 			close(fd[1]);
 			close(fd[0]);
@@ -173,7 +175,7 @@ TEST(NickHandlerTest, RegisterNick)
 	expect("", "NICK dakim\r\n", true, UNKNOWN);
 	CHECK_EQUAL(server.sendClients.size(), 0);
 	CHECK_EQUAL(server.clientList.size(), 0);
-	given(server, CONNECT, "dakim", UNKNOWN);
+	given(server, CONNECT, "dakim", "1", UNKNOWN);
 	if (server.sendClients.find("dakim") != server.sendClients.end())
 		CHECK_EQUAL(1,1);
 	else
@@ -181,7 +183,7 @@ TEST(NickHandlerTest, RegisterNick)
 	CHECK_EQUAL(server.sendClients.size(), 1);
 	CHECK_EQUAL(server.clientList.size(), 1);
 	expect("dakim", "NICK dakim1\r\n", true, UNKNOWN);
-	given(server, CONNECT, "dakim1", UNKNOWN);
+	given(server, CONNECT, "dakim1", "1", UNKNOWN);
 	if (server.sendClients.find("dakim") == server.sendClients.end())
 		CHECK_EQUAL(1,1);
 	else
