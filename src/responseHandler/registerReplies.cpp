@@ -20,5 +20,5 @@ void			Server::registerReplies(void)
 	this->replies[RPL_MOTDCONTENT] = &Server::rMOTDContentHandler;
 	this->replies[RPL_MOTDSTART] = &Server::rMOTDStartHandler;
 	this->replies[RPL_ENDOFMOTD] = &Server::rEndOfMOTDHandler;
-	this->replies[RPL_NICK] = &Server::rNickHandler;
+	this->replies[RPL_NICKBROADCAST] = &Server::rNickBroadcastHandler;
 }

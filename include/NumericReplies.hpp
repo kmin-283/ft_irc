@@ -2,6 +2,10 @@
 # define NUMERIC_REPLIES
 
 # define RPL_REGISTER_USER "RPL REGISTER USER"
+# define RPL_MOTD "MOTD"
+# define RPL_NICK "NICK"
+# define RPL_NICKBROADCAST "NICK BROADCAST"
+
 # define RPL_WELCOME "001"
 # define RPL_YOURHOST "002"
 # define RPL_CREATED "003"
@@ -12,7 +16,6 @@
 # define RPL_LUSERCHANNELS "254"
 # define RPL_LUSERME "255"
 
-# define RPL_MOTD "MOTD"
 # define RPL_MOTDCONTENT "372"
 # define RPL_MOTDSTART "375"
 # define RPL_ENDOFMOTD "376"

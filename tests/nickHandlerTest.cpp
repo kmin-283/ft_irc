@@ -189,7 +189,7 @@ TEST(NickHandlerTest, RegisterUser)
 		else
 			CHECK_EQUAL(1, 0);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~dakim@localhost.3000\r"));
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~dakim@127.0.0.1\r"));
 		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 002 dakim :Your host is localhost.3000, running version ircserv.1.0\r"));
@@ -233,6 +233,56 @@ TEST(NickHandlerTest, RegisterUser)
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 376 dakim :End of MOTD command\r"));
 		free(result);
+		close(fd[0]);
+		close(fd[1]);
 		delete client;
+	}
+}
+
+TEST(NickHandlerTest, BroadCastNick)
+{
+	int			i;
+	int			fd[6];
+	char		*result;
+	Client		*client;
+	Client		*otherServer;
+	Client		*anotherServer;
+	std::string	expectStr;
+	Server		server("111", "3000");
+	Message		message(std::string("NICK dakim\r\n"));
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+
+		client->setInfo(USERNAME, "dakim");
+		client->setInfo(HOSTNAME, "localhost.3000");
+		client->setInfo(HOPCOUNT, "1");
+		otherServer->setInfo(SERVERNAME, "otherServer");
+		anotherServer->setInfo(SERVERNAME, "anotherServer");
+		server.prefix = std::string(":localhost.3000");
+		server.serverName = std::string("localhost.3000");
+		server.version = std::string("ircserv.1.0");
+		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.userMode = std::string("abBcCFiIoqrRswx");
+		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
+		server.motdDir = std::string("./ft_irc.motd");
+		server.serverList["otherServer"] = otherServer;
+		server.serverList["anotherServer"] = anotherServer;
+		server.nickHandler(message, client);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		i = -1;
+		while (fd[++i] < 6)
+			close(fd[i]);
+		delete client;
+		delete otherServer;
+		delete anotherServer;
 	}
 }

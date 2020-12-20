@@ -66,15 +66,3 @@ bool			isValidFormat(const std::string &key, const char &value)
 		return (false);
 	return (true);
 }
-
-bool			isValidNickname(const Message &message)
-{
-	for (size_t i = 0; i < message.getParameter(0).length(); i++)
-	{
-		if (i == 0 && !isValidFormat(std::string(LETTER) + std::string(SPECIAL), message.getParameter(0)[i]))
-			return false;
-		else if (!isValidFormat(std::string(LETTER) + std::string(SPECIAL) + std::string(DIGIT), message.getParameter(0)[i]))
-			return false;
-	}
-	return true;
-}

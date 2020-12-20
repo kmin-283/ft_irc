@@ -56,6 +56,7 @@ private:
 	int																	rMOTDContentHandler(const Message &message, Client *client);
 	int																	rMOTDStartHandler(const Message &message, Client *client);
 	int																	rEndOfMOTDHandler(const Message &message, Client *client);
+	int																	rNickBroadcastHandler(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
 
