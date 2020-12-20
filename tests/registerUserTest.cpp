@@ -136,6 +136,10 @@ TEST(RegisterUser, UserFirst)
 		expect(&server, client);
 		server.userHandler(userMessage, client);
 		server.nickHandler(nickMessage, client);
+		if (server.clientList.find("dakim") != server.clientList.end())
+			CHECK_EQUAL(1, 1);
+		else
+			CHECK_EQUAL(1, 0);
 		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
