@@ -6,7 +6,9 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NEEDMOREPARAMS] = &Server::eNeedMoreParamsHandler;
 	this->replies[ERR_ERRONEUSNICKNAME] = &Server::eErroneusNickNameHandler;
 	this->replies[ERR_NICKNAMEINUSE] = &Server::eNickNameInUseHandler;
-
+	this->replies[ERR_ALREADYREGISTRED] = &Server::eAlreadyRegisteredHandler;
+	this->replies[ERR_PASSUNAUTHORIE] = &Server::ePassUnauthorizedHandler;
+	this->replies[ERR_ERRONEUSUSERNAME] = &Server::eErroneusUserNameHandler;
 
 	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;
 	this->replies[RPL_WELCOMEMESSAGE] = &Server::rWelcomeMessageHandler;

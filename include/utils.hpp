@@ -31,6 +31,7 @@
 # define LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWYZ"
 # define DIGIT "0123456789"
 # define SPECIAL "-[]\\`^{|}"
+# define USER_FORMAT "\r\n @"
 
 # define SSL_PORT "6669"
 # define ERROR -2

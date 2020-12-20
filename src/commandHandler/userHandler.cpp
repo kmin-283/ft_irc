@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-static bool			isValidNickname(const Message &message)
+static bool			isValidNickName(const Message &message)
 {
 	for (size_t i = 0; i < message.getParameter(0).length(); i++)
 	{
@@ -9,21 +9,19 @@ static bool			isValidNickname(const Message &message)
 		else if (!isValidFormat(std::string(LETTER) + std::string(SPECIAL) + std::string(DIGIT), message.getParameter(0)[i]))
 			return false;
 	}
-		return true;
+	return true;
 }
 
 static void			setNick(Client *client, const Message &message,
 					std::map<std::string, Client> &sendClients,
 					std::map<std::string, Client *> &clientList)
 {
-	if (client->getInfo(ORIGINNICK) == "")
-		client->setInfo(ORIGINNICK, message.getParameter(0));
-	else
+	if (client->getInfo(NICK) != "")
 	{
-		sendClients.erase(client->getInfo(CURRENTNICK));
-		clientList.erase(client->getInfo(CURRENTNICK));
+		sendClients.erase(client->getInfo(NICK));
+		clientList.erase(client->getInfo(NICK));
 	}
-	client->setInfo(CURRENTNICK, message.getParameter(0));
+	client->setInfo(NICK, message.getParameter(0));
 	sendClients[message.getParameter(0)] = *client;
 	clientList[message.getParameter(0)] = client;
 }
@@ -36,21 +34,15 @@ int					Server::nickHandler(const Message &message, Client *client)
 			return ((this->*(this->replies[ERR_NONICKNAMEGIVEN]))(message, client));
 		if (1 < message.getParameters().size())
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (!isValidNickname(message) || 9 < message.getParameter(0).length())
+		if (!isValidNickName(message) || 9 < message.getParameter(0).length())
 			return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
 		if (!client->getIsAuthorized())
-		{
-			this->sendMessage(Message("", ERROR_STR, std::string(":Access denied: Bad password")), client);
-			return (DISCONNECT);
-		}
+			return ((this->*(this->replies[ERR_PASSUNAUTHORIE]))(message, client));
 		if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
 			return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(message, client));
 		setNick(client, message, this->sendClients, this->clientList);
 		if (client->getInfo(USERNAME) == "")
-		{
-			this->sendMessage(Message("", message.getParameter(0), ":Nick registered"), client);
 			return (CONNECT);
-		}
 		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
 		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
 	}
@@ -63,26 +55,54 @@ int					Server::nickHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+static bool			isVaildUserName(const Message &message)
+{
+	for (size_t i = 0; i < message.getParameter(0).length(); i++)
+	{
+		if (isValidFormat(std::string(USER_FORMAT), message.getParameter(0)[i]))
+			return false;
+	}
+	return true;
+}
+
+static void			setUser(const Message &message, Client *client,
+					std::map<std::string, Client> &sendClients, std::string serverName)
+{
+	std::string realName;
+
+	realName = (*(message.getParameter(3).begin()) == ':'
+	? message.getParameter(3).substr(1, message.getParameter(3).length())
+	: message.getParameter(3));
+	client->setInfo(HOPCOUNT, "1");
+	client->setInfo(USERNAME, message.getParameter(0));
+	client->setInfo(HOSTNAME, serverName);
+	client->setInfo(REALNAME, realName);
+	if (client->getInfo(NICK) != "")
+	{
+		(sendClients[client->getInfo(NICK)]).setInfo(HOPCOUNT, "1");
+		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, message.getParameter(0));
+		(sendClients[client->getInfo(NICK)]).setInfo(HOSTNAME, serverName);
+		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, realName);
+	}
+}
+
 int					Server::userHandler(const Message &message, Client *client)
 {
-	(void)message;
-	(void)client;
-	// std::string		userNick;
-
-	// userNick = client->getCurrentNick() == "" ? "*" : client->getCurrentNick();
-	// if (message.getParameters().size() != 4)
-		// this->sendNumericReplies(Message(this->prefix, ERR_NEEDMOREPARAMS, std::string(" ") + userNick + std::string(" USER :Syntax error")), client);
-	// else if ()
-		// this->sendNumericReplies(ERR_ALREADYREGISTRED, std::string(" ") + userNick + std::string(" :Connection already registered"), client);
-	// else if (!client->getIsAuthorized())
-	// 	this->sendNumericReplies(Message(this->prefix, ERROR_STR, std::string(" ") + userNick + std::string(":Bad password")), client);
-	// else
-	// {
-	// 	client->registerUser(message.getParameters());
-	// 	if (client->isClientRegistered())
-	// 		client->setStatus(USER);
-	// 	if (client->getStatus() == USER)
-	// 		std::cout << "client status = client" << std::endl;
-	// }
-	return (0);
+	if (client->getStatus() == UNKNOWN)
+	{
+		if (message.getParameters().empty() || message.getParameters().size() != 4)
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		if (!client->getIsAuthorized())
+			return ((this->*(this->replies[ERR_PASSUNAUTHORIE]))(message, client));
+		if (client->getInfo(USERNAME) != "")
+			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+		if (!isVaildUserName(message))
+			return ((this->*(this->replies[ERR_ERRONEUSUSERNAME]))(message, client));
+		setUser(message, client, this->sendClients, this->serverName);
+		if (client->getInfo(NICK) == "")
+			return (CONNECT);
+		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
+		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
+	}
+	return (CONNECT);
 }

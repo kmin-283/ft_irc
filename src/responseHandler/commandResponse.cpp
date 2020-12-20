@@ -27,9 +27,9 @@ int		Server::rWelcomeHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :Welcome to the Internet Relay Network ");
-	parameters += client->getInfo(CURRENTNICK);
+	parameters += client->getInfo(NICK);
 	parameters += std::string("!~");
 	parameters += client->getInfo(USERNAME);
 	parameters += std::string("@");
@@ -45,7 +45,7 @@ int		Server::rYourHostHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :Your host is ");
 	parameters += this->serverName;
 	parameters += std::string(", running version ");
@@ -61,7 +61,7 @@ int		Server::rCreatedHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :This server has been started ");
 	parameters += this->startTime;
 	sendMessage = Message(this->prefix, RPL_CREATED, parameters);
@@ -75,7 +75,7 @@ int		Server::rMyInfoHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" ");
 	parameters += this->serverName;
 	parameters += std::string(" ");
@@ -119,7 +119,7 @@ int		Server::rLUserClientHandler(const Message &message, Client *client)
 
 	(void)message;
 	countServerConnections(this->sendClients, userCount, serviceCount, serverCount);
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :There are ");
 	stream << userCount;
 	parameters += stream.str();
@@ -144,7 +144,7 @@ int		Server::rLUserChannelHandler(const Message &message, Client *client)
 	Message				sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" ");
 	stream << this->channelList.size();
 	parameters += stream.str();
@@ -161,7 +161,7 @@ int		Server::rLUserMeHandler(const Message &message, Client *client)
 	Message				sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :I have ");
 	stream << this->clientList.size();
 	parameters += stream.str();
@@ -194,7 +194,7 @@ int		Server::rMOTDStartHandler(const Message &message, Client *client)
 	Message		sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :- ");
 	parameters += this->serverName;
 	parameters += std::string(" message of the day");
@@ -209,7 +209,7 @@ int		Server::rEndOfMOTDHandler(const Message &message, Client *client)
 	Message		sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :End of MOTD command");
 	sendMessage = Message(this->prefix, RPL_ENDOFMOTD, parameters);
 	this->sendMessage(sendMessage, client);
@@ -225,7 +225,7 @@ int		Server::rMOTDContentHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
-	prefix = client->getInfo(CURRENTNICK);
+	prefix = client->getInfo(NICK);
 	prefix += std::string(" :- ");
 	stream.open(this->motdDir);
 	if (!stream)
@@ -258,7 +258,7 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 	Message				sendMessage;
 
 	(void)message;
-	parameters = client->getInfo(CURRENTNICK);
+	parameters = client->getInfo(NICK);
 	parameters += std::string(" :");
 	parameters += client->getInfo(HOPCOUNT);
 	sendMessage = Message(std::string(""), RPL_NICK, parameters);

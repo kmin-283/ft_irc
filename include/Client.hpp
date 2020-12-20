@@ -13,12 +13,11 @@ enum				ClientStatus
 
 enum				UserIndex
 {
-	ORIGINNICK,
-	CURRENTNICK,
+	HOSTNAME,
+	NICK,
 	DISTANCE,
 	USERNAME,
 	REALNAME,
-	HOSTNAME
 };
 
 enum				ServerIndex

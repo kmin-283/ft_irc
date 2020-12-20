@@ -2,8 +2,6 @@
 # define define TEST_HPP
 
 # include "CppUTest/TestHarness.h"
-# include "Message.hpp"
-# include "Client.hpp"
 
 # define private public
 # include "Server.hpp"

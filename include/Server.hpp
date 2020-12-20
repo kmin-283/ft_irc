@@ -44,6 +44,9 @@ private:
 	int																	eNeedMoreParamsHandler(const Message &message, Client *client);
 	int																	eErroneusNickNameHandler(const Message &message, Client *client);
 	int																	eNickNameInUseHandler(const Message &message, Client *client);
+	int																	eAlreadyRegisteredHandler(const Message &message, Client *client);
+	int																	ePassUnauthorizedHandler(const Message &message, Client *client);
+	int																	eErroneusUserNameHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
