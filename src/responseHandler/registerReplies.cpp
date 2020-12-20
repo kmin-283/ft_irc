@@ -8,7 +8,8 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NICKNAMEINUSE] = &Server::eNickNameInUseHandler;
 
 
-	this->replies[RPL_REGISTER_USER] = &Server::rRegisterUserHandler;
+	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;
+	this->replies[RPL_WELCOMEMESSAGE] = &Server::rWelcomeMessageHandler;
 	this->replies[RPL_WELCOME] = &Server::rWelcomeHandler;
 	this->replies[RPL_YOURHOST] = &Server::rYourHostHandler;
 	this->replies[RPL_CREATED] = &Server::rCreatedHandler;

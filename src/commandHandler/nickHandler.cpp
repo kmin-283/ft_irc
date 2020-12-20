@@ -51,7 +51,8 @@ int					Server::nickHandler(const Message &message, Client *client)
 			this->sendMessage(Message("", message.getParameter(0), ":Nick registered"), client);
 			return (CONNECT);
 		}
-		return ((this->*(this->replies[RPL_REGISTER_USER]))(message, client));
+		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
+		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
 	}
 	else if (client->getStatus() == USER)
 	{

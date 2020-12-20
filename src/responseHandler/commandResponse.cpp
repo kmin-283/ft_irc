@@ -4,7 +4,12 @@ int		Server::rRegisterUserHandler(const Message &message, Client *client)
 {
 	client->setStatus(USER);
 	this->sendClients[message.getParameter(0)].setStatus(USER);
+	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
+	return (CONNECT);
+}
 
+int		Server::rWelcomeMessageHandler(const Message &message, Client *client)
+{
 	(this->*(this->replies[RPL_WELCOME]))(message, client);
 	(this->*(this->replies[RPL_YOURHOST]))(message, client);
 	(this->*(this->replies[RPL_CREATED]))(message, client);
@@ -13,8 +18,6 @@ int		Server::rRegisterUserHandler(const Message &message, Client *client)
 	(this->*(this->replies[RPL_LUSERCHANNELS]))(message, client);
 	(this->*(this->replies[RPL_LUSERME]))(message, client);
 	(this->*(this->replies[RPL_MOTD]))(message, client);
-
-	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
 	return (CONNECT);
 }
 

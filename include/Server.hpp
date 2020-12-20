@@ -45,6 +45,7 @@ private:
 	int																	eErroneusNickNameHandler(const Message &message, Client *client);
 	int																	eNickNameInUseHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
+	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
 	int																	rYourHostHandler(const Message &message, Client *client);
 	int																	rCreatedHandler(const Message &message, Client *client);
