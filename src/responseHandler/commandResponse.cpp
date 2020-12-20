@@ -12,12 +12,14 @@ int		Server::rRegisterUserHandler(const Message &message, Client *client)
 	(this->*(this->replies[RPL_LUSERCHANNELS]))(message, client);
 	(this->*(this->replies[RPL_LUSERME]))(message, client);
 	(this->*(this->replies[RPL_MOTD]))(message, client);
+	(this->*(this->replies[RPL_NICK]))(message, client);
 	return (CONNECT);
 }
 
 int		Server::rWelcomeHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
+	Message			sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
@@ -27,7 +29,7 @@ int		Server::rWelcomeHandler(const Message &message, Client *client)
 	parameters += client->getInfo(USERNAME);
 	parameters += std::string("@");
 	parameters += this->serverName;
-	Message sendMessage(this->prefix, RPL_WELCOME, parameters);
+	sendMessage = Message(this->prefix, RPL_WELCOME, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -35,6 +37,7 @@ int		Server::rWelcomeHandler(const Message &message, Client *client)
 int		Server::rYourHostHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
+	Message			sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
@@ -42,7 +45,7 @@ int		Server::rYourHostHandler(const Message &message, Client *client)
 	parameters += this->serverName;
 	parameters += std::string(", running version ");
 	parameters += this->version;
-	Message sendMessage(this->prefix, RPL_YOURHOST, parameters);
+	sendMessage = Message(this->prefix, RPL_YOURHOST, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -50,12 +53,13 @@ int		Server::rYourHostHandler(const Message &message, Client *client)
 int		Server::rCreatedHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
+	Message			sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
 	parameters += std::string(" :This server has been started ");
 	parameters += this->startTime;
-	Message sendMessage(this->prefix, RPL_CREATED, parameters);
+	sendMessage = Message(this->prefix, RPL_CREATED, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -63,6 +67,7 @@ int		Server::rCreatedHandler(const Message &message, Client *client)
 int		Server::rMyInfoHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
+	Message			sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
@@ -74,12 +79,13 @@ int		Server::rMyInfoHandler(const Message &message, Client *client)
 	parameters += this->userMode;
 	parameters += std::string(" ");
 	parameters += this->channelMode;
-	Message sendMessage(this->prefix, RPL_MYINFO, parameters);
+	sendMessage = Message(this->prefix, RPL_MYINFO, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
 
-static void		countServerConnections(std::map<std::string, Client> &sendClients, int &userCount, int &serviceCount, int &serverCount)
+static void		countServerConnections(std::map<std::string, Client> &sendClients,
+							int &userCount, int &serviceCount, int &serverCount)
 {
 	std::map<std::string, Client>::iterator	iterator;
 
@@ -100,8 +106,9 @@ static void		countServerConnections(std::map<std::string, Client> &sendClients, 
 int		Server::rLUserClientHandler(const Message &message, Client *client)
 {
 	std::stringstream	stream;
-	int					userCount;
 	std::string			parameters;
+	Message				sendMessage;
+	int					userCount;
 	int					serviceCount;
 	int					serverCount;
 
@@ -117,17 +124,19 @@ int		Server::rLUserClientHandler(const Message &message, Client *client)
 	parameters += stream.str();
 	stream.str("");
 	parameters += std::string(" services on ");
-	stream << (serviceCount == 0 ? ++serverCount : serverCount);
+	stream << ++serviceCount;
 	parameters += stream.str();
 	parameters += std::string(" servers");
-	Message sendMessage(this->prefix, RPL_LUSERCLIENT, parameters);
+	sendMessage = Message(this->prefix, RPL_LUSERCLIENT, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
 int		Server::rLUserChannelHandler(const Message &message, Client *client)
 {
 	std::stringstream	stream;
 	std::string			parameters;
+	Message				sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
@@ -135,7 +144,7 @@ int		Server::rLUserChannelHandler(const Message &message, Client *client)
 	stream << this->channelList.size();
 	parameters += stream.str();
 	parameters += std::string(" :channels formed");
-	Message sendMessage(this->prefix, RPL_LUSERCHANNELS, parameters);
+	sendMessage = Message(this->prefix, RPL_LUSERCHANNELS, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -144,6 +153,7 @@ int		Server::rLUserMeHandler(const Message &message, Client *client)
 {
 	std::stringstream	stream;
 	std::string			parameters;
+	Message				sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
@@ -160,7 +170,7 @@ int		Server::rLUserMeHandler(const Message &message, Client *client)
 	parameters += stream.str();
 	stream.str("");
 	parameters += std::string(" servers");
-	Message sendMessage(this->prefix, RPL_LUSERME, parameters);
+	sendMessage = Message(this->prefix, RPL_LUSERME, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -176,13 +186,14 @@ int		Server::rMOTDHandler(const Message &message, Client *client)
 int		Server::rMOTDStartHandler(const Message &message, Client *client)
 {
 	std::string	parameters;
+	Message		sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
 	parameters += std::string(" :- ");
 	parameters += this->serverName;
 	parameters += std::string(" message of the day");
-	Message sendMessage(this->prefix, RPL_MOTDSTART, parameters);
+	sendMessage = Message(this->prefix, RPL_MOTDSTART, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -190,11 +201,12 @@ int		Server::rMOTDStartHandler(const Message &message, Client *client)
 int		Server::rEndOfMOTDHandler(const Message &message, Client *client)
 {
 	std::string	parameters;
+	Message		sendMessage;
 
 	(void)message;
 	parameters = client->getInfo(CURRENTNICK);
 	parameters += std::string(" :End of MOTD command");
-	Message sendMessage(this->prefix, RPL_ENDOFMOTD, parameters);
+	sendMessage = Message(this->prefix, RPL_ENDOFMOTD, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -205,6 +217,7 @@ int		Server::rMOTDContentHandler(const Message &message, Client *client)
 	std::string		prefix;
 	std::string		readResult;
 	std::string		parameters;
+	Message			sendMessage;
 
 	(void)message;
 	prefix = client->getInfo(CURRENTNICK);
@@ -215,7 +228,7 @@ int		Server::rMOTDContentHandler(const Message &message, Client *client)
 		std::cerr << ERROR_FILE_OPEN_FAIL << std::endl;
 		parameters = prefix;
 		parameters += std::string("42cursus c5 ft_irc made by kmin seunkim dakim");
-		Message sendMessage(this->prefix, RPL_MOTDCONTENT, parameters);
+		sendMessage = Message(this->prefix, RPL_MOTDCONTENT, parameters);
 		this->sendMessage(sendMessage, client);
 		return (CONNECT);
 	}
@@ -226,10 +239,17 @@ int		Server::rMOTDContentHandler(const Message &message, Client *client)
 		{
 			parameters = prefix;
 			parameters += readResult.substr(0, 79);
-			Message sendMessage(this->prefix, RPL_MOTDCONTENT, parameters);
+			sendMessage = Message(this->prefix, RPL_MOTDCONTENT, parameters);
 			this->sendMessage(sendMessage, client);
 		}
 	}
 	stream.close();
+	return (CONNECT);
+}
+
+int		Server::rNickHandler(const Message &message, Client *client)
+{
+	(void)message;
+	(void)client;
 	return (CONNECT);
 }
