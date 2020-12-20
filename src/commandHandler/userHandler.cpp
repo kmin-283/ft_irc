@@ -128,5 +128,11 @@ int					Server::userHandler(const Message &message, Client *client)
 		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
 		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
 	}
+	else if (client->getStatus() == SERVER)
+	{
+	}
+	else if (client->getStatus() == USER)
+	{
+	}
 	return (CONNECT);
 }
