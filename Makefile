@@ -27,6 +27,10 @@ $(NAME) : $(OBJS) $(OBJS_COM) $(OBJS_RE)
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
+test:
+	cd ./tests; make re
+	./tests/test
+
 clean:
 	rm -rf $(OBJS) $(OBJS_COM) $(OBJS_RE)
 
