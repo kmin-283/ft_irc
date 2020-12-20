@@ -16,9 +16,11 @@ private:
 	void						setVector(std::vector<std::string> &vector, std::string &parameter);
 	void						setTotalMessage(const std::string &prefix, const std::string &message, const std::string &parameters);
 public:
+									Message(void);
 									Message(const std::string &message);
 									Message(const std::string &prefix, const std::string &command, const std::string &parameters);
 									~Message(void);
+	Message							&operator=(const Message &message);
 	std::string						getPrefix(void) const;
 	std::string						getCommand(void) const;
 	std::string						getParameter(int index) const;
