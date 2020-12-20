@@ -146,7 +146,7 @@ TEST_GROUP(UserHanderTest)
 		client = clientPtr;
 		sendMessage = message;
 	}
-	void		given(Server &server, std::string userName, std::string realName,
+	void		given(Server &server, std::string userName, std::string realName, std::string address,
 				std::string hopCount, std::string hostName, int connectStatus, ClientStatus status)
 	{
 		if (client != NULL)
@@ -154,6 +154,7 @@ TEST_GROUP(UserHanderTest)
 			CHECK_EQUAL(connectStatus, server.userHandler(sendMessage, client));
 			CHECK_EQUAL(client->getStatus(), status);
 			CHECK_EQUAL(client->getInfo(USERNAME), userName);
+			CHECK_EQUAL(client->getInfo(ADDRESS), address);
 			CHECK_EQUAL(client->getInfo(REALNAME), realName);
 			CHECK_EQUAL(client->getInfo(HOPCOUNT), hopCount);
 			CHECK_EQUAL(client->getInfo(HOSTNAME), hostName);
@@ -171,17 +172,18 @@ TEST(UserHanderTest, RegisterUserOnly)
 	if (pipe(fd) != -1)
 	{
 		server.serverName = std::string("localhost.3000");
+		server.ipAddress = std::string("127.0.0.1");
 		client = new Client(fd[1], true);
 		message = Message("USER da 1 1 :dakim\r\n");
 		expect(client, message);
-		given(server, std::string("da"), std::string("dakim"), std::string("1"),
-		std::string("localhost.3000"), CONNECT, UNKNOWN);
+		given(server, std::string("da"), std::string("dakim"), std::string("127.0.0.1"),
+		std::string("1"), std::string("localhost.3000"), CONNECT, UNKNOWN);
 		delete client;
 		client = new Client(fd[1], true);
 		message = Message("USER da 1 1 dakim\r\n");
 		expect(client, message);
-		given(server, std::string("da"), std::string("dakim"), std::string("1"),
-		std::string("localhost.3000"), CONNECT, UNKNOWN);
+		given(server, std::string("da"), std::string("dakim"), std::string("127.0.0.1"),
+		std::string("1"), std::string("localhost.3000"), CONNECT, UNKNOWN);
 		close(fd[0]);
 		close(fd[1]);
 		delete client;
@@ -199,13 +201,15 @@ TEST(UserHanderTest, RegisterNickUser)
 	{
 		server.serverName = std::string("localhost.3000");
 		server.motdDir = std::string("./ft_irc.motd");
+		server.ipAddress = std::string("127.0.0.1");
 		client = new Client(fd[1], true);
 		message = Message("USRE da 1 1 :dakim\r\n");
 		server.nickHandler(Message(std::string("NICK dakim\r\n")), client);
 		expect(client, message);
-		given(server, std::string("da"), std::string("dakim"), std::string("1"),
-		std::string("localhost.3000"), CONNECT, USER);
+		given(server, std::string("da"), std::string("dakim"), std::string("127.0.0.1"),
+		std::string("1"), std::string("localhost.3000"), CONNECT, USER);
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(USERNAME), std::string("da"));
+		CHECK_EQUAL(server.sendClients["dakim"].getInfo(ADDRESS), std::string("127.0.0.1"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(REALNAME), std::string("dakim"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(HOPCOUNT), std::string("1"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(HOSTNAME), std::string("localhost.3000"));

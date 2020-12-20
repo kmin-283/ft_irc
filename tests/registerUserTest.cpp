@@ -11,18 +11,20 @@ TEST_GROUP(RegisterUser)
 		server = serverPtr;
 	}
 	void		given(std::string nick, std::string userName, std::string realName,
-				std::string hopCount, std::string hostName, ClientStatus status)
+		std::string address, std::string hopCount, std::string hostName, ClientStatus status)
 	{
 		if (client != NULL)
 		{
 			CHECK_EQUAL(client->getStatus(), status);
 			CHECK_EQUAL(client->getInfo(NICK), nick);
 			CHECK_EQUAL(client->getInfo(USERNAME), userName);
+			CHECK_EQUAL(client->getInfo(ADDRESS), address);
 			CHECK_EQUAL(client->getInfo(REALNAME), realName);
 			CHECK_EQUAL(client->getInfo(HOPCOUNT), hopCount);
 			CHECK_EQUAL(client->getInfo(HOSTNAME), hostName);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(NICK), nick);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(USERNAME), userName);
+			CHECK_EQUAL(server->sendClients["dakim"].getInfo(ADDRESS), address);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(REALNAME), realName);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(HOPCOUNT), hopCount);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(HOSTNAME), hostName);
@@ -50,6 +52,7 @@ TEST(RegisterUser, NickFirst)
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
+		server.ipAddress = std::string("127.0.0.1");
 		nickMessage = Message(std::string("NICK dakim\r\n"));
 		userMessage = Message(std::string("USER da 1 1 :kkiii kkii\r\n"));
 		expect(&server, client);
@@ -59,7 +62,8 @@ TEST(RegisterUser, NickFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"), std::string("1"), std::string("localhost.3000"), USER);
+		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
 		free(result);
@@ -131,6 +135,7 @@ TEST(RegisterUser, UserFirst)
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
+		server.ipAddress = std::string("127.0.0.1");
 		nickMessage = Message(std::string("NICK dakim\r\n"));
 		userMessage = Message(std::string("USER da 1 1 :kkiii kkii\r\n"));
 		expect(&server, client);
@@ -140,7 +145,8 @@ TEST(RegisterUser, UserFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"), std::string("1"), std::string("localhost.3000"), USER);
+		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
 		free(result);
@@ -192,50 +198,128 @@ TEST(RegisterUser, UserFirst)
 	}
 }
 
-// TEST(RegisterUser, BroadCastNick)
-// {
-// 	int			i;
-// 	int			fd[6];
-// 	char		*result;
-// 	Client		*client;
-// 	Client		*otherServer;
-// 	Client		*anotherServer;
-// 	std::string	expectStr;
-// 	Server		server("111", "3000");
-// 	Message		message(std::string("NICK dakim\r\n"));
+TEST(RegisterUser, BroadCastUserFirst)
+{
+	int			i;
+	int			fd[6];
+	char		*result;
+	Client		*client;
+	Client		*otherServer;
+	Client		*anotherServer;
+	std::string	expectStr;
+	Server		server("111", "3000");
+	Message		nickMessage;
+	Message		userMessage;
 
-// 	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
-// 	{
-// 		client = new Client(fd[1], true);
-// 		otherServer = new Client(fd[3], true);
-// 		anotherServer = new Client(fd[5], true);
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+		otherServer->setInfo(SERVERNAME, "otherServer");
+		anotherServer->setInfo(SERVERNAME, "anotherServer");
+		server.serverList["otherServer"] = otherServer;
+		server.serverList["anotherServer"] = anotherServer;
+		server.ipAddress = std::string("127.0.0.1");
+		server.prefix = std::string(":localhost.3000");
+		server.serverName = std::string("localhost.3000");
+		server.version = std::string("ircserv.1.0");
+		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.userMode = std::string("abBcCFiIoqrRswx");
+		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
+		server.motdDir = std::string("./ft_irc.motd");
+		server.ipAddress = std::string("127.0.0.1");
+		nickMessage = Message(std::string("NICK dakim\r\n"));
+		userMessage = Message(std::string("USER da 1 1 :kkiii kkii\r\n"));
+		expect(&server, client);
+		server.userHandler(userMessage, client);
+		server.nickHandler(nickMessage, client);
+		if (server.clientList.find("dakim") != server.clientList.end())
+			CHECK_EQUAL(1, 1);
+		else
+			CHECK_EQUAL(1, 0);
+		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~da 127.0.0.1 localhost.3000 :kkiii kkii\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~da 127.0.0.1 localhost.3000 :kkiii kkii\r"));
+		free(result);
+		i = -1;
+		while (fd[++i] < 6)
+			close(fd[i]);
+		delete client;
+		delete otherServer;
+		delete anotherServer;
+	}
+}
 
-// 		client->setInfo(USERNAME, "dakim");
-// 		client->setInfo(HOSTNAME, "localhost.3000");
-// 		client->setInfo(HOPCOUNT, "1");
-// 		otherServer->setInfo(SERVERNAME, "otherServer");
-// 		anotherServer->setInfo(SERVERNAME, "anotherServer");
-// 		server.prefix = std::string(":localhost.3000");
-// 		server.serverName = std::string("localhost.3000");
-// 		server.version = std::string("ircserv.1.0");
-// 		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
-// 		server.userMode = std::string("abBcCFiIoqrRswx");
-// 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
-// 		server.motdDir = std::string("./ft_irc.motd");
-// 		server.serverList["otherServer"] = otherServer;
-// 		server.serverList["anotherServer"] = anotherServer;
-// 		server.nickHandler(message, client);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
-// 		free(result);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
-// 		free(result);
-// 		i = -1;
-// 		while (fd[++i] < 6)
-// 			close(fd[i]);
-// 		delete client;
-// 		delete otherServer;
-// 		delete anotherServer;
-// 	}
-// }
+TEST(RegisterUser, BroadCastNickFirst)
+{
+	int			i;
+	int			fd[6];
+	char		*result;
+	Client		*client;
+	Client		*otherServer;
+	Client		*anotherServer;
+	std::string	expectStr;
+	Server		server("111", "3000");
+	Message		nickMessage;
+	Message		userMessage;
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+		otherServer->setInfo(SERVERNAME, "otherServer");
+		anotherServer->setInfo(SERVERNAME, "anotherServer");
+		server.serverList["otherServer"] = otherServer;
+		server.serverList["anotherServer"] = anotherServer;
+		server.ipAddress = std::string("127.0.0.1");
+		server.prefix = std::string(":localhost.3000");
+		server.serverName = std::string("localhost.3000");
+		server.version = std::string("ircserv.1.0");
+		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.userMode = std::string("abBcCFiIoqrRswx");
+		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
+		server.motdDir = std::string("./ft_irc.motd");
+		server.ipAddress = std::string("127.0.0.1");
+		nickMessage = Message(std::string("NICK dakim\r\n"));
+		userMessage = Message(std::string("USER da 1 1 :kkiii kkii\r\n"));
+		expect(&server, client);
+		server.nickHandler(nickMessage, client);
+		server.userHandler(userMessage, client);
+		if (server.clientList.find("dakim") != server.clientList.end())
+			CHECK_EQUAL(1, 1);
+		else
+			CHECK_EQUAL(1, 0);
+		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~da 127.0.0.1 localhost.3000 :kkiii kkii\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~da 127.0.0.1 localhost.3000 :kkiii kkii\r"));
+		free(result);
+		i = -1;
+		while (fd[++i] < 6)
+			close(fd[i]);
+		delete client;
+		delete otherServer;
+		delete anotherServer;
+	}
+}

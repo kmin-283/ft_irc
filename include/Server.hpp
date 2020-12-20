@@ -11,12 +11,15 @@ class																	Server
 {
 private:
 	std::string															prefix;
+
+	std::string															ipAddress;
 	std::string															serverName;
 	std::string															version;
 	std::string															startTime;
 	std::string															userMode;
 	std::string															channelMode;
 	std::string															motdDir;
+
 	std::string															pass;
 	std::string															info;
 	const char															*port;
@@ -61,6 +64,7 @@ private:
 	int																	rMOTDStartHandler(const Message &message, Client *client);
 	int																	rEndOfMOTDHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
+	int																	rUserBroadcastHandler(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
 

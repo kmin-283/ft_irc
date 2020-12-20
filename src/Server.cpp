@@ -197,13 +197,15 @@ void					Server::disconnectClient(Client *client)
 {
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
-	if (client->getStatus() != UNKNOWN)
-	{
+	// if (client->getStatus() != UNKNOWN)
+	// {
 		if (this->sendClients.find(client->getInfo(1)) != this->sendClients.end())
 			this->sendClients.erase(client->getInfo(1));
 		if (this->serverList.find(client->getInfo(1)) != this->serverList.end())
 			this->serverList.erase(client->getInfo(1));
-	}
+		if (this->clientList.find(client->getInfo(1)) != this->serverList.end())
+			this->clientList.erase(client->getInfo(1));
+	// }
 	if (this->acceptClients.find(client->getFd()) != this->acceptClients.end())
 		this->acceptClients.erase(client->getFd());
 	std::cout << "Disconnect client." << std::endl;
