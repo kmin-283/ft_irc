@@ -30,9 +30,6 @@ static void			setNick(Client *client, const Message &message,
 
 int					Server::nickHandler(const Message &message, Client *client)
 {
-	std::string		userNick;
-
-	userNick = client->getInfo(CURRENTNICK) == "" ? "*" : client->getInfo(CURRENTNICK);
 	if (client->getStatus() == UNKNOWN)
 	{
 		if (message.getParameters().empty())
@@ -55,17 +52,9 @@ int					Server::nickHandler(const Message &message, Client *client)
 			return (CONNECT);
 		}
 		return ((this->*(this->replies[RPL_REGISTER_USER]))(message, client));
-
-		/*
-			환영 메시지
-			NICK broead cast
-			USER broad cast
-		*/
 	}
 	else if (client->getStatus() == USER)
 	{
-		// 프리픽스
-
 	}
 	else if (client->getStatus() == SERVER)
 	{
