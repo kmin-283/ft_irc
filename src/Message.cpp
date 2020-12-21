@@ -3,8 +3,8 @@
 /**
  *
  *  :prefix command param :param param
- * 
- * 
+ *
+ *
  * 	:irc.example.net SERVER localhost.6671 2 3 :!23
  *
  **/
@@ -50,7 +50,8 @@ void						Message::setTotalMessage(const std::string &prefix, const std::string 
 	if (prefix != "")
 		this->totalMessage += " ";
 	this->totalMessage += command;
-	this->totalMessage += " ";
+	if (parameters != "")
+		this->totalMessage += " ";
 	this->totalMessage += parameters;
 	this->totalMessage += CR_LF;
 }
@@ -85,7 +86,6 @@ void						Message::setParameters(std::string::const_iterator &iterator, const st
 		else
 		{
 			this->setString(parameter, iterator, message);
-
 			this->setVector(this->parameters, parameter);
 		}
 	}
@@ -97,17 +97,17 @@ void						Message::setVector(std::vector<std::string> &vector, std::string &para
 	parameter = "";
 }
 
-std::string					Message::getPrefix(void) const
+const std::string					Message::getPrefix(void) const
 {
 	return (this->prefix);
 }
 
-std::string					Message::getCommand(void) const
+const std::string					Message::getCommand(void) const
 {
 	return (this->command);
 }
 
-std::string					Message::getParameter(int index) const
+std::string					Message::getParameter(const int &index) const
 {
 	return (this->parameters[index]);
 }

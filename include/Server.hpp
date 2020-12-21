@@ -6,30 +6,23 @@
 # include "Message.hpp"
 # include "NumericReplies.hpp"
 
-/**
- *
- *
- **/
-
 class																	Server
 {
 private:
 	std::string															prefix;
 	std::string															pass;
+	std::string															info;
 	const char															*port;
 	int																	mainSocket;
 	int																	maxFd;
 	fd_set																readFds;
+
 	std::map<int, Client>												acceptClients;
 	std::map<std::string, Client>										sendClients;
+	std::map<std::string, Client>										serverList;
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 
-	//추가//
-	std::string															uplink;
-	std::map<std::string, Client *>									serverList;
-
-	struct addrinfo														*getAddrInfo(const std::string info);
-	void																clearClient(void);
 	void																renewFd(const int fd);
 
 	int																	passHandler(const Message &message, Client *client);
@@ -37,22 +30,19 @@ private:
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 
-	void																sendNumericReplies(const Message &message, Client *client);
-
+	void																connectClient(void);
 	void																disconnectClient(Client *client);
+
+	void																receiveMessage(const int fd);
+	void																sendMessage(const Message &message, Client *client);
+	void																broadcastMessage(const Message &message, Client *client);
+	void																sendAllInfo(Client *client);
 public:
 																		Server(const char *pass, const char *port);
-	virtual																~Server(void);
-	virtual void														init(void);
-	virtual void														acceptConnection(void);
-	virtual void														receiveMessage(const int fd);
-
+																		~Server(void);
+	void																init(void);
 	void																start(void);
 	void																connectServer(const std::string address);
-
-	std::string															getPass(void) const;
-	int																	getSocket(void) const;
-
 
 	class GetAddressFailException: public std::exception
 	{

@@ -14,8 +14,8 @@ enum				ClientStatus
 enum				UserIndex
 {
 	PREFIX,
-	ORIGINNICK,
 	CURRENTNICK,
+	ORIGINNICK,
 	USERNAME
 };
 
@@ -27,6 +27,15 @@ enum				ServerIndex
 	SERVERINFO,
 };
 
+// D -- A -- B -- C
+
+// : A SERVER D 1 :123123
+
+// client A
+// : A SERVER D 2 :123123
+// client B
+// : A SERVER D 3 :123123
+
 // Ng - Sa - Sb
 // Sa - Ng - Sb
 
@@ -37,7 +46,7 @@ enum				ServerIndex
 // Sc fd(Sb = fd)
 // Sc Sb prefix, Hostname,ServerName
 
-// Sa 
+// Sa
 //  |
 // / \
 // Sb Sc
@@ -61,40 +70,28 @@ enum				ServerIndex
 class				Client
 {
 private:
-	int				fd;
-	bool			isAuthorized;
-	ClientStatus	status;
+	int							fd;
+	bool						isAuthorized;
 
-	std::string		prefix;
-	std::string		originNick;
-	std::string		currentNick;
-	std::string		userName;
-	std::string		hostName;
-	std::string		serverName;
-	std::string		realName;
+	// 추가
 
-	std::vector<std::string>	Info;
+	ClientStatus				status;
+	std::vector<std::string>	info;
 
 public:
-					Client();
-					Client(const int fd, const bool isAuthorized = false);
-					~Client(void);
-	int				getFd(void) const;
-	ClientStatus	getStatus(void) const;
-	void			setStatus(const ClientStatus &status);
-	bool			getIsAuthorized(void) const;
-	void			setIsAuthorized(bool isAuthorized);
-	std::string		getOriginNick(void) const;
-	void			setOriginNick(const std::string &originNick);
-	std::string		getCurrentNick(void) const;
-	void			setCurrentNick(const std::string &currentNick);
-	void			registerUser(const std::vector<std::string> &parameters);
-	bool			isClientRegistered(void);
+								Client(void);
+								Client(const int fd, const bool isAuthorized = false);
+								~Client(void);
 
-	void			setInfo(const Message &message, const std::string &myPrefix);
-	std::string		getInfo(const int &index) const;
+	int							getFd(void) const;
+	ClientStatus				getStatus(void) const;
+	void						setStatus(const ClientStatus &status);
+	bool						getIsAuthorized(void) const;
+	void						setIsAuthorized(bool isAuthorized);
+	void						setInfo(const int &index, const std::string &myPrefix);
 
-	std::string		getPrefix(void) const;
+	std::string					getInfo(const int &index) const;
+	std::vector<std::string>	getInfo(void) const;
 };
 
 #endif

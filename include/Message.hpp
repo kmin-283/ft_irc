@@ -19,10 +19,13 @@ public:
 									Message(const std::string &message);
 									Message(const std::string &prefix, const std::string &command, const std::string &parameters);
 									~Message(void);
-	std::string						getPrefix(void) const;
-	std::string						getCommand(void) const;
-	std::string						getParameter(int index) const;
+
+	const std::string						getPrefix(void) const;
+	const std::string						getCommand(void) const;
+
+	std::string						getParameter(const int &index) const;
 	std::vector<std::string>		getParameters(void) const;
+
 	const std::string				&getTotalMessage(void) const;
 };
 
