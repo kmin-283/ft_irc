@@ -5,15 +5,17 @@ Server::Server(const char *pass, const char *port)
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
-	// this->serverName
-	// this->version
-	// this->startTime
-	// this->userMode
-	// this->channelMode;
-
 
 	this->registerCommands();
 	this->registerReplies();
+
+	Client client;
+	client.setInfo(UPLINKSERVER, this->prefix);
+	client.setInfo(SERVERNAME, this->prefix.substr(1, this->prefix.length()));
+	client.setInfo(HOPCOUNT, "0");
+	client.setInfo(SERVERINFO, this->info);
+
+	this->serverList[client.getInfo(SERVERNAME)] = client;
 }
 
 Server::~Server(void)
@@ -61,7 +63,7 @@ void					Server::start(void)
 {
 	struct timeval timeout;
 
-	timeout.tv_sec = 2;
+	timeout.tv_sec = 5;
 	timeout.tv_usec = 0;
 	while(42)
 	{
@@ -105,6 +107,10 @@ void					Server::receiveMessage(const int fd)
 	int			connectionStatus;
 	Client 		&sender = this->acceptClients[fd];
 
+	// std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+	// auto duration = now.time_since_epoch();
+	// auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+
 	messageStr = "";
 	readResult = 0;
 	connectionStatus = CONNECT;
@@ -117,7 +123,7 @@ void					Server::receiveMessage(const int fd)
 			std::cout << "Reveive message = " << messageStr;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
-			messageStr = "";
+			messageStr.clear();
 		}
 		if (connectionStatus == DISCONNECT)
 			break ;
@@ -186,11 +192,13 @@ void					Server::connectServer(std::string address)
 	Client newClient(newFd);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
-	Message passMessage("PASS " + password + "\r\n");
-	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + "\r\n");
+	Message passMessage("PASS " + password + CR_LF);
+	Message serverMessage("SERVER " + this->prefix.substr(1, this->prefix.length()) + " 1 " + this->info + CR_LF);
 	this->sendMessage(passMessage, &newClient);
 	this->sendMessage(serverMessage, &newClient);
 	std::cout << "Connect other server." << std::endl;
+
+	newClient.setStatus(SERVER);
 }
 
 void					Server::disconnectClient(Client *client)
@@ -221,11 +229,14 @@ void					Server::sendMessage(const Message &message, Client *client)
 
 void					Server::broadcastMessage(const Message &message, Client *client)
 {
-	std::map<std::string, Client *>::iterator	iterator;
+	std::map<std::string, Client>::iterator	iterator;
 
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
-		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-			this->sendMessage(message, iterator->second);
+		if (iterator->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME)
+		&& iterator->second.getInfo(HOPCOUNT) == "1")
+		{
+			this->sendMessage(message, &iterator->second);
+		}
 	}
 }

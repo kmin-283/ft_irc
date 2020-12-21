@@ -29,6 +29,15 @@ enum				ServerIndex
 	SERVERINFO,
 };
 
+// D -- A -- B -- C
+
+// : A SERVER D 1 :123123
+
+// client A
+// : A SERVER D 2 :123123
+// client B
+// : A SERVER D 3 :123123
+
 // Ng - Sa - Sb
 // Sa - Ng - Sb
 
@@ -65,8 +74,12 @@ class				Client
 private:
 	int							fd;
 	bool						isAuthorized;
+
+	// 추가
+
 	ClientStatus				status;
 	std::vector<std::string>	info;
+
 public:
 								Client(void);
 								Client(const int fd, const bool isAuthorized = false);
@@ -78,6 +91,7 @@ public:
 	bool						getIsAuthorized(void) const;
 	void						setIsAuthorized(bool isAuthorized);
 	void						setInfo(const int &index, const std::string &myPrefix);
+
 	std::string					getInfo(const int &index) const;
 	std::vector<std::string>	getInfo(void) const;
 };

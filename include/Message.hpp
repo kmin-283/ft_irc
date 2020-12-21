@@ -23,8 +23,9 @@ public:
 	Message							&operator=(const Message &message);
 	std::string						getPrefix(void) const;
 	std::string						getCommand(void) const;
-	std::string						getParameter(int index) const;
+	std::string						getParameter(const int &index) const;
 	std::vector<std::string>		getParameters(void) const;
+
 	const std::string				&getTotalMessage(void) const;
 };
 
