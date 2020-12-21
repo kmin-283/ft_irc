@@ -9,6 +9,8 @@
  *
  **/
 
+Message::Message(void) {}
+
 Message::Message(const std::string &message)
  : totalMessage(message)
 {
@@ -35,6 +37,15 @@ Message::Message(const std::string &prefix, const std::string &command, const st
 
 Message::~Message(void)
 {
+}
+
+Message						&Message::operator=(const Message &message)
+{
+	this->totalMessage = message.totalMessage;
+	this->prefix = message.prefix;
+	this->command = message.command;
+	this->parameters = message.parameters;
+	return (*this);
 }
 
 void						Message::skipSpace(std::string::const_iterator &iterator, const std::string &message)

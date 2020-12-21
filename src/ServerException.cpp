@@ -29,8 +29,3 @@ const char		*Server::AcceptFailException::what() const throw()
 {
 	return ("ServerException:: Accept fail");
 }
-
-const char		*Server::ReceiveMessageFailException::what() const throw()
-{
-	return ("ServerException:: Receive messageStr fail");
-}
