@@ -75,12 +75,6 @@ int					Server::serverHandler(const Message &message, Client *client)
 		this->sendClients[message.getParameter(0)] = *client;
 		this->serverList[message.getParameter(0)] = *client;
 	}
-	// for(auto it = serverList.begin(); it != serverList.end();++it)
-	// {
-	// 	std::cout << "server list is => " << it->second.getInfo(UPLINKSERVER)
-	// 	<< " " << it->second.getInfo(SERVERNAME) << " "
-	// 	<< it->second.getInfo(HOPCOUNT) << std::endl;
-	// }
 	if (message.getPrefix() == "")
 	{
 		if (client->getStatus() == UNKNOWN)
