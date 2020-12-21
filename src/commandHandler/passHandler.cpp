@@ -9,10 +9,10 @@ int					Server::passHandler(const Message &message, Client *client)
 	else if (this->pass == message.getParameter(0))
 	{
 		// TODO privmsg함수로 바꿔야함
-		send(client->getFd(), "Password accepted\r\n", 20, 0);
+		send(client->getFd(), "Password accepted\r\n", 19, 0);
 		client->setIsAuthorized(true);
 	}
-	else
-		this->sendMessage(Message("", ERROR_STR, ": You put a wrong Password"), client);
+	// else
+	// 	this->sendMessage(Message("", ERROR_STR, ": You put a wrong Password"), client);
 	return (0);
 }

@@ -19,7 +19,7 @@ private:
 
 	std::map<int, Client>												acceptClients;
 	std::map<std::string, Client>										sendClients;
-	std::map<std::string, Client *>										serverList;
+	std::map<std::string, Client>										serverList;
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 
@@ -36,6 +36,7 @@ private:
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
+	void																sendAllInfo(Client *client);
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);
