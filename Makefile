@@ -9,22 +9,30 @@ SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
-SRC_COM = nickHandler.cpp passHandler.cpp serverHandler.cpp userHandler.cpp
+SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp
 SRC_COM_DIR = ./src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))
 OBJS_COM = $(SRCS_COM:%.cpp=%.o)
 
+SRC_RE = registerReplies.cpp commandResponse.cpp errorResponse.cpp
+SRC_RE_DIR = ./src/responseHandler/
+SRCS_RE = $(addprefix $(SRC_RE_DIR), $(SRC_RE))
+OBJS_RE = $(SRCS_RE:%.cpp=%.o)
 
 all : $(NAME)
 
-$(NAME) : $(OBJS) $(OBJS_COM)
-	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS) $(OBJS_COM) -o $(NAME)
+$(NAME) : $(OBJS) $(OBJS_COM) $(OBJS_RE)
+	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS) $(OBJS_COM) $(OBJS_RE) -o $(NAME)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $(INCLUDE) $(TEST_H) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+test:
+	cd ./tests; make re
+	./tests/test
 
 clean:
-	rm -rf $(OBJS) $(OBJS_COM)
+	rm -rf $(OBJS) $(OBJS_COM) $(OBJS_RE)
 
 fclean : clean
 	rm -rf $(NAME)

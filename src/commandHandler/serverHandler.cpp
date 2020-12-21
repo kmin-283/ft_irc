@@ -54,7 +54,7 @@ int					Server::serverHandler(const Message &message, Client *client)
 	if (message.getParameter(1) != "1") // hopcount가 1이 아닌 경우
 	{
 		Client newClient(client->getFd());
-		
+
 		message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix)
 		: newClient.setInfo(UPLINKSERVER, message.getPrefix());
 		newClient.setInfo(SERVERNAME, message.getParameter(0));
@@ -62,7 +62,7 @@ int					Server::serverHandler(const Message &message, Client *client)
 		: newClient.setInfo(HOPCOUNT, message.getParameter(1));
 		newClient.setInfo(SERVERINFO, message.getParameter(2));
 		this->sendClients[message.getParameter(0)] = newClient;
-		this->serverList[message.getParameter(0)] = newClient;
+		this->serverList[message.getParameter(0)] = &this->sendClients[message.getParameter(0)];
 	}
 	else // hopcount가 1인 경우
 	{
@@ -83,13 +83,13 @@ int					Server::serverHandler(const Message &message, Client *client)
 			sendMessage(Message("PASS " + this->pass + CR_LF), client);
 			sendAllInfo(client);
 		}
-		broadcastMessage(Message(this->prefix, message.getCommand(), client->getInfo(SERVERNAME) + 
-		" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) + 
+		broadcastMessage(Message(this->prefix, message.getCommand(), client->getInfo(SERVERNAME) +
+		" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
 		" " + message.getParameter(2)), client);
 		return (0);
 	}
-	broadcastMessage(Message(message.getPrefix(), message.getCommand(), message.getParameter(0) + 
-	" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) + 
+	broadcastMessage(Message(message.getPrefix(), message.getCommand(), message.getParameter(0) +
+	" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
 	" " + message.getParameter(2)), client);
 	std::cout << message.getTotalMessage();
 	return (0);
