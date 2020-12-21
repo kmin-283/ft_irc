@@ -114,7 +114,7 @@ void					Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			std::cout << "Reveive message = " << messageStr;
+			// std::cout << "Reveive message = " << messageStr;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr.clear();
@@ -227,8 +227,8 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
-		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME)
-		&& iterator->second->getInfo(HOPCOUNT) == "1")
+		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+		// && iterator->second->getInfo(HOPCOUNT) == "1")
 		{
 			this->sendMessage(message, iterator->second);
 		}
