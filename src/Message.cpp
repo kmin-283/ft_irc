@@ -118,7 +118,7 @@ const std::string					Message::getCommand(void) const
 	return (this->command);
 }
 
-std::string					Message::getParameter(const int &index) const
+const std::string					Message::getParameter(const int &index) const
 {
 	return (this->parameters[index]);
 }

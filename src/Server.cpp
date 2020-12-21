@@ -9,13 +9,7 @@ Server::Server(const char *pass, const char *port)
 	this->registerCommands();
 	this->registerReplies();
 
-	Client client;
-	client.setInfo(UPLINKSERVER, this->prefix);
-	client.setInfo(SERVERNAME, this->prefix.substr(1, this->prefix.length()));
-	client.setInfo(HOPCOUNT, "0");
-	client.setInfo(SERVERINFO, this->info);
-
-	this->serverList[client.getInfo(SERVERNAME)] = client;
+	this->serverName = std::string("localhost.") + this->port;
 }
 
 Server::~Server(void)
@@ -63,7 +57,7 @@ void					Server::start(void)
 {
 	struct timeval timeout;
 
-	timeout.tv_sec = 5;
+	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
 	while(42)
 	{
@@ -229,14 +223,14 @@ void					Server::sendMessage(const Message &message, Client *client)
 
 void					Server::broadcastMessage(const Message &message, Client *client)
 {
-	std::map<std::string, Client>::iterator	iterator;
+	std::map<std::string, Client*>::iterator	iterator;
 
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
-		if (iterator->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME)
-		&& iterator->second.getInfo(HOPCOUNT) == "1")
+		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME)
+		&& iterator->second->getInfo(HOPCOUNT) == "1")
 		{
-			this->sendMessage(message, &iterator->second);
+			this->sendMessage(message, iterator->second);
 		}
 	}
 }

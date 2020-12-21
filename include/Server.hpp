@@ -5,7 +5,7 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Message.hpp"
-# include "NumericReplies.hpp"
+# include "Replies.hpp"
 
 class																	Server
 {

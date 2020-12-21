@@ -19,16 +19,21 @@
 
 void			Server::sendAllInfo(Client *client)
 {
-	std::map<std::string, Client>::iterator it;
+	std::map<std::string, Client*>::iterator it;
+
+	this->sendMessage(Message(this->prefix, "SERVER",
+			this->serverName + " "
+			+ "1" + " "
+			+ this->info), client);
 
 	for(it = this->serverList.begin(); it != this->serverList.end(); ++it)
 	{
-		if (it->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+		if (it->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
 		{
-			this->sendMessage(Message(it->second.getInfo(UPLINKSERVER), "SERVER",
-			it->second.getInfo(SERVERNAME) + " "
-			+ std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1) + " "
-			+ it->second.getInfo(SERVERINFO)), client);
+			this->sendMessage(Message(it->second->getInfo(UPLINKSERVER), "SERVER",
+			it->second->getInfo(SERVERNAME) + " "
+			+ std::to_string(ft_atoi(it->second->getInfo(HOPCOUNT).c_str()) + 1) + " "
+			+ it->second->getInfo(SERVERINFO)), client);
 		}
 	}
 }
@@ -73,7 +78,7 @@ int					Server::serverHandler(const Message &message, Client *client)
 		client->setInfo(SERVERINFO, message.getParameter(2));
 
 		this->sendClients[message.getParameter(0)] = *client;
-		this->serverList[message.getParameter(0)] = *client;
+		this->serverList[message.getParameter(0)] = client;
 	}
 	if (message.getPrefix() == "")
 	{
