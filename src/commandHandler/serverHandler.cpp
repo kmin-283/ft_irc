@@ -46,14 +46,15 @@ int					Server::serverHandler(const Message &message, Client *client)
 	|| (message.getParameter(0).find('.') == std::string::npos))
 	// || (message.getPrefix() != client->getPrefix()))
 	{
-		this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
-		return (ERROR);
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		// this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
+		// return (ERROR);
 	}
 	if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
 	|| (message.getPrefix() == "" &&
 	this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
 	{
-		this->sendMessage(Message("", "ERROR", " :ID " + message.getParameter(0) + " already registered"), client);
+		this->sendMessage(Message("", "ERROR", ":ID " + message.getParameter(0) + " already registered"), client);
 		return (DISCONNECT);
 	}
 	if (message.getParameter(1) != "1") // hopcount가 1이 아닌 경우

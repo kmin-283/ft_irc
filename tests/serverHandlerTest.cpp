@@ -77,21 +77,21 @@ TEST(LocalServerErrorTest, AuthorizedSyntaxError)
 }
 
 // TODO 공백 두번
-// TEST(LocalServerErrorTest, ServerNameOverlap)
-// {
-// 	Message		message;
-// 	Server		server("111", "3000");
-// 	Client		otherServer;
+TEST(LocalServerErrorTest, ServerNameOverlap)
+{
+	Message		message;
+	Server		server("111", "3000");
+	Client		otherServer;
 
-// 	message = Message("SERVER localhost.3000 1 :1\r\n");
-// 	expect(message, true);
-// 	given(server, DISCONNECT, std::string("ERROR :ID localhost.3000 already registered\r"));
-// 	otherServer.setInfo(SERVERNAME, "localhost.123");
-// 	server.sendClients[otherServer.getInfo(SERVERNAME)] = otherServer;
-// 	message = Message("SERVER localhost.123 1 :1\r\n");
-// 	expect(message, true);
-// 	given(server, DISCONNECT, std::string("ERROR :ID localhost.123 already registered\r"));
-// }
+	message = Message("SERVER localhost.3000 1 :1\r\n");
+	expect(message, true);
+	given(server, DISCONNECT, std::string("ERROR :ID localhost.3000 already registered\r"));
+	otherServer.setInfo(SERVERNAME, "localhost.123");
+	server.sendClients[otherServer.getInfo(SERVERNAME)] = otherServer;
+	message = Message("SERVER localhost.123 1 :1\r\n");
+	expect(message, true);
+	given(server, DISCONNECT, std::string("ERROR :ID localhost.123 already registered\r"));
+}
 
 TEST_GROUP(LocalServerTest)
 {
@@ -128,33 +128,33 @@ TEST_GROUP(LocalServerTest)
 
 // TODO pass prefix없음
 // TODO up link 세미콜론
-// TEST(LocalServerTest, RegisterServer)
-// {
-// 	int			fd[2];
-// 	char		*result;
-// 	Client		*client;
-// 	std::string	expectStr;
-// 	Message		serverMessage;
-// 	Server		server("111", "3000");
+TEST(LocalServerTest, RegisterServer)
+{
+	int			fd[2];
+	char		*result;
+	Client		*client;
+	std::string	expectStr;
+	Message		serverMessage;
+	Server		server("111", "3000");
 
-// 	if (pipe(fd) != -1)
-// 	{
-// 		client = new Client(fd[1], true);
-// 		serverMessage = Message("SERVER localhost.3001 1 :kikik kiki\r\n");
-// 		expect(&server, client);
-// 		server.serverHandler(serverMessage, client);
-// 		given(std::string("localhost.3000"), std::string("localhost.3001"), std::string("1"), std::string(":kikik kiki"), SERVER);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-// 		free(result);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
-// 		free(result);
-// 		close(fd[1]);
-// 		close(fd[0]);
-// 		delete client;
-// 	}
-// }
+	if (pipe(fd) != -1)
+	{
+		client = new Client(fd[1], true);
+		serverMessage = Message("SERVER localhost.3001 1 :kikik kiki\r\n");
+		expect(&server, client);
+		server.serverHandler(serverMessage, client);
+		given(std::string("localhost.3000"), std::string("localhost.3001"), std::string("1"), std::string(":kikik kiki"), SERVER);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
+		free(result);
+		close(fd[1]);
+		close(fd[0]);
+		delete client;
+	}
+}
 
 // TODO 토큰 없음 -> ngircd작동 안함
 // TEST(LocalServerTest, RegisterServer)
