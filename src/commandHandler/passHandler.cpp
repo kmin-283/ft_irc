@@ -13,5 +13,5 @@ int					Server::passHandler(const Message &message, Client *client)
 	}
 	// else
 	// 	this->sendMessage(Message("", ERROR_STR, ": You put a wrong Password"), client);
-	return (0);
+	return (CONNECT);
 }

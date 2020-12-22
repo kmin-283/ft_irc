@@ -40,7 +40,7 @@
 # define CR_LF "\r\n"
 
 # define CONNECT 1
-# define DISCONNECT -1
+# define DISCONNECT 0
 
 # define DEFAULT_SIZE 10
 

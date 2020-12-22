@@ -55,12 +55,24 @@ int		Server::eAlreadyRegisteredHandler(const Message &message, Client *client)
 {
 	std::string	parameters;
 	Message		sendMessage;
+	int			connectionStatus;
 
 	(void)message;
-	parameters += std::string(":Unauthorized command (already registered)");
+	if (message.getCommand() == "USER")
+	{
+		parameters += std::string(":Unauthorized command (already registered)");
+		connectionStatus = CONNECT;
+	}
+	else
+	{
+		parameters += std::string(":ID ");
+		parameters += message.getParameter(0);
+		parameters += std::string(" already registered");
+		connectionStatus = DISCONNECT;
+	}
 	sendMessage = Message(this->prefix, ERR_ALREADYREGISTRED, parameters);
 	this->sendMessage(sendMessage, client);
-	return (CONNECT);
+	return (connectionStatus);
 }
 
 int		Server::ePassUnauthorizedHandler(const Message &message, Client *client)

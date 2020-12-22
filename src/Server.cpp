@@ -180,6 +180,8 @@ void					Server::connectServer(std::string address)
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	Client newClient(newFd);
+
+	newClient.setStatus(SERVER);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
@@ -187,9 +189,6 @@ void					Server::connectServer(std::string address)
 	this->sendMessage(passMessage, &newClient);
 	this->sendMessage(serverMessage, &newClient);
 	std::cout << "Connect other server." << std::endl;
-
-	newClient.setStatus(SERVER);
-
 	// Message versionMessage(std::string(":localhost.3000 VERSION irc.example.net")+ CR_LF);
 	// this->sendMessage(versionMessage, &newClient);
 	// std::cout << "versionnn" << std::endl;

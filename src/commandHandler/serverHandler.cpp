@@ -38,65 +38,106 @@ void			Server::sendAllInfo(Client *client)
 	}
 }
 
+
 int					Server::serverHandler(const Message &message, Client *client)
 {
-	std::cout << "=======in=======" << std::endl;
-
-	if (!client->getIsAuthorized() || (3 > message.getParameters().size())
-	|| (message.getParameter(0).find('.') == std::string::npos))
-	// || (message.getPrefix() != client->getPrefix()))
+	std::cout << "in" << std::endl;
+	if (client->getStatus() == UNKNOWN)
 	{
-		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		// this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, "* SERVER :Syntax error"), client);
-		// return (ERROR);
-	}
-	if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
-	|| (message.getPrefix() == "" &&
-	this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
-	{
-		this->sendMessage(Message("", "ERROR", ":ID " + message.getParameter(0) + " already registered"), client);
-		return (DISCONNECT);
-	}
-	if (message.getParameter(1) != "1") // hopcount가 1이 아닌 경우
-	{
-		Client newClient(client->getFd());
-
-		message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
-		: newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
-		newClient.setInfo(SERVERNAME, message.getParameter(0));
-		message.getPrefix() == "" ? newClient.setInfo(HOPCOUNT, "1")
-		: newClient.setInfo(HOPCOUNT, message.getParameter(1));
-		newClient.setInfo(SERVERINFO, message.getParameter(2));
-		this->sendClients[message.getParameter(0)] = newClient;
-		// this->serverList[message.getParameter(0)] = &this->sendClients[message.getParameter(0)];
-	}
-	else // hopcount가 1인 경우
-	{
-		message.getPrefix() == "" ? client->setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
-		: client->setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
+		std::cout << "1" << std::endl;
+		if (!client->getIsAuthorized() || (3 != message.getParameters().size())
+		|| (message.getParameter(0).find('.') == std::string::npos))
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end()
+		|| this->serverName == message.getParameter((0)))
+		{
+			std::cout << message.getParameter(0) << std::endl;
+			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+		}
+		client->setStatus(SERVER);
+		client->setInfo(UPLINKSERVER, this->serverName);
 		client->setInfo(SERVERNAME, message.getParameter(0));
-		client->setInfo(HOPCOUNT, message.getParameter(1));
+		client->setInfo(HOPCOUNT, std::string("1"));
 		client->setInfo(SERVERINFO, message.getParameter(2));
-
 		this->sendClients[message.getParameter(0)] = *client;
 		this->serverList[message.getParameter(0)] = client;
+		return ((this->*(this->replies[RPL_SERVER]))(message, client));
 	}
-	if (message.getPrefix() == "")
+	else if (client->getStatus() == SERVER)
 	{
-		if (client->getStatus() == UNKNOWN)
+		std::cout << "2" << std::endl;
+		if (message.getPrefix() == ""
+		|| !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length())))
+			return (CONNECT);
+		if (message.getParameters().size() != 4)
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		if (this->sendClients.count(message.getParameter(0)))
+			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+		if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end()
+		|| this->serverName == message.getParameter((0)))
 		{
-			client->setStatus(SERVER);
-			sendMessage(Message("PASS " + this->pass + CR_LF), client);
-			sendAllInfo(client);
+			// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);	
+			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));	
 		}
-		broadcastMessage(Message(this->prefix, message.getCommand(), client->getInfo(SERVERNAME) +
-		" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
-		" " + message.getParameter(2)), client);
-		return (0);
 	}
-	broadcastMessage(Message(message.getPrefix(), message.getCommand(), message.getParameter(0) +
-	" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
-	" " + message.getParameter(2)), client);
-	std::cout << message.getTotalMessage();
-	return (0);
+	else if (client->getStatus() == USER)
+	{
+		// syntax error
+	}
+
+	// if (!client->getIsAuthorized() || (3 > message.getParameters().size())
+	// || (message.getParameter(0).find('.') == std::string::npos))
+	// // || (message.getPrefix() != client->getPrefix()))
+	// {
+	// 	return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	// }
+	// if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
+	// || (message.getPrefix() == "" &&
+	// this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
+	// {
+	// 	this->sendMessage(Message("", "ERROR", ":ID " + message.getParameter(0) + " already registered"), client);
+	// 	return (DISCONNECT);
+	// }
+	// if (message.getParameter(1) != "1") // hopcount가 1이 아닌 경우
+	// {
+	// 	Client newClient(client->getFd());
+	// 	// client->getStatus() == SERVER;
+	// 	message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
+	// 	: newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
+	// 	newClient.setInfo(SERVERNAME, message.getParameter(0));
+	// 	message.getPrefix() == "" ? newClient.setInfo(HOPCOUNT, "1")
+	// 	: newClient.setInfo(HOPCOUNT, message.getParameter(1));
+	// 	newClient.setInfo(SERVERINFO, message.getParameter(2));
+	// 	this->sendClients[message.getParameter(0)] = newClient;
+	// 	// this->serverList[message.getParameter(0)] = &this->sendClients[message.getParameter(0)];
+	// }
+	// else // hopcount가 1인 경우
+	// {
+	// 	message.getPrefix() == "" ? client->setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
+	// 	: client->setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
+	// 	client->setInfo(SERVERNAME, message.getParameter(0));
+	// 	client->setInfo(HOPCOUNT, message.getParameter(1));
+	// 	client->setInfo(SERVERINFO, message.getParameter(2));
+
+	// 	this->sendClients[message.getParameter(0)] = *client;
+	// 	this->serverList[message.getParameter(0)] = client;
+	// }
+	// if (message.getPrefix() == "")
+	// {
+	// 	if (client->getStatus() == UNKNOWN)
+	// 	{
+	// 		client->setStatus(SERVER);
+	// 		sendMessage(Message(this->prefix, "PASS", this->pass), client);
+	// 		sendAllInfo(client);
+	// 	}
+	// 	broadcastMessage(Message(this->prefix, message.getCommand(), client->getInfo(SERVERNAME) +
+	// 	" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
+	// 	" " + message.getParameter(2)), client);
+	// 	return (CONNECT);
+	// }
+	// broadcastMessage(Message(message.getPrefix(), message.getCommand(), message.getParameter(0) +
+	// " " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
+	// " " + message.getParameter(2)), client);
+	// std::cout << message.getTotalMessage();
+	return (CONNECT);
 }

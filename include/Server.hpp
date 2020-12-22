@@ -65,6 +65,11 @@ private:
 	int																	rEndOfMOTDHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
 	int																	rUserBroadcastHandler(const Message &message, Client *client);
+	int																	rPassHandler(const Message &message, Client *client);
+	int																	rServerHandler(const Message &message, Client *client);
+	int																	rHostHandler(const Message &message, Client *client);
+	int																	rOtherServerHandler(const Message &message, Client *client);
+	int																	rServerBroadcastHandler(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
 

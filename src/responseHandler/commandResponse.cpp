@@ -288,3 +288,89 @@ int		Server::rUserBroadcastHandler(const Message &message, Client *client)
 	this->broadcastMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::rPassHandler(const Message &message, Client *client)
+{
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	parameters = this->pass;
+	sendMessage = Message(this->prefix, RPL_PASS, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::rHostHandler(const Message &message, Client *client)
+{
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	parameters += this->serverName;
+	parameters += std::string(" ");
+	parameters += client->getInfo(HOPCOUNT);
+	if (message.getParameters().size() == 4)
+		parameters += std::string(" 0 ");
+	else
+		parameters += std::string(" ");
+	parameters += this->info;
+	sendMessage = Message(this->prefix, RPL_SERVER, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::rOtherServerHandler(const Message &message, Client *client)
+{
+	std::map<std::string, Client>::iterator	it;
+	std::string								prefix;
+	std::string								parameters;
+	Message									sendMessage;
+
+	(void)message;
+	for(it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
+	{
+		if (it->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+		{
+			prefix = std::string(":");
+			prefix += it->second.getInfo(UPLINKSERVER);
+			parameters = it->second.getInfo(SERVERNAME);
+			parameters += std::string(" ");
+			parameters += std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1);
+			parameters += std::string(" 0 ");
+			parameters += it->second.getInfo(SERVERINFO);
+			sendMessage = Message(prefix, RPL_SERVER, parameters);
+			this->sendMessage(sendMessage, client);
+		}
+	}
+	return (CONNECT);
+}
+
+int		Server::rServerBroadcastHandler(const Message &message, Client *client)
+{
+	std::string								prefix;
+	std::string								parameters;
+	Message									sendMessage;
+
+	(void)message;
+	prefix = std::string(":");
+	prefix += client->getInfo(UPLINKSERVER);
+	parameters = client->getInfo(SERVERNAME);
+	parameters += std::string(" ");
+	parameters += std::to_string(ft_atoi(client->getInfo(HOPCOUNT).c_str()) + 1);
+	parameters += std::string(" 0 ");
+	parameters += client->getInfo(SERVERINFO);
+	sendMessage = Message(prefix, RPL_SERVER, parameters);
+	this->broadcastMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::rServerHandler(const Message &message, Client *client)
+{
+	(this->*(this->replies[RPL_PASS]))(message, client);
+	(this->*(this->replies[RPL_HOST]))(message, client);
+	(this->*(this->replies[RPL_OTHERSERVER]))(message, client);
+	(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
+	return (CONNECT);
+}
+
