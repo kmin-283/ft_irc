@@ -624,6 +624,9 @@ TEST_GROUP(RegisterRemoteServerTest)
 // 		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SERVER localhost.3004 3 0 :1\r"));
 // 		free(result);
 // 		get_next_line(fd[0], &result);
+// 		CHECK_EQUAL(std::string(result), std::string(""));
+//		CHECK_EQUAL(server.sendClients.size(), 4);
+//		CHECK_EQUAL(server.serverList.size(), 3);
 // 		i = -1;
 // 		while (++i < 6)
 // 			close(fd[i]);
