@@ -27,6 +27,7 @@ enum				ServerIndex
 	SERVERNAME,
 	HOPCOUNT,
 	SERVERINFO,
+	TOKEN,
 };
 
 // D -- A -- B -- C

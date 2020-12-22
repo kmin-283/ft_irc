@@ -353,11 +353,13 @@ int		Server::rServerBroadcastHandler(const Message &message, Client *client)
 	Message									sendMessage;
 
 	(void)message;
-	prefix = std::string(":");
-	prefix += client->getInfo(UPLINKSERVER);
-	parameters = client->getInfo(SERVERNAME);
+	if (message.getPrefix() == "")
+		prefix = this->prefix;
+	else
+		prefix += message.getPrefix();
+	parameters = message.getParameter(0);
 	parameters += std::string(" ");
-	parameters += std::to_string(ft_atoi(client->getInfo(HOPCOUNT).c_str()) + 1);
+	parameters += std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1);
 	parameters += std::string(" 0 ");
 	parameters += client->getInfo(SERVERINFO);
 	sendMessage = Message(prefix, RPL_SERVER, parameters);

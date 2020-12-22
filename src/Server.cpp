@@ -185,7 +185,7 @@ void					Server::connectServer(std::string address)
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
-	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF);
+	Message serverMessage("SERVER " + this->serverName + " 1 0 " + this->info + CR_LF); //토큰 추가
 	this->sendMessage(passMessage, &newClient);
 	this->sendMessage(serverMessage, &newClient);
 	std::cout << "Connect other server." << std::endl;

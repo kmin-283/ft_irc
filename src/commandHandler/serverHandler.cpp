@@ -41,14 +41,13 @@ void			Server::sendAllInfo(Client *client)
 
 int					Server::serverHandler(const Message &message, Client *client)
 {
-	std::cout << "in" << std::endl;
 	if (client->getStatus() == UNKNOWN)
 	{
 		std::cout << "1" << std::endl;
-		if (!client->getIsAuthorized() || (3 != message.getParameters().size())
+		if (!client->getIsAuthorized() || (3 > message.getParameters().size()) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 		|| (message.getParameter(0).find('.') == std::string::npos))
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end()
+		if (this->sendClients.count(message.getParameter(0))
 		|| this->serverName == message.getParameter((0)))
 		{
 			std::cout << message.getParameter(0) << std::endl;
@@ -58,27 +57,78 @@ int					Server::serverHandler(const Message &message, Client *client)
 		client->setInfo(UPLINKSERVER, this->serverName);
 		client->setInfo(SERVERNAME, message.getParameter(0));
 		client->setInfo(HOPCOUNT, std::string("1"));
-		client->setInfo(SERVERINFO, message.getParameter(2));
+		if (message.getParameters().size() == 4)
+		{
+			client->setInfo(TOKEN, message.getParameter(2));
+			client->setInfo(SERVERINFO, message.getParameter(3));
+		}
+		else
+		{
+			client->setInfo(TOKEN, "0"); // 바뀌어야할 수도 있ㅇ므
+			client->setInfo(SERVERINFO, message.getParameter(2));
+		}
 		this->sendClients[message.getParameter(0)] = *client;
 		this->serverList[message.getParameter(0)] = client;
+		std::cout << "2" << std::endl;
 		return ((this->*(this->replies[RPL_SERVER]))(message, client));
 	}
 	else if (client->getStatus() == SERVER)
 	{
-		std::cout << "2" << std::endl;
+		std::cout << "3" << std::endl;
 		if (message.getPrefix() == ""
-		|| !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length())))
+		/*|| !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length()))*/) // 서버연결시에 새로운 연결일 수도 있음
 			return (CONNECT);
-		if (message.getParameters().size() != 4)
+		if (message.getParameters().size() < 3) // 첫 연결시에 :localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server. ==> parameter가 4가 아님
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (this->sendClients.count(message.getParameter(0)))
+		if (this->sendClients.count(message.getParameter(0)) || this->serverName == message.getParameter((0)))
+			// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);
 			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
-		if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end()
-		|| this->serverName == message.getParameter((0)))
+		// if ()
+		// {
+		// 	// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);	
+		// 	return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));	
+		// }
+		if (message.getParameter(1) == "1") // 홉카운트가 1
 		{
-			// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);	
-			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));	
+			client->setStatus(SERVER);
+			client->setInfo(UPLINKSERVER, this->serverName);
+			client->setInfo(SERVERNAME, message.getParameter(0));
+			client->setInfo(HOPCOUNT, std::string("1"));
+			if (message.getParameters().size() == 4)
+			{
+				client->setInfo(TOKEN, message.getParameter(2));
+				client->setInfo(SERVERINFO, message.getParameter(3));
+			}
+			else
+			{
+				client->setInfo(TOKEN, "0"); // 바뀌어야할 수도 있ㅇ므
+				client->setInfo(SERVERINFO, message.getParameter(2));
+			}
+			this->sendClients[message.getParameter(0)] = *client;
+			this->serverList[message.getParameter(0)] = client;
 		}
+		else
+		{
+			Client newClient(client->getFd());
+
+			newClient.setStatus(SERVER);
+			newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
+			newClient.setInfo(SERVERNAME, message.getParameter(0));
+			newClient.setInfo(HOPCOUNT, message.getParameter(1));
+			if (message.getParameters().size() == 4)
+			{
+				newClient.setInfo(TOKEN, message.getParameter(2));
+				newClient.setInfo(SERVERINFO, message.getParameter(3));
+			}
+			else
+			{
+				newClient.setInfo(TOKEN, "0"); // "바뀌어야 할 수도 있음" 서버의 멤버변수로 token을 지니고 있으면 어떨까
+				newClient.setInfo(SERVERINFO, message.getParameter(2));
+			}
+			this->sendClients[message.getParameter(0)] = newClient;
+		}
+		std::cout << "4" << std::endl;
+		(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
 	}
 	else if (client->getStatus() == USER)
 	{
