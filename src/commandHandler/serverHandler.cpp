@@ -30,7 +30,7 @@ void			Server::sendAllInfo(Client *client)
 	{
 		if (it->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
 		{
-			this->sendMessage(Message(it->second.getInfo(UPLINKSERVER), "SERVER",
+			this->sendMessage(Message(":" + it->second.getInfo(UPLINKSERVER), "SERVER",
 			it->second.getInfo(SERVERNAME) + " "
 			+ std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1) + " "
 			+ it->second.getInfo(SERVERINFO)), client);
@@ -60,8 +60,8 @@ int					Server::serverHandler(const Message &message, Client *client)
 	{
 		Client newClient(client->getFd());
 
-		message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix)
-		: newClient.setInfo(UPLINKSERVER, message.getPrefix());
+		message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
+		: newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
 		newClient.setInfo(SERVERNAME, message.getParameter(0));
 		message.getPrefix() == "" ? newClient.setInfo(HOPCOUNT, "1")
 		: newClient.setInfo(HOPCOUNT, message.getParameter(1));
@@ -71,8 +71,8 @@ int					Server::serverHandler(const Message &message, Client *client)
 	}
 	else // hopcount가 1인 경우
 	{
-		message.getPrefix() == "" ? client->setInfo(UPLINKSERVER, this->prefix)
-		: client->setInfo(UPLINKSERVER, message.getPrefix());
+		message.getPrefix() == "" ? client->setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
+		: client->setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
 		client->setInfo(SERVERNAME, message.getParameter(0));
 		client->setInfo(HOPCOUNT, message.getParameter(1));
 		client->setInfo(SERVERINFO, message.getParameter(2));

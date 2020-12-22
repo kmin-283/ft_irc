@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: pass(std::string(pass)), info(": kmin seunkim dakim made this server."), port(port), mainSocket(0), maxFd(0)
+	: version("ft-irc1.0"), pass(std::string(pass)), info(": kmin seunkim dakim made this server."), port(port), mainSocket(0), maxFd(0)
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
@@ -101,10 +101,6 @@ void					Server::receiveMessage(const int fd)
 	int			connectionStatus;
 	Client 		&sender = this->acceptClients[fd];
 
-	// std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-	// auto duration = now.time_since_epoch();
-	// auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-
 	messageStr = "";
 	readResult = 0;
 	connectionStatus = CONNECT;
@@ -114,7 +110,7 @@ void					Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			// std::cout << "Reveive message = " << messageStr;
+			std::cout << "Reveive message = " << messageStr;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr.clear();
@@ -187,12 +183,16 @@ void					Server::connectServer(std::string address)
 	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
-	Message serverMessage("SERVER " + this->prefix.substr(1, this->prefix.length()) + " 1 " + this->info + CR_LF);
+	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF);
 	this->sendMessage(passMessage, &newClient);
 	this->sendMessage(serverMessage, &newClient);
 	std::cout << "Connect other server." << std::endl;
 
 	newClient.setStatus(SERVER);
+
+	// Message versionMessage(std::string(":localhost.3000 VERSION irc.example.net")+ CR_LF);
+	// this->sendMessage(versionMessage, &newClient);
+	// std::cout << "versionnn" << std::endl;
 }
 
 void					Server::disconnectClient(Client *client)
@@ -216,7 +216,6 @@ void					Server::disconnectClient(Client *client)
 void					Server::sendMessage(const Message &message, Client *client)
 {
 	//TODO 512자가 넘은 경우 나누어 전송해야함
-	// if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
 	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
 }
@@ -228,7 +227,6 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
 		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-		// && iterator->second->getInfo(HOPCOUNT) == "1")
 		{
 			this->sendMessage(message, iterator->second);
 		}
