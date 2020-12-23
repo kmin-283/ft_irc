@@ -28,7 +28,7 @@ $(NAME) : $(OBJS) $(OBJS_COM) $(OBJS_RE)
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 test:
-	cd ./tests; make re
+	cd ./tests; make
 	./tests/test
 
 clean:

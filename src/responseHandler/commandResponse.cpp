@@ -369,9 +369,12 @@ int		Server::rServerBroadcastHandler(const Message &message, Client *client)
 
 int		Server::rServerHandler(const Message &message, Client *client)
 {
-	(this->*(this->replies[RPL_PASS]))(message, client);
-	(this->*(this->replies[RPL_HOST]))(message, client);
-	(this->*(this->replies[RPL_OTHERSERVER]))(message, client);
+	if (message.getPrefix() == "")
+	{
+		(this->*(this->replies[RPL_PASS]))(message, client);
+		(this->*(this->replies[RPL_HOST]))(message, client);
+		(this->*(this->replies[RPL_OTHERSERVER]))(message, client);
+	}
 	(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
 	return (CONNECT);
 }

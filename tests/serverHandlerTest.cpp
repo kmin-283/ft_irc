@@ -168,7 +168,7 @@ TEST(LocalServerTest, RegisterServerHopCountNotMatch)
 		serverMessage = Message("SERVER localhost.3001 1000 :kikik kiki\r\n");
 		expect(&server, client);
 		server.serverHandler(serverMessage, client);
-		given(std::string(":localhost.3000"), std::string("localhost.3001"), std::string("1"), std::string(":kikik kiki"), SERVER);
+		given(std::string("localhost.3000"), std::string("localhost.3001"), std::string("1"), std::string(":kikik kiki"), SERVER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
 		free(result);
@@ -250,7 +250,9 @@ TEST_GROUP(RemoteServerErrorTest)
 		connectionStatus = server.serverHandler(remoteServerMessage, client);
 		CHECK_EQUAL(connectionStatus, expectStatus);
 		if (!remoteServerMessage.getParameters().empty())
+		{
 			CHECK_EQUAL(server.sendClients.count(remoteServerMessage.getParameter(0)), serverCount);
+		}
 	}
 };
 
@@ -268,11 +270,11 @@ TEST(RemoteServerErrorTest, PrefixError)
 		expect(message, client);
 		given(server, CONNECT, fd[0], 0);
 		delete client;
-		client = new Client(fd[1], true);
-		message = Message("localhost.3001 SERVER localhost.3002 2 0 :123\r\n");
-		expect(message, client);
-		given(server, CONNECT, fd[0], 0);
-		delete client;
+		// client = new Client(fd[1], true);
+		// message = Message("localhost.3001 SERVER localhost.3002 2 0 :123\r\n");
+		// expect(message, client);
+		// given(server, CONNECT, fd[0], 0);
+		// delete client;
 		client = new Client(fd[1], true);
 		message = Message(":localhost.123123 SERVER localhost.3002 2 0 :123\r\n");
 		expect(message, client);
@@ -348,14 +350,15 @@ TEST(RemoteServerErrorTest, ServerNameError)
 	Message		clientMessage;
 	Message		otherServerMessage;
 	Message		anotherServerMessage;
-	// char		*result;
+	char		*result;
 	Client		*client;
 	Client		*otherServer;
 	Client		*anotherServer;
-	Server		server("111", "3000");
+	Server		*server;
 
 	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
 	{
+		server = new Server("111", "3000");
 		client = new Client(fd[1], true);
 		otherServer = new Client(fd[3], true);
 		anotherServer = new Client(fd[5], true);
@@ -364,93 +367,128 @@ TEST(RemoteServerErrorTest, ServerNameError)
 		otherServer->setStatus(SERVER);
 		anotherServer->setInfo(SERVERNAME, std::string("localhost.3003"));
 		anotherServer->setStatus(SERVER);
-		server.serverList["otherServer"] = otherServer;
-		server.serverList["anotherServer"] = anotherServer;
+		otherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string(":1"));
+		anotherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string(":1"));
+		server->serverList["localhost.3002"] = otherServer;
+		server->serverList["localhost.3003"] = anotherServer;
+		server->sendClients["localhost.3002"] = *otherServer;
+		server->sendClients["localhost.3003"] = *anotherServer;
 		expect(clientMessage, client);
-		given(server, DISCONNECT, fd[0], 1);
+		given(*server, DISCONNECT, fd[0], 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
+		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 462 :ID localhost.3001 already registered\r"));
 		free(result);
-		get_next_line(fd[2], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
-		free(result);
-		get_next_line(fd[4], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
-		free(result);
+
+		// get_next_line(fd[2], &result);
+		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
+		// free(result);
+
+		// get_next_line(fd[4], &result);
+		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
+		// free(result);
+
+		delete server;
 		delete client;
 		delete otherServer;
 		delete anotherServer;
 
-		// client = new Client(fd[1], true);
-		// otherServer = new Client(fd[3], true);
-		// anotherServer = new Client(fd[5], true);
-		// otherServerMessage = Message("SERVER localhost.3002 1 :1\r\n");
-		// anotherServerMessage = Message("SERVER localhost.3003 1 :1\r\n");
-		// clientMessage = Message(":localhost.3001 SERVER localhost.3000 1 0 :1\r\n");
-		// server.serverHandler(otherServerMessage, otherServer);
-		// server.serverHandler(anotherServerMessage, anotherServer);
-		// expect(clientMessage, client);
-		// given(server, CONNECT, fd[0], 1);
-		// get_next_line(fd[0], &result);
-		// CHECK_EQUAL(std::string(result), std::string("ERROR :ID \"localhost.3001\" already registered\r"));
-		// free(result);
-		// get_next_line(fd[2], &result);
-		// CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-		// free(result);
-		// get_next_line(fd[2], &result);
-		// CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 0 : kmin seunkim dakim made this server.\r"));
-		// free(result);
+		server = new Server("111", "3000");
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+		otherServerMessage = Message("SERVER localhost.3002 1 :1\r\n");
+		anotherServerMessage = Message("SERVER localhost.3003 1 :1\r\n");
+		clientMessage = Message(":localhost.3001 SERVER localhost.3000 1 0 :1\r\n");
+		otherServer->setInfo(SERVERNAME, std::string("localhost.3002"));
+		otherServer->setStatus(SERVER);
+		anotherServer->setInfo(SERVERNAME, std::string("localhost.3003"));
+		anotherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string(":1"));
+		anotherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string(":1"));
+		server->serverList["localhost.3002"] = otherServer;
+		server->serverList["localhost.3003"] = anotherServer;
+		server->sendClients["localhost.3002"] = *otherServer;
+		server->sendClients["localhost.3003"] = *anotherServer;
+		expect(clientMessage, client);
+		given(*server, DISCONNECT, fd[0], 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 462 :ID localhost.3000 already registered\r"));
+		free(result);
 		// get_next_line(fd[2], &result);
 		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
 		// free(result);
 		// get_next_line(fd[4], &result);
-		// CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-		// free(result);
-		// get_next_line(fd[4], &result);
-		// CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 0 : kmin seunkim dakim made this server.\r"));
-		// free(result);
-		// get_next_line(fd[4], &result);
 		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
 		// free(result);
-		// delete client;
-		// delete otherServer;
-		// delete anotherServer;
 
-		// client = new Client(fd[1], true);
-		// otherServer = new Client(fd[3], true);
-		// anotherServer = new Client(fd[5], true);
-		// otherServerMessage = Message("SERVER localhost.3002 1 :1\r\n");
-		// anotherServerMessage = Message("SERVER localhost.3003 1 :1\r\n");
-		// clientMessage = Message(":localhost.3001 SERVER localhost.3002 1 0 :1\r\n");
-		// server.serverHandler(otherServerMessage, otherServer);
-		// server.serverHandler(anotherServerMessage, anotherServer);
-		// expect(clientMessage, client);
-		// given(server, CONNECT, fd[0], 1);
-		// given(server, DISCONNECT, fd[0], 1);
-		// get_next_line(fd[0], &result);
-		// CHECK_EQUAL(std::string(result), std::string("ERROR :ID \"localhost.3001\" already registered\r"));
-		// free(result);
-		// get_next_line(fd[2], &result);
-		// CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-		// free(result);
-		// get_next_line(fd[2], &result);
-		// CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 0 : kmin seunkim dakim made this server.\r"));
-		// free(result);
+		delete server;
+		delete client;
+		delete otherServer;
+		delete anotherServer;
+
+		server = new Server("111", "3000");
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+		otherServerMessage = Message("SERVER localhost.3002 1 :1\r\n");
+		anotherServerMessage = Message("SERVER localhost.3003 1 :1\r\n");
+		clientMessage = Message(":localhost.3001 SERVER localhost.3002 1 0 :1\r\n");
+		otherServer->setInfo(SERVERNAME, std::string("localhost.3002"));
+		otherServer->setStatus(SERVER);
+		anotherServer->setInfo(SERVERNAME, std::string("localhost.3003"));
+		anotherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string(":1"));
+		anotherServer->setInfo(UPLINKSERVER, std::string("localhost.3000"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string(":1"));
+		server->serverList["localhost.3002"] = otherServer;
+		server->serverList["localhost.3003"] = anotherServer;
+		server->sendClients["localhost.3002"] = *otherServer;
+		server->sendClients["localhost.3003"] = *anotherServer;
+		expect(clientMessage, client);
+		given(*server, DISCONNECT, fd[0], 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 462 :ID localhost.3002 already registered\r"));
+		free(result);
 		// get_next_line(fd[2], &result);
 		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
 		// free(result);
 		// get_next_line(fd[4], &result);
-		// CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-		// free(result);
-		// get_next_line(fd[4], &result);
-		// CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 0 : kmin seunkim dakim made this server.\r"));
-		// free(result);
-		// get_next_line(fd[4], &result);
 		// CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SQUIT localhost.3001 :ID \"localhost.3001\" already registered\r"));
 		// free(result);
-		// delete client;
-		// delete otherServer;
-		// delete anotherServer;
+
+		delete server;
+		delete client;
+		delete otherServer;
+		delete anotherServer;
 
 		i = -1;
 		while (++i < 6)
@@ -458,7 +496,7 @@ TEST(RemoteServerErrorTest, ServerNameError)
 	}
 }
 
-// TODO hopCount, token이 숫자가 아닌경우
+// // TODO hopCount, token이 숫자가 아닌경우
 // TEST(RemoteServerErrorTest, HopCountTokenError)
 // {
 // 	int			fd[2];
@@ -490,53 +528,53 @@ TEST(RemoteServerErrorTest, ServerNameError)
 
 // TODO serverHandler 리턴값
 // TODO 메시지 에러
-// TEST(RemoteServerErrorTest, ServerMessageSendAfterNick)
-// {
-// 	int		fd[2];
-// 	int		status;
-// 	Server	server("111", "3000");
-// 	Message	nickMessage;
-// 	Message	serverMessage;
-// 	Client	*client;
+TEST(RemoteServerErrorTest, ServerMessageSendAfterNick)
+{
+	int		fd[2];
+	int		status;
+	Server	server("111", "3000");
+	Message	nickMessage;
+	Message	serverMessage;
+	Client	*client;
 
-// 	if (pipe(fd) != -1)
-// 	{
-// 		client = new Client(fd[1],true);
-// 		nickMessage = Message("NICK dakim\r\n");
-// 		server.nickHandler(nickMessage, client);
-// 		serverMessage = Message("SERVER localhost.3001 1 :1\r\n");
-// 		status = server.serverHandler(serverMessage, client);
-// 		CHECK_EQUAL(CONNECT, status);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 461 dakim SERVER :Syntax error\r\n"));
-// 		free(result);
-// 		delete client;
-// 	}
-// }
+	if (pipe(fd) != -1)
+	{
+		client = new Client(fd[1],true);
+		nickMessage = Message("NICK dakim\r\n");
+		server.nickHandler(nickMessage, client);
+		serverMessage = Message("SERVER localhost.3001 1 :1\r\n");
+		status = server.serverHandler(serverMessage, client);
+		CHECK_EQUAL(CONNECT, status);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 461 dakim SERVER :Syntax error\r"));
+		free(result);
+		delete client;
+	}
+}
 
-// TEST(RemoteServerErrorTest, ServerMessageSendAfterUser)
-// {
-// 	int		fd[2];
-// 	int		status;
-// 	Server	server("111", "3000");
-// 	Message	nickMessage;
-// 	Message	serverMessage;
-// 	Client	*client;
+TEST(RemoteServerErrorTest, ServerMessageSendAfterUser)
+{
+	int		fd[2];
+	int		status;
+	Server	server("111", "3000");
+	Message	nickMessage;
+	Message	serverMessage;
+	Client	*client;
 
-// 	if (pipe(fd) != -1)
-// 	{
-// 		client = new Client(fd[1],true);
-// 		nickMessage = Message("USER dakim 123 123 :123\r\n");
-// 		server.userHandler(nickMessage, client);
-// 		serverMessage = Message("SERVER localhost.3001 1 :1\r\n");
-// 		status = server.serverHandler(serverMessage, client);
-// 		CHECK_EQUAL(CONNECT, status);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 461 * SERVER :Syntax error\r\n"));
-// 		free(result);
-// 		delete client;
-// 	}
-// }
+	if (pipe(fd) != -1)
+	{
+		client = new Client(fd[1],true);
+		nickMessage = Message("USER dakim 123 123 :123\r\n");
+		server.userHandler(nickMessage, client);
+		serverMessage = Message("SERVER localhost.3001 1 :1\r\n");
+		status = server.serverHandler(serverMessage, client);
+		CHECK_EQUAL(CONNECT, status);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 461 * SERVER :Syntax error\r"));
+		free(result);
+		delete client;
+	}
+}
 
 TEST_GROUP(RegisterRemoteServerTest)
 {
@@ -566,84 +604,84 @@ TEST_GROUP(RegisterRemoteServerTest)
 	}
 };
 
-// TEST(RegisterRemoteServerTest, RegisterRemoteServer)
-// {
-// 	int		i;
-// 	int		fd[6];
-// 	char	*result;
-// 	Client	*client;
-// 	Client	*otherServer;
-// 	Client	*anotherServer;
-// 	Message	otherMessage;
-// 	Message	clientMessage;
-// 	Message	anotherMessage;
-// 	Message remoteMessage;
-// 	Server	server("111", "3000");
+TEST(RegisterRemoteServerTest, RegisterRemoteServer)
+{
+	int		i;
+	int		fd[6];
+	char	*result;
+	Client	*client;
+	Client	*otherServer;
+	Client	*anotherServer;
+	Message	otherMessage;
+	Message	clientMessage;
+	Message	anotherMessage;
+	Message remoteMessage;
+	Server	server("111", "3000");
 
-// 	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
-// 	{
-// 		client = new Client(fd[1], true);
-// 		otherServer = new Client(fd[3], true);
-// 		anotherServer = new Client(fd[5], true);
-// 		clientMessage = Message("SERVER localhost.3001 1 :1\r\n");
-// 		otherMessage = Message("SERVER localhost.3002 1 :1\r\n");
-// 		anotherMessage = Message("SERVER localhost.3003 1 :1\r\n");
-// 		server.serverHandler(clientMessage, client);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-// 		free(result);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
-// 		free(result);
-// 		server.serverHandler(otherMessage, otherServer);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-// 		free(result);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
-// 		free(result);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3001 2 :1\r"));
-// 		free(result);
-// 		server.serverHandler(anotherMessage, anotherServer);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string("PASS 111\r"));
-// 		free(result);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 0 : kmin seunkim dakim made this server.\r"));
-// 		free(result);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3001 2 0 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
-// 		free(result);
-// 		remoteMessage = Message(":localhost.3001 SERVER localhost.3004 2 0 :1\r\n");
-// 		server.serverHandler(remoteMessage, client);
-// 		get_next_line(fd[2], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SERVER localhost.3004 3 0 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[4], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SERVER localhost.3004 3 0 :1\r"));
-// 		free(result);
-// 		get_next_line(fd[0], &result);
-// 		CHECK_EQUAL(std::string(result), std::string(""));
-//		CHECK_EQUAL(server.sendClients.size(), 4);
-//		CHECK_EQUAL(server.serverList.size(), 3);
-// 		i = -1;
-// 		while (++i < 6)
-// 			close(fd[i]);
-// 		delete client;
-// 		delete otherServer;
-// 		delete anotherServer;
-// 	}
-// }
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		client = new Client(fd[1], true);
+		otherServer = new Client(fd[3], true);
+		anotherServer = new Client(fd[5], true);
+		clientMessage = Message("SERVER localhost.3001 1 :1\r\n");
+		otherMessage = Message("SERVER localhost.3002 1 :1\r\n");
+		anotherMessage = Message("SERVER localhost.3003 1 :1\r\n");
+		server.serverHandler(clientMessage, client);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
+		free(result);
+		server.serverHandler(otherMessage, otherServer);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3001 2 0 :1\r"));
+		free(result);
+		server.serverHandler(anotherMessage, anotherServer);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3003 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3001 2 0 :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3002 2 0 :1\r"));
+		free(result);
+		remoteMessage = Message(":localhost.3001 SERVER localhost.3004 2 0 :1\r\n");
+		server.serverHandler(remoteMessage, client);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SERVER localhost.3004 3 0 :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3001 SERVER localhost.3004 3 0 :1\r"));
+		free(result);
+		// get_next_line(fd[0], &result);
+		// CHECK_EQUAL(std::string(result), std::string(""));
+		CHECK_EQUAL(server.sendClients.size(), 4);
+		CHECK_EQUAL(server.serverList.size(), 3);
+		i = -1;
+		while (++i < 6)
+			close(fd[i]);
+		delete client;
+		delete otherServer;
+		delete anotherServer;
+	}
+}

@@ -43,16 +43,16 @@ int					Server::serverHandler(const Message &message, Client *client)
 {
 	if (client->getStatus() == UNKNOWN)
 	{
-		std::cout << "1" << std::endl;
 		if (!client->getIsAuthorized() || (3 > message.getParameters().size()) // nc로 입력할 때 토큰 없이 입력하는 경우 3
-		|| (message.getParameter(0).find('.') == std::string::npos))
+		|| (message.getParameter(0).find('.') == std::string::npos)
+		|| client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
+		{
+			std::cout << "in" << std::endl;
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		}
 		if (this->sendClients.count(message.getParameter(0))
 		|| this->serverName == message.getParameter((0)))
-		{
-			std::cout << message.getParameter(0) << std::endl;
 			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
-		}
 		client->setStatus(SERVER);
 		client->setInfo(UPLINKSERVER, this->serverName);
 		client->setInfo(SERVERNAME, message.getParameter(0));
@@ -69,20 +69,23 @@ int					Server::serverHandler(const Message &message, Client *client)
 		}
 		this->sendClients[message.getParameter(0)] = *client;
 		this->serverList[message.getParameter(0)] = client;
-		std::cout << "2" << std::endl;
 		return ((this->*(this->replies[RPL_SERVER]))(message, client));
+		// prefix o -> server x
+		// prefix x -> server o
 	}
 	else if (client->getStatus() == SERVER)
 	{
-		std::cout << "3" << std::endl;
 		if (message.getPrefix() == ""
-		/*|| !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length()))*/) // 서버연결시에 새로운 연결일 수도 있음
+		|| !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length()))) // 서버연결시에 새로운 연결일 수도 있음
 			return (CONNECT);
-		if (message.getParameters().size() < 3) // 첫 연결시에 :localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server. ==> parameter가 4가 아님
+		if (message.getParameters().size() <= 3) // 첫 연결시에 :localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server. ==> parameter가 4가 아님
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (this->sendClients.count(message.getParameter(0)) || this->serverName == message.getParameter((0)))
+		if (this->serverName == message.getParameter((0)) ||
+		(this->sendClients.count(message.getParameter(0))))
+		{
 			// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);
 			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+		}
 		// if ()
 		// {
 		// 	// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);	
@@ -127,7 +130,6 @@ int					Server::serverHandler(const Message &message, Client *client)
 			}
 			this->sendClients[message.getParameter(0)] = newClient;
 		}
-		std::cout << "4" << std::endl;
 		(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
 	}
 	else if (client->getStatus() == USER)
