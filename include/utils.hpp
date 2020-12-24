@@ -41,6 +41,7 @@
 
 # define CONNECT 1
 # define DISCONNECT 0
+# define TOTALDISCONNECT -1
 
 # define DEFAULT_SIZE 10
 

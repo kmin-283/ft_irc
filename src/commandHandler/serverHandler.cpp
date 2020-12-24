@@ -17,27 +17,21 @@
  * => 함수 종료
  **/
 
-void			Server::sendAllInfo(Client *client)
+void				Server::settingClient(const Message &message, Client *client)
 {
-	std::map<std::string, Client>::iterator it;
-
-	this->sendMessage(Message(this->prefix, "SERVER",
-			this->serverName + " "
-			+ "1" + " "
-			+ this->info), client);
-
-	for(it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
+	client->setStatus(SERVER);
+	client->setInfo(SERVERNAME, message.getParameter(0));
+	if (message.getParameters().size() == 4)
 	{
-		if (it->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-		{
-			this->sendMessage(Message(":" + it->second.getInfo(UPLINKSERVER), "SERVER",
-			it->second.getInfo(SERVERNAME) + " "
-			+ std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1) + " "
-			+ it->second.getInfo(SERVERINFO)), client);
-		}
+		client->setInfo(TOKEN, message.getParameter(2));
+		client->setInfo(SERVERINFO, message.getParameter(3));
+	}
+	else
+	{
+		client->setInfo(TOKEN, "0");
+		client->setInfo(SERVERINFO, message.getParameter(2));
 	}
 }
-
 
 int					Server::serverHandler(const Message &message, Client *client)
 {
@@ -47,31 +41,17 @@ int					Server::serverHandler(const Message &message, Client *client)
 		|| (message.getParameter(0).find('.') == std::string::npos)
 		|| client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
-			std::cout << "in" << std::endl;
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 		}
 		if (this->sendClients.count(message.getParameter(0))
 		|| this->serverName == message.getParameter((0)))
 			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
-		client->setStatus(SERVER);
+		settingClient(message, client);
 		client->setInfo(UPLINKSERVER, this->serverName);
-		client->setInfo(SERVERNAME, message.getParameter(0));
 		client->setInfo(HOPCOUNT, std::string("1"));
-		if (message.getParameters().size() == 4)
-		{
-			client->setInfo(TOKEN, message.getParameter(2));
-			client->setInfo(SERVERINFO, message.getParameter(3));
-		}
-		else
-		{
-			client->setInfo(TOKEN, "0"); // 바뀌어야할 수도 있ㅇ므
-			client->setInfo(SERVERINFO, message.getParameter(2));
-		}
 		this->sendClients[message.getParameter(0)] = *client;
 		this->serverList[message.getParameter(0)] = client;
 		return ((this->*(this->replies[RPL_SERVER]))(message, client));
-		// prefix o -> server x
-		// prefix x -> server o
 	}
 	else if (client->getStatus() == SERVER)
 	{
@@ -86,27 +66,11 @@ int					Server::serverHandler(const Message &message, Client *client)
 			// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);
 			return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
 		}
-		// if ()
-		// {
-		// 	// (this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);	
-		// 	return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));	
-		// }
 		if (message.getParameter(1) == "1") // 홉카운트가 1
 		{
-			client->setStatus(SERVER);
+			settingClient(message, client);
 			client->setInfo(UPLINKSERVER, this->serverName);
-			client->setInfo(SERVERNAME, message.getParameter(0));
 			client->setInfo(HOPCOUNT, std::string("1"));
-			if (message.getParameters().size() == 4)
-			{
-				client->setInfo(TOKEN, message.getParameter(2));
-				client->setInfo(SERVERINFO, message.getParameter(3));
-			}
-			else
-			{
-				client->setInfo(TOKEN, "0"); // 바뀌어야할 수도 있ㅇ므
-				client->setInfo(SERVERINFO, message.getParameter(2));
-			}
 			this->sendClients[message.getParameter(0)] = *client;
 			this->serverList[message.getParameter(0)] = client;
 		}
@@ -114,20 +78,9 @@ int					Server::serverHandler(const Message &message, Client *client)
 		{
 			Client newClient(client->getFd());
 
-			newClient.setStatus(SERVER);
+			settingClient(message, &newClient);
 			newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
-			newClient.setInfo(SERVERNAME, message.getParameter(0));
 			newClient.setInfo(HOPCOUNT, message.getParameter(1));
-			if (message.getParameters().size() == 4)
-			{
-				newClient.setInfo(TOKEN, message.getParameter(2));
-				newClient.setInfo(SERVERINFO, message.getParameter(3));
-			}
-			else
-			{
-				newClient.setInfo(TOKEN, "0"); // "바뀌어야 할 수도 있음" 서버의 멤버변수로 token을 지니고 있으면 어떨까
-				newClient.setInfo(SERVERINFO, message.getParameter(2));
-			}
 			this->sendClients[message.getParameter(0)] = newClient;
 		}
 		(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
@@ -136,60 +89,95 @@ int					Server::serverHandler(const Message &message, Client *client)
 	{
 		// syntax error
 	}
+	return (CONNECT);
+}
 
-	// if (!client->getIsAuthorized() || (3 > message.getParameters().size())
-	// || (message.getParameter(0).find('.') == std::string::npos))
-	// // || (message.getPrefix() != client->getPrefix()))
-	// {
-	// 	return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	// }
-	// if ((this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
-	// || (message.getPrefix() == "" &&
-	// this->prefix.substr(1, this->prefix.length()) == message.getParameter((0))))
-	// {
-	// 	this->sendMessage(Message("", "ERROR", ":ID " + message.getParameter(0) + " already registered"), client);
-	// 	return (DISCONNECT);
-	// }
-	// if (message.getParameter(1) != "1") // hopcount가 1이 아닌 경우
-	// {
-	// 	Client newClient(client->getFd());
-	// 	// client->getStatus() == SERVER;
-	// 	message.getPrefix() == "" ? newClient.setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
-	// 	: newClient.setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
-	// 	newClient.setInfo(SERVERNAME, message.getParameter(0));
-	// 	message.getPrefix() == "" ? newClient.setInfo(HOPCOUNT, "1")
-	// 	: newClient.setInfo(HOPCOUNT, message.getParameter(1));
-	// 	newClient.setInfo(SERVERINFO, message.getParameter(2));
-	// 	this->sendClients[message.getParameter(0)] = newClient;
-	// 	// this->serverList[message.getParameter(0)] = &this->sendClients[message.getParameter(0)];
-	// }
-	// else // hopcount가 1인 경우
-	// {
-	// 	message.getPrefix() == "" ? client->setInfo(UPLINKSERVER, this->prefix.substr(1, this->prefix.length()))
-	// 	: client->setInfo(UPLINKSERVER, message.getPrefix().substr(1, message.getPrefix().length()));
-	// 	client->setInfo(SERVERNAME, message.getParameter(0));
-	// 	client->setInfo(HOPCOUNT, message.getParameter(1));
-	// 	client->setInfo(SERVERINFO, message.getParameter(2));
+/*
+ * 인자가 2개가 아닌 경우 syntax error
+ * 없는 servername(localhost.locahost) 이거나 잘못된 servername(asdfasdf)인 경우 모두 무시
+ * 
+ * 
+ * 
+ * 
+ * 
+ *
+ * 
+ * 나와 1대1로 연결된 서버인 경우 WALLOPS와 SQUIT을 보내면 됨 (홉카운트 1)
+ *
+ * 하지만 나와 1대1로 연결되지 않은 remote서버인 경우 해당 remote서버에게만 메시지를 보냄
+ * 연결을 종료하는 것이 아닌 리스트에서 지우기만 하면 됨.
+ * 그런데 이때 SQUIT명령어 그대로를 보내야 할 듯
+ * Sa --- Sb --- Sc // Sc가 SQUIT Sa :badlink이면 Sb에는 메시지가 가지 않고 Sa에게만 메시지를 보냄
+ * 
+ * 
+ * 
+ * 
+ * Sa -- Sb -- Sc   // Sa가 SQUIT Sc :badlink 이면 먼저 Sd를 SQUIT 그 다음 Sc SQUIT
+ *              |
+ * 			   Sd
+ * 
+ * 
+ * nc 명령어를 쓰면 결국 ngircd에게 명령을 보내는 것이라는 점을 기억하자!
+ */
 
-	// 	this->sendClients[message.getParameter(0)] = *client;
-	// 	this->serverList[message.getParameter(0)] = client;
-	// }
-	// if (message.getPrefix() == "")
+int					Server::squitHandler(const Message &message, Client *client)
+{
+	std::map<std::string, Client*>::iterator	it;
+
+	if (message.getParameters().size() != 2)
+	{
+		std::cout << "111" << std::endl;
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	}
+
+	// 유저모드가 w이면 메시지를 보내야 한다고 함 <-- 추가해야할 내용...?
+
+
+	if (message.getParameter(0) == this->serverName)
+	{
+		std::map<std::string, Client*>::iterator	it;
+		this->run = false;
+		// 현재 서버가 uplink인 자식 서버들?에게 연결이 끊어지라고 메시지를 보내야 함 SQUIT serverName :bad
+		for (it = this->serverList.begin(); it != this->serverList.end(); ++it)
+			sendMessage(Message("", "SQUIT", it->second->getInfo(SERVERNAME) + " " + message.getParameter(1)), it->second);
+		std::cout << "ERROR: \"" << message.getParameter(1) << "\" (SQUIT from " << message.getPrefix() << ")" << std::endl;
+		return (TOTALDISCONNECT);
+	}
+	for (it = this->serverList.begin(); it != this->serverList.end(); ++it)
+	{
+		std::cout << "222" << std::endl;
+		if (it->second->getInfo(SERVERNAME) == message.getParameter(0)) // 직접적으로 연결된 서버
+		{
+			// sendMessage(Message("WALLOPS\r\n"), it->second); // 다시 모든 serverList를 돌면서 WALLOPS메시지를 보냄
+			// 추가로 SQUIT 메시지도 보냄
+
+			std::cout << "2.5 2.5 2.5" << std::endl;
+			sendMessage(message, it->second);
+			disconnectClient(it->second);
+			return (CONNECT);
+		}
+	}
+	// 직접적으로 연결되지 않은 클라이언트 ---> operator 이거나 다른 server이거나
+	// if (client->getStatus() == SERVER)
 	// {
-	// 	if (client->getStatus() == UNKNOWN)
-	// 	{
-	// 		client->setStatus(SERVER);
-	// 		sendMessage(Message(this->prefix, "PASS", this->pass), client);
-	// 		sendAllInfo(client);
-	// 	}
-	// 	broadcastMessage(Message(this->prefix, message.getCommand(), client->getInfo(SERVERNAME) +
-	// 	" " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
-	// 	" " + message.getParameter(2)), client);
-	// 	return (CONNECT);
+		std::cout << "333" << std::endl;
+		std::string tmp;
+
+		if (message.getPrefix() == "")
+		{
+			tmp = ":";
+			tmp += this->serverName;
+			tmp += " ";
+			tmp += message.getTotalMessage();
+			broadcastMessage(Message(tmp), client);
+		}
+		else
+			broadcastMessage(message, client);
+		this->sendClients.erase(message.getParameter(0));
 	// }
-	// broadcastMessage(Message(message.getPrefix(), message.getCommand(), message.getParameter(0) +
-	// " " + std::to_string(ft_atoi(message.getParameter(1).c_str()) + 1) +
-	// " " + message.getParameter(2)), client);
-	// std::cout << message.getTotalMessage();
+	// else
+	// {
+	// 	std::cout << "444" << std::endl;
+	// }
 	return (CONNECT);
 }
