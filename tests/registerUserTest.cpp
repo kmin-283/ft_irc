@@ -62,7 +62,7 @@ TEST(RegisterUser, NickFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		given(std::string("dakim"), std::string("da"), std::string(":kkiii kkii"),
 		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
@@ -145,7 +145,7 @@ TEST(RegisterUser, UserFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		given(std::string("dakim"), std::string("da"), std::string(":kkiii kkii"),
 		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
@@ -238,7 +238,7 @@ TEST(RegisterUser, BroadCastUserFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		given(std::string("dakim"), std::string("da"), std::string(":kkiii kkii"),
 		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[2], &result);
 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
@@ -301,7 +301,7 @@ TEST(RegisterUser, BroadCastNickFirst)
 			CHECK_EQUAL(1, 1);
 		else
 			CHECK_EQUAL(1, 0);
-		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
+		given(std::string("dakim"), std::string("da"), std::string(":kkiii kkii"),
 		std::string("127.0.0.1"), std::string("1"), std::string("localhost.3000"), USER);
 		get_next_line(fd[2], &result);
 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));

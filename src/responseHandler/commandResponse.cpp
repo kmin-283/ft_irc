@@ -282,7 +282,7 @@ int		Server::rUserBroadcastHandler(const Message &message, Client *client)
 	parameters += client->getInfo(ADDRESS);
 	parameters += std::string(" ");
 	parameters += client->getInfo(HOSTNAME);
-	parameters += std::string(" :");
+	parameters += std::string(" ");
 	parameters += client->getInfo(REALNAME);
 	sendMessage = Message(prefix, RPL_USER, parameters);
 	this->broadcastMessage(sendMessage, client);

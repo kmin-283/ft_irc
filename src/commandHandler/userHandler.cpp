@@ -35,7 +35,6 @@ static void			setNick(Client *client, const Message &message,
 					std::map<std::string, Client *> &clientList)
 {
 	std::stringstream	stream;
-	std::string			hopCount;
 
 	if (client->getInfo(NICK) != "")
 	{
@@ -90,22 +89,16 @@ static bool			isVaildUserName(const Message &message)
 static void			setUser(const Message &message, Client *client, std::string address,
 					std::map<std::string, Client> &sendClients, std::string serverName)
 {
-	std::string			realName;
-	std::string			hopCount;
-
-	realName = (*(message.getParameter(3).begin()) == ':'
-	? message.getParameter(3).substr(1, message.getParameter(3).length())
-	: message.getParameter(3));
 	client->setInfo(USERNAME, message.getParameter(0));
 	client->setInfo(HOSTNAME, serverName);
 	client->setInfo(ADDRESS, address);
-	client->setInfo(REALNAME, realName);
+	client->setInfo(REALNAME, message.getParameter(3));
 	if (client->getInfo(NICK) != "")
 	{
 		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, message.getParameter(0));
 		(sendClients[client->getInfo(NICK)]).setInfo(HOSTNAME, serverName);
 		(sendClients[client->getInfo(NICK)]).setInfo(ADDRESS, address);
-		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, realName);
+		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, message.getParameter(3));
 	}
 }
 
@@ -128,10 +121,14 @@ int					Server::userHandler(const Message &message, Client *client)
 		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
 		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
 	}
-	else if (client->getStatus() == SERVER)
-	{
-	}
 	else if (client->getStatus() == USER)
+	{
+		if (message.getPrefix() != ""
+		&& message.getPrefix() != std::string(":") + client->getInfo(SERVERNAME))
+			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+		return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+	}
+	else if (client->getStatus() == SERVER)
 	{
 	}
 	return (CONNECT);
