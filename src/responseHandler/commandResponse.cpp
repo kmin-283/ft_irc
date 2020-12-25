@@ -2,10 +2,10 @@
 
 int		Server::rRegisterUserHandler(const Message &message, Client *client)
 {
-	client->setStatus(USER);
-	this->sendClients[message.getParameter(0)].setStatus(USER);
 	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
 	(this->*(this->replies[RPL_USERBROADCAST]))(message, client);
+	client->setStatus(USER);
+	this->sendClients[message.getParameter(0)].setStatus(USER);
 	return (CONNECT);
 }
 
@@ -253,16 +253,47 @@ int		Server::rMOTDContentHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+
+int		Server::rNickHandler(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = std::string(":");
+	prefix += client->getInfo(NICK);
+	prefix += std::string("!~");
+	prefix += client->getInfo(USERNAME);
+	prefix += std::string("@");
+	prefix += client->getInfo(HOSTNAME);
+	parameters = std::string(":");
+	parameters += message.getParameter(0);
+	sendMessage = Message(prefix, RPL_NICK, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
 int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 {
+	std::string			prefix;
 	std::string			parameters;
 	Message				sendMessage;
 
-	(void)message;
-	parameters = client->getInfo(NICK);
-	parameters += std::string(" :");
-	parameters += client->getInfo(HOPCOUNT);
-	sendMessage = Message(std::string(""), RPL_NICK, parameters);
+	if (client->getStatus() == UNKNOWN)
+	{
+		prefix = std::string("");
+		parameters = client->getInfo(NICK);
+		parameters += std::string(" :");
+		parameters += client->getInfo(HOPCOUNT);
+	}
+	else
+	{
+		prefix = std::string(":");
+		prefix += client->getInfo(NICK);
+		parameters = std::string(":");
+		parameters += message.getParameter(0);
+	}
+	sendMessage = Message(prefix, RPL_NICK, parameters);
 	this->broadcastMessage(sendMessage, client);
 	return (CONNECT);
 }

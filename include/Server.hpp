@@ -64,6 +64,7 @@ private:
 	int																	rMOTDContentHandler(const Message &message, Client *client);
 	int																	rMOTDStartHandler(const Message &message, Client *client);
 	int																	rEndOfMOTDHandler(const Message &message, Client *client);
+	int																	rNickHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
 	int																	rUserBroadcastHandler(const Message &message, Client *client);
 	int																	rPassHandler(const Message &message, Client *client);

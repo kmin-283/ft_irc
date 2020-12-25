@@ -219,7 +219,7 @@ TEST(UserHanderTest, RegisterNickUser)
 	}
 }
 
-TEST_GROUP(RegisterUserAfterTest)
+TEST_GROUP(UserSendUserMessageTest)
 {
 	int			fd[2];
 	char		*result;
@@ -266,7 +266,7 @@ TEST_GROUP(RegisterUserAfterTest)
 	}
 };
 
-TEST(RegisterUserAfterTest, PrefixError)
+TEST(UserSendUserMessageTest, PrefixError)
 {
 	Server server("111", "3000");
 
@@ -288,7 +288,7 @@ TEST(RegisterUserAfterTest, PrefixError)
 	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
 }
 
-TEST(RegisterUserAfterTest, ParameterError)
+TEST(UserSendUserMessageTest, ParameterError)
 {
 	Server server("111", "3000");
 

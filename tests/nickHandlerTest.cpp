@@ -125,11 +125,15 @@ TEST(NickHandlerErrorTest, NickOverlap)
 {
 	Server		server("111", "3000");
 
+	server.prefix = std::string(":lolo");
+	server.serverName = std::string("lolo");
 	server.sendClients["dakim"] = Client(0, true);
 	expect("", "NICK dakim\r\n", true, UNKNOWN, "", "");
-	given(server, ":localhost.3000 433 * dakim :Nickname already in use\r\n", CONNECT, "", UNKNOWN);
+	given(server, ":lolo 433 * dakim :Nickname already in use\r\n", CONNECT, "", UNKNOWN);
 	expect("da", "NICK dakim\r\n", true, UNKNOWN, "", "");
-	given(server, ":localhost.3000 433 da dakim :Nickname already in use\r\n", CONNECT, "da", UNKNOWN);
+	given(server, ":lolo 433 da dakim :Nickname already in use\r\n", CONNECT, "da", UNKNOWN);
+	expect("da", "NICK lolo\r\n", true, UNKNOWN, "", "");
+	given(server, ":lolo 433 da lolo :Nickname already in use\r\n", CONNECT, "da", UNKNOWN);
 }
 
 TEST_GROUP(NickHandlerTest)
@@ -195,4 +199,274 @@ TEST(NickHandlerTest, RegisterNick)
 	CHECK_EQUAL(server.sendClients["dakim1"].getInfo(NICK), std::string("dakim1"));
 	CHECK_EQUAL(server.sendClients.size(), 1);
 	CHECK_EQUAL(server.clientList.size(), 1);
+}
+
+
+TEST_GROUP(UserSendNickMessageTest)
+{
+	int			fd[2];
+	char		*result;
+	Client		*client;
+	std::string	resultStr;
+	Message		sendMessage;
+
+	void			expect(Message message)
+	{
+		client = NULL;
+		if (pipe(fd) != -1)
+		{
+			client = new Client(fd[1], true);
+			client->setStatus(USER);
+			client->setInfo(HOSTNAME, std::string("lo1"));
+			client->setInfo(NICK, std::string("dakim"));
+			client->setInfo(HOPCOUNT, std::string("1"));
+			client->setInfo(ADDRESS, std::string("127.0.0.1"));
+			client->setInfo(USERNAME, std::string("dak"));
+			client->setInfo(REALNAME, std::string("deok"));
+			sendMessage = message;
+		}
+	}
+	void			given(Server &server, int connection, std::string expectStr, std::string nick)
+	{
+		if (client != NULL)
+		{
+			server.prefix = std::string(":lo1");
+			server.serverName = std::string("lo1");
+			server.sendClients["dakim"] = *client;
+			server.clientList["dakim"] = &server.sendClients["dakim"];
+			CHECK_EQUAL(connection, server.nickHandler(sendMessage, client));
+			get_next_line(fd[0], &result);
+			CHECK_EQUAL(std::string(result), expectStr);
+			free(result);
+			CHECK_EQUAL(client->getInfo(HOSTNAME), std::string("lo1"));
+			CHECK_EQUAL(client->getInfo(NICK), nick);
+			CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
+			CHECK_EQUAL(client->getInfo(ADDRESS), std::string("127.0.0.1"));
+			CHECK_EQUAL(client->getInfo(USERNAME), std::string("dak"));
+			CHECK_EQUAL(client->getInfo(REALNAME), std::string("deok"));
+			CHECK_EQUAL(server.sendClients.count(nick), 1);
+			delete client;
+		}
+	}
+};
+
+TEST(UserSendNickMessageTest, PrefixError)
+{
+	Server server("111", "3000");
+
+	expect(Message(std::string(":"), std::string("NICK"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"\"\r"), std::string("dakim"));
+	expect(Message(std::string(":d"), std::string("NICK"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \":d\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+}
+
+TEST(UserSendNickMessageTest, ParameterError)
+{
+	Server server("111", "3000");
+
+	expect(Message(std::string(""), std::string("NICK"), std::string("")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("d d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("d d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string(":lo1 461 dakim NICK :Syntax error\r"), std::string("dakim"));
+}
+
+TEST(UserSendNickMessageTest, NotVaildNick)
+{
+	Server server("111", "3000");
+
+	expect(Message(std::string(""), std::string("NICK"), std::string("!dakim")));
+	given(server, CONNECT, std::string(":lo1 432 !dakim :Erroneous nickname\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("1dakim")));
+	given(server, CONNECT, std::string(":lo1 432 1dakim :Erroneous nickname\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("d!akim")));
+	given(server, CONNECT, std::string(":lo1 432 d!akim :Erroneous nickname\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("dadadadadadada")));
+	given(server, CONNECT, std::string(":lo1 432 dadadadadadada :Erroneous nickname\r"), std::string("dakim"));
+	expect(Message(std::string(""), std::string("NICK"), std::string("lo.lo")));
+	given(server, CONNECT, std::string(":lo1 432 lo.lo :Erroneous nickname\r"), std::string("dakim"));
+}
+
+TEST(UserSendNickMessageTest, NickOverlap)
+{
+	Server	server("111", "3000");
+	Client	localServer(0, true);
+	Client	remoteServer(0, true);
+	Client	localUser(0, true);
+	Client	remoteUser(0, true);
+
+	localServer.setStatus(SERVER);
+	localServer.setInfo(UPLINKSERVER, std::string("lo1"));
+	localServer.setInfo(SERVERNAME, std::string("lo2"));
+	localServer.setInfo(HOPCOUNT, std::string("1"));
+	localServer.setInfo(SERVERINFO, std::string(":1"));
+	server.sendClients[std::string("lo2")] = localServer;
+	server.serverList[std::string("lo2")] = &server.sendClients[std::string("lo2")];
+
+	remoteServer.setStatus(SERVER);
+	remoteServer.setInfo(UPLINKSERVER, std::string("lo2"));
+	remoteServer.setInfo(SERVERNAME, std::string("lo3"));
+	remoteServer.setInfo(HOPCOUNT, std::string("2"));
+	localServer.setInfo(SERVERINFO, std::string(":1"));
+	server.sendClients[std::string("lo3")] = remoteServer;
+
+	remoteUser.setStatus(USER);
+	remoteUser.setInfo(HOSTNAME, std::string("lo2"));
+	remoteUser.setInfo(NICK, std::string("da"));
+	remoteUser.setInfo(HOPCOUNT, std::string("2"));
+	remoteUser.setInfo(ADDRESS, std::string("127.0.0.10"));
+	remoteUser.setInfo(USERNAME, std::string("dak"));
+	remoteUser.setInfo(REALNAME, std::string("deok"));
+	server.sendClients[std::string("da")] = remoteUser;
+
+	localUser.setStatus(USER);
+	localUser.setInfo(HOSTNAME, std::string("lo1"));
+	localUser.setInfo(NICK, std::string("d"));
+	localUser.setInfo(HOPCOUNT, std::string("1"));
+	localUser.setInfo(ADDRESS, std::string("127.0.0.10"));
+	localUser.setInfo(USERNAME, std::string("dak"));
+	localUser.setInfo(REALNAME, std::string("deok"));
+	server.sendClients[std::string("d")] = localUser;
+	server.clientList[std::string("d")] = &server.sendClients[std::string("d")];
+
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("dakim")));
+	given(server, CONNECT, std::string(":lo1 433 dakim dakim :Nickname already in use\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("lo2")));
+	given(server, CONNECT, std::string(":lo1 433 dakim lo2 :Nickname already in use\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("lo3")));
+	given(server, CONNECT, std::string(":lo1 433 dakim lo3 :Nickname already in use\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("da")));
+	given(server, CONNECT, std::string(":lo1 433 dakim da :Nickname already in use\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("d")));
+	given(server, CONNECT, std::string(":lo1 433 dakim d :Nickname already in use\r"), std::string("dakim"));
+	expect(Message(std::string(":dakim"), std::string("NICK"), std::string("lo1")));
+	given(server, CONNECT, std::string(":lo1 433 dakim lo1 :Nickname already in use\r"), std::string("dakim"));
+}
+
+TEST(UserSendNickMessageTest, RegisterNickWithPrefix)
+{
+	int		i;
+	int		fd[4];
+	char	*result;
+	Server	server("111", "3000");
+	Client	*otherServer;
+	Client	*anotherServer;
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1)
+	{
+		otherServer = new Client(fd[1], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo2"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string(":1"));
+		server.sendClients[std::string("lo2")] = *otherServer;
+		server.serverList[std::string("lo2")] = &server.sendClients[std::string("lo2")];
+
+		anotherServer = new Client(fd[3], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo3"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string(":1"));
+		server.sendClients[std::string("lo3")] = *anotherServer;
+		server.serverList[std::string("lo3")] = &server.sendClients[std::string("lo3")];
+
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 0);
+		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("deok")));
+		given(server, CONNECT, std::string(":dakim!~dak@lo1 NICK :deok\r"), std::string("deok"));
+		CHECK_EQUAL(server.sendClients.count(std::string("dakim")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 1);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		delete otherServer;
+		delete anotherServer;
+		i = -1;
+		while (++i < 4)
+			close(fd[i]);
+	}
+}
+
+TEST(UserSendNickMessageTest, RegisterNickWithOutPrefix)
+{
+	int		i;
+	int		fd[4];
+	char	*result;
+	Server	server("111", "3000");
+	Client	*otherServer;
+	Client	*anotherServer;
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1)
+	{
+		otherServer = new Client(fd[1], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo2"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string(":1"));
+		server.sendClients[std::string("lo2")] = *otherServer;
+		server.serverList[std::string("lo2")] = &server.sendClients[std::string("lo2")];
+
+		anotherServer = new Client(fd[3], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo3"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string(":1"));
+		server.sendClients[std::string("lo3")] = *anotherServer;
+		server.serverList[std::string("lo3")] = &server.sendClients[std::string("lo3")];
+
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 0);
+		expect(Message(std::string(""), std::string("NICK"), std::string("deok")));
+		given(server, CONNECT, std::string(":dakim!~dak@lo1 NICK :deok\r"), std::string("deok"));
+		CHECK_EQUAL(server.sendClients.count(std::string("dakim")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 1);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		delete otherServer;
+		delete anotherServer;
+		i = -1;
+		while (++i < 4)
+			close(fd[i]);
+	}
 }
