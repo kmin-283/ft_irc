@@ -52,6 +52,7 @@ private:
 	int																	eAlreadyRegisteredHandler(const Message &message, Client *client);
 	int																	ePassUnauthorizedHandler(const Message &message, Client *client);
 	int																	eErroneusUserNameHandler(const Message &message, Client *client);
+	int																	ePrefixHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
@@ -65,6 +66,7 @@ private:
 	int																	rMOTDContentHandler(const Message &message, Client *client);
 	int																	rMOTDStartHandler(const Message &message, Client *client);
 	int																	rEndOfMOTDHandler(const Message &message, Client *client);
+	int																	rNickHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
 	int																	rUserBroadcastHandler(const Message &message, Client *client);
 	int																	rPassHandler(const Message &message, Client *client);

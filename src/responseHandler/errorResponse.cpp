@@ -57,19 +57,21 @@ int		Server::eAlreadyRegisteredHandler(const Message &message, Client *client)
 	Message		sendMessage;
 	int			connectionStatus;
 
-	(void)message;
-	if (message.getCommand() == "USER")
+	connectionStatus = CONNECT;
+	if (message.getCommand() != "USER")
 	{
-		parameters += std::string(":Unauthorized command (already registered)");
-		connectionStatus = CONNECT;
-	}
-	else
-	{
-		parameters += std::string(":ID ");
+		parameters = std::string(":ID ");
 		parameters += message.getParameter(0);
 		parameters += std::string(" already registered");
 		connectionStatus = DISCONNECT;
 	}
+	else if (client->getStatus() == USER)
+	{
+		parameters = client->getInfo(NICK);
+		parameters += std::string(" :Connection already registered");
+	}
+	else
+		parameters = std::string(":Unauthorized command (already registered)");
 	sendMessage = Message(this->prefix, ERR_ALREADYREGISTRED, parameters);
 	this->sendMessage(sendMessage, client);
 	return (connectionStatus);
@@ -95,6 +97,20 @@ int		Server::eErroneusUserNameHandler(const Message &message, Client *client)
 	parameters = message.getCommand();
 	parameters += std::string(" :Erroneous username");
 	sendMessage = Message("", ERROR_STR, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::ePrefixHandler(const Message &message, Client *client)
+{
+	std::string	parameters;
+	Message		sendMessage;
+
+	parameters = std::string(":Invaild prefix \"");
+	parameters += message.getPrefix().length() == 2 ? message.getPrefix()
+	: message.getPrefix().substr(1, message.getPrefix().length());
+	parameters += std::string("\"");
+	sendMessage = Message(std::string(""), ERROR_STR, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }

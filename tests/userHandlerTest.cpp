@@ -175,7 +175,7 @@ TEST(UserHanderTest, RegisterUserOnly)
 		client = new Client(fd[1], true);
 		message = Message("USER da 1 1 :dakim\r\n");
 		expect(client, message);
-		given(server, std::string("da"), std::string("dakim"), std::string("127.0.0.1"),
+		given(server, std::string("da"), std::string(":dakim"), std::string("127.0.0.1"),
 		std::string("localhost.3000"), CONNECT, UNKNOWN);
 		delete client;
 		client = new Client(fd[1], true);
@@ -205,16 +205,116 @@ TEST(UserHanderTest, RegisterNickUser)
 		message = Message("USRE da 1 1 :dakim\r\n");
 		server.nickHandler(Message(std::string("NICK dakim\r\n")), client);
 		expect(client, message);
-		given(server, std::string("da"), std::string("dakim"), std::string("127.0.0.1"),
+		given(server, std::string("da"), std::string(":dakim"), std::string("127.0.0.1"),
 		std::string("localhost.3000"), CONNECT, USER);
 		CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(USERNAME), std::string("da"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(ADDRESS), std::string("127.0.0.1"));
-		CHECK_EQUAL(server.sendClients["dakim"].getInfo(REALNAME), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients["dakim"].getInfo(REALNAME), std::string(":dakim"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(HOPCOUNT), std::string("1"));
 		CHECK_EQUAL(server.sendClients["dakim"].getInfo(HOSTNAME), std::string("localhost.3000"));
 		close(fd[0]);
 		close(fd[1]);
 		delete client;
 	}
+}
+
+TEST_GROUP(UserSendUserMessageTest)
+{
+	int			fd[2];
+	char		*result;
+	Client		*client;
+	std::string	resultStr;
+	Message		sendMessage;
+
+	void			expect(Message message)
+	{
+		client = NULL;
+		if (pipe(fd) != -1)
+		{
+			client = new Client(fd[1], true);
+			client->setStatus(USER);
+			client->setInfo(HOSTNAME, std::string("localhost.3000"));
+			client->setInfo(NICK, std::string("dakim"));
+			client->setInfo(HOPCOUNT, std::string("1"));
+			client->setInfo(ADDRESS, std::string("127.0.0.1"));
+			client->setInfo(USERNAME, std::string("dak"));
+			client->setInfo(REALNAME, std::string("deok"));
+			sendMessage = message;
+		}
+	}
+	void			given(Server server, int connection, std::string expectStr)
+	{
+		if (client != NULL)
+		{
+			server.prefix = std::string(":localhost.3000");
+			server.serverName = std::string("localhost.3000");
+			server.sendClients["dakim"] = *client;
+			server.clientList["dakim"] = &server.sendClients["dakim"];
+			CHECK_EQUAL(connection, server.userHandler(sendMessage, client));
+			get_next_line(fd[0], &result);
+			CHECK_EQUAL(std::string(result), expectStr);
+			free(result);
+			CHECK_EQUAL(client->getInfo(HOSTNAME), std::string("localhost.3000"));
+			CHECK_EQUAL(client->getInfo(NICK), std::string("dakim"));
+			CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
+			CHECK_EQUAL(client->getInfo(ADDRESS), std::string("127.0.0.1"));
+			CHECK_EQUAL(client->getInfo(USERNAME), std::string("dak"));
+			CHECK_EQUAL(client->getInfo(REALNAME), std::string("deok"));
+			delete client;
+		}
+	}
+};
+
+TEST(UserSendUserMessageTest, PrefixError)
+{
+	Server server("111", "3000");
+
+	expect(Message(std::string(":"), std::string("USER"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"\"\r"));
+	expect(Message(std::string(":d"), std::string("USER"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \":d\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+	expect(Message(std::string(":sdfss"), std::string("USER"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+}
+
+TEST(UserSendUserMessageTest, ParameterError)
+{
+	Server server("111", "3000");
+
+	expect(Message(std::string(""), std::string("USER"), std::string("")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(""), std::string("USER"), std::string("d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(""), std::string("USER"), std::string("d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(""), std::string("USER"), std::string("d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(""), std::string("USER"), std::string("d d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(""), std::string("USER"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
+	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d d d d d d d d")));
+	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
 }

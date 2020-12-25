@@ -9,6 +9,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_ALREADYREGISTRED] = &Server::eAlreadyRegisteredHandler;
 	this->replies[ERR_PASSUNAUTHORIE] = &Server::ePassUnauthorizedHandler;
 	this->replies[ERR_ERRONEUSUSERNAME] = &Server::eErroneusUserNameHandler;
+	this->replies[ERR_PREFIX] = &Server::ePrefixHandler;
 
 	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;
 	this->replies[RPL_WELCOMEMESSAGE] = &Server::rWelcomeMessageHandler;
@@ -23,6 +24,7 @@ void			Server::registerReplies(void)
 	this->replies[RPL_MOTDCONTENT] = &Server::rMOTDContentHandler;
 	this->replies[RPL_MOTDSTART] = &Server::rMOTDStartHandler;
 	this->replies[RPL_ENDOFMOTD] = &Server::rEndOfMOTDHandler;
+	this->replies[RPL_NICK] = &Server::rNickHandler;
 	this->replies[RPL_NICKBROADCAST] = &Server::rNickBroadcastHandler;
 	this->replies[RPL_USERBROADCAST] = &Server::rUserBroadcastHandler;
 	this->replies[RPL_PASS] = &Server::rPassHandler;
