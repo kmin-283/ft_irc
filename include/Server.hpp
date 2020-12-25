@@ -34,13 +34,15 @@ private:
 	std::map<std::string, Client *>										serviceList;
 	std::map<std::string, Channel>										channelList;
 
+	bool																run;
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
 	int																	nickHandler(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
-
+	int																	squitHandler(const Message &message, Client *client);
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -75,11 +77,13 @@ private:
 
 	void																connectClient(void);
 	void																disconnectClient(Client *client);
+	void																clearClient(Client *client);
+
 
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
-	void																sendAllInfo(Client *client);
+	void																settingClient(const Message &message, Client *client);
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);

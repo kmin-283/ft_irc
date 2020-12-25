@@ -1,7 +1,8 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: version("ft-irc1.0"), pass(std::string(pass)), info(": kmin seunkim dakim made this server."), port(port), mainSocket(0), maxFd(0)
+	: version("ft-irc1.0"), pass(std::string(pass)), info(": kmin seunkim dakim made this server.")
+	, port(port), mainSocket(0), maxFd(0), run(true)
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
@@ -59,7 +60,7 @@ void					Server::start(void)
 
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
-	while(42)
+	while(run)
 	{
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
 			this->renewFd(listenFd);
@@ -115,11 +116,13 @@ void					Server::receiveMessage(const int fd)
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr.clear();
 		}
-		if (connectionStatus == DISCONNECT)
+		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
 			break ;
 	}
 	if (connectionStatus == DISCONNECT || readResult == 0)
 		this->disconnectClient(&sender);
+	if (connectionStatus == TOTALDISCONNECT)
+		this->clearClient(&sender);
 }
 
 static struct addrinfo	*getAddrInfo(const std::string info)
@@ -195,20 +198,31 @@ void					Server::connectServer(std::string address)
 	// std::cout << "versionnn" << std::endl;
 }
 
+void					Server::clearClient(Client *client)
+{
+	close(client->getFd());
+	FD_CLR(client->getFd(), &this->readFds);
+	this->sendClients.clear();
+	this->serverList.clear();
+	this->clientList.clear();
+	this->acceptClients.clear();
+}
+
 void					Server::disconnectClient(Client *client)
 {
 	close(client->getFd());
 	FD_CLR(client->getFd(), &this->readFds);
 	// if (client->getStatus() != UNKNOWN)
 	// {
-		if (this->sendClients.find(client->getInfo(1)) != this->sendClients.end())
+		if (this->sendClients.count(client->getInfo(1)))
 			this->sendClients.erase(client->getInfo(1));
-		if (this->serverList.find(client->getInfo(1)) != this->serverList.end())
+		if (this->serverList.count(client->getInfo(1)))
 			this->serverList.erase(client->getInfo(1));
-		if (this->clientList.find(client->getInfo(1)) != this->serverList.end())
+		if (this->clientList.count(client->getInfo(1)))
 			this->clientList.erase(client->getInfo(1));
+
 	// }
-	if (this->acceptClients.find(client->getFd()) != this->acceptClients.end())
+	if (this->acceptClients.count(client->getFd()))
 		this->acceptClients.erase(client->getFd());
 	std::cout << "Disconnect client." << std::endl;
 }
