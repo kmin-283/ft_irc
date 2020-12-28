@@ -120,47 +120,77 @@ int					Server::serverHandler(const Message &message, Client *client)
  * nc 명령어를 쓰면 결국 ngircd에게 명령을 보내는 것이라는 점을 기억하자!
  */
 
+void			Server::deleteUplinkServer(const Message &message)
+{
+	std::map<std::string, Client>::iterator it;
+	std::map<std::string, Client>::iterator prev;
+
+	it = this->sendClients.begin();
+	prev = this->sendClients.begin();
+	for(; it != this->sendClients.end(); ++it)
+	{
+		if (it->second.getInfo(UPLINKSERVER) == message.getParameter(0))
+		{
+			deleteUplinkServer(it->second.getInfo(SERVERNAME));
+			it = prev;
+		}
+		prev = it;
+	}
+	if (this->sendClients.count(message.getParameter(0)))
+		this->sendClients.erase(message.getParameter(0));
+	std::cout << message.getParameter(0) << " SQUIT " << message.getParameter(0) << message.getParameter(1) << std::endl;
+}
+
 int					Server::squitHandler(const Message &message, Client *client)
 {
 	std::map<std::string, Client*>::iterator	it;
 
 	if (message.getParameters().size() != 2)
-	{
-		std::cout << "111" << std::endl;
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	}
 
 	// 유저모드가 w이면 메시지를 보내야 한다고 함 <-- 추가해야할 내용...?
 
 
 	if (message.getParameter(0) == this->serverName)
 	{
-		std::map<std::string, Client*>::iterator	it;
 		this->run = false;
 		// 현재 서버가 uplink인 자식 서버들?에게 연결이 끊어지라고 메시지를 보내야 함 SQUIT serverName :bad
 		for (it = this->serverList.begin(); it != this->serverList.end(); ++it)
-			sendMessage(Message("", "SQUIT", it->second->getInfo(SERVERNAME) + " " + message.getParameter(1)), it->second);
-		std::cout << "ERROR: \"" << message.getParameter(1) << "\" (SQUIT from " << message.getPrefix() << ")" << std::endl;
+		{
+			if (it->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+				sendMessage(Message("", "SQUIT", it->second->getInfo(SERVERNAME) + " " + message.getParameter(1)), it->second);
+		}
+		std::cout << "ERROR: \"" << message.getParameter(1) << "\" (SQUIT from " << client->getInfo(SERVERNAME) << ")" << std::endl;
 		return (TOTALDISCONNECT);
 	}
-	for (it = this->serverList.begin(); it != this->serverList.end(); ++it)
+	if (this->serverList.count(message.getParameter(0))) // 직접적으로 연결된 서버
 	{
-		std::cout << "222" << std::endl;
-		if (it->second->getInfo(SERVERNAME) == message.getParameter(0)) // 직접적으로 연결된 서버
+		std::map<std::string, Client*>::iterator	iter;
+		// sendMessage(Message("WALLOPS\r\n"), it->second); // 다시 모든 serverList를 돌면서 WALLOPS메시지를 보냄
+		// 추가로 SQUIT 메시지도 보냄
+		for (iter = this->serverList.begin(); iter != this->serverList.end(); ++iter)
 		{
-			// sendMessage(Message("WALLOPS\r\n"), it->second); // 다시 모든 serverList를 돌면서 WALLOPS메시지를 보냄
-			// 추가로 SQUIT 메시지도 보냄
+			if (iter->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+			{
+				std::string parameters;
 
-			std::cout << "2.5 2.5 2.5" << std::endl;
-			sendMessage(message, it->second);
-			disconnectClient(it->second);
-			return (CONNECT);
+				parameters = ":Received SQUIT ";
+				parameters += message.getParameter(0);
+				parameters += " from ";
+				parameters += this->serverName;
+				parameters += " ";
+				parameters += message.getParameter(1);
+				sendMessage(Message(this->prefix, "WALLOPS", parameters) ,iter->second);
+				sendMessage(message,iter->second);
+			}
 		}
+		deleteUplinkServer(message.getParameter(0));
+		disconnectClient(this->serverList[message.getParameter(0)]);
+		return (CONNECT);
 	}
 	// 직접적으로 연결되지 않은 클라이언트 ---> operator 이거나 다른 server이거나
 	// if (client->getStatus() == SERVER)
 	// {
-		std::cout << "333" << std::endl;
 		std::string tmp;
 
 		if (message.getPrefix() == "")
@@ -173,7 +203,7 @@ int					Server::squitHandler(const Message &message, Client *client)
 		}
 		else
 			broadcastMessage(message, client);
-		this->sendClients.erase(message.getParameter(0));
+		deleteUplinkServer(message.getParameter(0)); // delete sub servers
 	// }
 	// else
 	// {

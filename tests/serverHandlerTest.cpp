@@ -222,6 +222,57 @@ TEST(LocalServerTest, RegisterServerBroadcast)
 	}
 }
 
+TEST(LocalServerTest, RegisterServerBroadCastUser)
+ {
+ 	int			fd[2];
+ 	char		*result;
+ 	Client		*client;
+ 	Client		*localUser;
+ 	std::string	expectStr;
+ 	Message		serverMessage;
+ 	Server		server("111", "3000");
+
+ 	if (pipe(fd) != -1)
+ 	{
+ 		client = new Client(fd[1], true);
+ 		localUser = new Client(0, true);
+ 		localUser->setStatus(USER);
+ 		localUser->setInfo(HOSTNAME, std::string("localhost.3000"));
+ 		localUser->setInfo(NICK, std::string("dakim"));
+ 		localUser->setInfo(HOPCOUNT, std::string("1"));
+ 		localUser->setInfo(ADDRESS, std::string("127.0.0.1"));
+ 		localUser->setInfo(USERNAME, std::string("deok"));
+ 		localUser->setInfo(REALNAME, std::string("dek"));
+ 		server.sendClients[std::string("dakim")] = *localUser;
+ 		server.clientList[std::string("dakim")] = &server.sendClients[std::string("dakim")];
+ 		server.prefix = std::string(":localhost.3000");
+ 		server.serverName = std::string("localhost.3000");
+ 		server.info = std::string(": kmin seunkim dakim made this server.");
+ 		serverMessage = Message("SERVER localhost.3001 1 :kikik kiki\r\n");
+ 		expect(&server, client);
+ 		server.serverHandler(serverMessage, client);
+ 		given(std::string("localhost.3000"), std::string("localhost.3001"), std::string("1"), std::string(":kikik kiki"), SERVER);
+ 		get_next_line(fd[0], &result);
+ 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 PASS 111\r"));
+ 		free(result);
+ 		get_next_line(fd[0], &result);
+ 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server.\r"));
+ 		free(result);
+ 		get_next_line(fd[0], &result);
+ 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+ 		free(result);
+ 		get_next_line(fd[0], &result);
+ 		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~deok 127.0.0.1 localhost.3000 :dek\r"));
+ 		free(result);
+ 		close(fd[1]);
+ 		close(fd[0]);
+ 		delete client;
+ 		delete localUser;
+ 	}
+ }
+
+
+
 TEST_GROUP(RemoteServerErrorTest)
 {
 	char		*result;

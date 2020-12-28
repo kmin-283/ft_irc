@@ -7,4 +7,5 @@ void	Server::registerCommands(void)
 	this->commands["USER"] = &Server::userHandler;
 	this->commands["SERVER"] = &Server::serverHandler;
 	this->commands["SQUIT"] = &Server::squitHandler;
+	this->commands["WALLOPS"] = &Server::wallopsHandler;
 }

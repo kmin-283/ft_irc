@@ -43,6 +43,9 @@ private:
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
+	int																	wallopsHandler(const Message &message, Client *client);
+	
+	
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -80,7 +83,7 @@ private:
 	void																connectClient(void);
 	void																disconnectClient(Client *client);
 	void																clearClient(Client *client);
-
+	void																deleteUplinkServer(const Message &message);
 
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);

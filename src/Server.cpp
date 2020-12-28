@@ -111,7 +111,7 @@ void					Server::receiveMessage(const int fd)
 		if (buffer == '\n')
 		{
 			Message message(messageStr);
-			std::cout << "Reveive message = " << messageStr;
+			// std::cout << "Reveive message = " << messageStr;
 			if (this->commands.find(message.getCommand()) != this->commands.end())
 				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
 			messageStr.clear();
@@ -210,8 +210,8 @@ void					Server::clearClient(Client *client)
 
 void					Server::disconnectClient(Client *client)
 {
-	close(client->getFd());
-	FD_CLR(client->getFd(), &this->readFds);
+	// close(client->getFd()); // 여기서 파일디스크립터를 닫으면 반복문에서 block이 발생하는 듯 하다...
+	// FD_CLR(client->getFd(), &this->readFds); // 여기도 파일디스크립터를 닫으면 block
 	// if (client->getStatus() != UNKNOWN)
 	// {
 		if (this->sendClients.count(client->getInfo(1)))

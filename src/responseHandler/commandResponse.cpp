@@ -363,15 +363,40 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 	{
 		if (it->second.getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
 		{
-			prefix = std::string(":");
-			prefix += it->second.getInfo(UPLINKSERVER);
-			parameters = it->second.getInfo(SERVERNAME);
-			parameters += std::string(" ");
-			parameters += std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1);
-			parameters += std::string(" 0 ");
-			parameters += it->second.getInfo(SERVERINFO);
-			sendMessage = Message(prefix, RPL_SERVER, parameters);
-			this->sendMessage(sendMessage, client);
+			if (it->second.getStatus() == SERVER)
+			{
+				prefix = std::string(":");
+				prefix += it->second.getInfo(UPLINKSERVER);
+				parameters = it->second.getInfo(SERVERNAME);
+				parameters += std::string(" ");
+				parameters += std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1);
+				parameters += std::string(" 0 ");
+				parameters += it->second.getInfo(SERVERINFO);
+				sendMessage = Message(prefix, RPL_SERVER, parameters);
+				this->sendMessage(sendMessage, client);
+			}
+			else // user일 때
+			{
+				//NICK
+				prefix = "";
+				parameters = it->second.getInfo(NICK);
+				parameters += std::string(" ");
+				parameters += it->second.getInfo(DISTANCE);
+				sendMessage = Message(prefix, RPL_NICK, parameters);
+				this->sendMessage(sendMessage, client);
+				parameters.clear();
+				//USER
+				prefix = message.getPrefix(); // 이거 맞음?
+				parameters = it->second.getInfo(USERNAME);
+				parameters += " ";
+				parameters += it->second.getInfo(ADDRESS);
+				parameters += " ";
+				parameters += it->second.getInfo(HOSTNAME);
+				parameters += " ";
+				parameters += it->second.getInfo(REALNAME);
+				sendMessage = Message(prefix, RPL_USER, parameters);
+				this->sendMessage(sendMessage, client);
+			}
 		}
 	}
 	return (CONNECT);
