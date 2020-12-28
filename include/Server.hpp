@@ -83,13 +83,14 @@ private:
 	void																connectClient(void);
 	void																disconnectClient(Client *client);
 	void																clearClient(Client *client);
-	void																deleteUplinkServer(const Message &message);
+	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
 public:
+	typedef std::map<int, Client>::iterator clientIter; 
 																		Server(const char *pass, const char *port);
 																		~Server(void);
 	void																init(void);

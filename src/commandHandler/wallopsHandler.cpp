@@ -3,7 +3,7 @@
 int         Server::wallopsHandler(const Message&message, Client *client)
 {
 	if (message.getParameters().size() < 1)
-	return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 	if (client->getStatus() == USER)
 	{
 
