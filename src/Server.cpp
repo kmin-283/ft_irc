@@ -133,6 +133,8 @@ void					Server::receiveMessage(const int fd)
 	}
 	//if (connectionStatus == DISCONNECT || readResult == 0) // uplink client를 지우게 되는 문제가 있음
 	//	this->disconnectClient(&sender);
+	if (readResult == 0)
+		this->disconnectClient(&sender);
 	if (connectionStatus == TOTALDISCONNECT)
 		this->clearClient(&sender);
 }

@@ -170,7 +170,7 @@ int Server::squitHandler(const Message &message, Client *client)
 
 		for (iter = this->serverList.begin(); iter != this->serverList.end(); ++iter)
 		{
-			if (iter->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+			if (iter->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME)) // this->prefix와 비교해도 
 			{
 				std::string parameters;
 
@@ -192,7 +192,7 @@ int Server::squitHandler(const Message &message, Client *client)
 			}
 		}
 		deleteSubServers(message.getParameter(0), message.getParameter(1));
-		disconnectClient(this->serverList[message.getParameter(0)]);
+		// disconnectClient(this->serverList[message.getParameter(0)]);
 		return (DISCONNECT);
 	}
 	// 직접적으로 연결되지 않은 클라이언트 ---> operator 이거나 다른 server이거나

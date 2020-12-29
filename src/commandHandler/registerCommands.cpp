@@ -8,4 +8,7 @@ void	Server::registerCommands(void)
 	this->commands["SERVER"] = &Server::serverHandler;
 	this->commands["SQUIT"] = &Server::squitHandler;
 	this->commands["WALLOPS"] = &Server::wallopsHandler;
+	this->commands["version"] = &Server::versionHandler;
+	this->commands["VERSION"] = &Server::versionHandler;
+	this->commands["351"] = &Server::versionHandler;
 }

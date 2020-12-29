@@ -28,6 +28,8 @@
 # define RPL_LUSERCHANNELS "254"
 # define RPL_LUSERME "255"
 
+# define RPL_VERSION "351"
+
 # define RPL_MOTDCONTENT "372"
 # define RPL_MOTDSTART "375"
 # define RPL_ENDOFMOTD "376"
