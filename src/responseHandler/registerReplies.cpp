@@ -10,6 +10,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_PASSUNAUTHORIE] = &Server::ePassUnauthorizedHandler;
 	this->replies[ERR_ERRONEUSUSERNAME] = &Server::eErroneusUserNameHandler;
 	this->replies[ERR_PREFIX] = &Server::ePrefixHandler;
+	this->replies[ERR_NICKCOLLISION] = &Server::eNickCollisionHandler;
 
 	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;
 	this->replies[RPL_WELCOMEMESSAGE] = &Server::rWelcomeMessageHandler;
@@ -32,4 +33,7 @@ void			Server::registerReplies(void)
 	this->replies[RPL_HOST] = &Server::rHostHandler;
 	this->replies[RPL_OTHERSERVER] = &Server::rOtherServerHandler;
 	this->replies[RPL_SERVERBROADCAST] = &Server::rServerBroadcastHandler;
+	this->replies[RPL_KILL] = &Server::rKillHandler;
+	this->replies[RPL_SQUITBROADCAST] = &Server::rSquitBroadcastHandler;
+	this->replies[RPL_QUITBROADCAST] = &Server::rQuitBroadcastHandler;
 }

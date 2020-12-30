@@ -44,8 +44,8 @@ private:
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
 	int																	wallopsHandler(const Message &message, Client *client);
-	int																	versionHandler(const Message &message, Client *client);	
-	
+	int																	versionHandler(const Message &message, Client *client);
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -56,6 +56,7 @@ private:
 	int																	ePassUnauthorizedHandler(const Message &message, Client *client);
 	int																	eErroneusUserNameHandler(const Message &message, Client *client);
 	int																	ePrefixHandler(const Message &message, Client *client);
+	int																	eNickCollisionHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
@@ -77,11 +78,15 @@ private:
 	int																	rHostHandler(const Message &message, Client *client);
 	int																	rOtherServerHandler(const Message &message, Client *client);
 	int																	rServerBroadcastHandler(const Message &message, Client *client);
+	int																	rKillHandler(const Message &message, Client *client);
+	int																	rSquitBroadcastHandler(const Message &message, Client *client);
+	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
 
 	void																connectClient(void);
-	void																disconnectClient(Client *client);
+	void																disconnectChild(const Message &message, Client *client);
+	void																disconnectClient(const Message &message, Client *client);
 	void																clearClient(Client *client);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
@@ -91,7 +96,7 @@ private:
 	void																settingClient(const Message &message, Client *client);
 	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
 public:
-	typedef std::map<int, Client>::iterator clientIter; 
+	typedef std::map<int, Client>::iterator clientIter;
 	typedef std::map<std::string, Client>::iterator strClientIter;
 	typedef std::map<std::string, Client*>::iterator strClientPtrIter;
 																		Server(const char *pass, const char *port);

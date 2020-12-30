@@ -153,7 +153,7 @@ TEST(LocalServerTest, RegisterServer)
 	}
 }
 
-TEST(LocalServerTest, RegisterServerBroadCastUser)
+TEST(LocalServerTest, RegisterServerBroadCastUserOne)
 {
 	int			fd[2];
 	char		*result;
@@ -271,7 +271,7 @@ TEST(LocalServerTest, RegisterServerBroadcast)
 	}
 }
 
-TEST(LocalServerTest, RegisterServerBroadCastUser)
+TEST(LocalServerTest, RegisterServerBroadCastUserTwo)
  {
  	int			fd[2];
  	char		*result;

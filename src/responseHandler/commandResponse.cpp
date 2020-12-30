@@ -298,6 +298,61 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int				Server::rSquitBroadcastHandler(const Message &message, Client *client)
+{
+	std::string				prefix;
+	std::string				parameters;
+	Message					sendMessage;
+
+	parameters = client->getInfo(SERVERNAME);
+	if (!message.getParameters().empty())
+	{
+		prefix = message.getPrefix();
+		parameters += std::string(" :ID \"");
+		parameters += message.getParameter(0);
+		parameters += std::string("\" already registered");
+	}
+	else
+	{
+		prefix = std::string(":");
+		prefix += client->getInfo(SERVERNAME);
+		parameters += std::string(" :");
+		if (this->serverList.count(client->getInfo(SERVERNAME)))
+			parameters += std::string("Client closed connection");
+		else
+		{
+			parameters += this->serverName;
+			parameters += std::string(" ");
+			parameters += client->getInfo(UPLINKSERVER);
+		}
+	}
+	sendMessage = Message(prefix, RPL_SQUIT, parameters);
+	this->broadcastMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
+{
+	std::string			prefix;
+	std::string			parameters;
+	Message				sendMessage;
+
+	prefix = std::string(":");
+	if (!message.getParameters().empty())
+	{
+		prefix += message.getParameter(0);
+		parameters = std::string(":Nick collision");
+	}
+	else
+	{
+		prefix += client->getInfo(NICK);
+		parameters = std::string(":Client closed connection");
+	}
+	sendMessage = Message(prefix, RPL_QUIT, parameters);
+	this->broadcastMessage(sendMessage, client);
+	return (CONNECT);
+}
+
 int		Server::rUserBroadcastHandler(const Message &message, Client *client)
 {
 	std::string		prefix;
@@ -375,24 +430,24 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 				sendMessage = Message(prefix, RPL_SERVER, parameters);
 				this->sendMessage(sendMessage, client);
 			}
-			else // user일 때
+			else
 			{
-				//NICK
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
-				parameters += std::string(" ");
+				parameters += std::string(" :");
 				parameters += it->second.getInfo(DISTANCE);
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();
-				//USER
-				prefix = message.getPrefix(); // 이거 맞음?
-				parameters = it->second.getInfo(USERNAME);
+				prefix = std::string(":");
+				prefix += it->second.getInfo(NICK);
+				parameters = std::string("~");
+				parameters += it->second.getInfo(USERNAME);
 				parameters += " ";
 				parameters += it->second.getInfo(ADDRESS);
 				parameters += " ";
 				parameters += it->second.getInfo(HOSTNAME);
-				parameters += " ";
+				parameters += " :";
 				parameters += it->second.getInfo(REALNAME);
 				sendMessage = Message(prefix, RPL_USER, parameters);
 				this->sendMessage(sendMessage, client);
@@ -435,3 +490,16 @@ int		Server::rServerHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int				Server::rKillHandler(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters = message.getParameter(0);
+	parameters += std::string(" :Nick collision");
+	sendMessage = Message(prefix, RPL_KILL, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
