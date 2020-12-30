@@ -112,20 +112,21 @@ void					Server::receiveMessage(const int fd)
 	std::string	messageStr;
 	int			connectionStatus;
 	Client 		&sender = this->acceptClients[fd];
+	Message		sendMessage;
 
 	messageStr = "";
 	readResult = 0;
 	connectionStatus = CONNECT;
-	
+
 	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
 	{
 		messageStr += buffer;
 		if (buffer == '\n')
 		{
-			Message message(messageStr);
-			std::cout << "Reveive message = " << messageStr;
-			if (this->commands.find(message.getCommand()) != this->commands.end())
-				connectionStatus = (this->*(this->commands[message.getCommand()]))(message, &sender);
+			sendMessage = Message(messageStr);
+			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
+			if (this->commands.find(sendMessage.getCommand()) != this->commands.end())
+				connectionStatus = (this->*(this->commands[sendMessage.getCommand()]))(sendMessage, &sender);
 			messageStr.clear();
 		}
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
@@ -134,7 +135,7 @@ void					Server::receiveMessage(const int fd)
 	//if (connectionStatus == DISCONNECT || readResult == 0) // uplink client를 지우게 되는 문제가 있음
 	//	this->disconnectClient(&sender);
 	if (readResult == 0)
-		this->disconnectClient(&sender);
+		this->disconnectClient(sendMessage, &sender);
 	if (connectionStatus == TOTALDISCONNECT)
 		this->clearClient(&sender);
 }
@@ -222,23 +223,62 @@ void					Server::clearClient(Client *client)
 	this->acceptClients.clear();
 }
 
-void					Server::disconnectClient(Client *client)
+static void				getServerList(std::map<std::string, Client> &sendClients, std::list<std::string> &serverList, std::string key)
 {
-	close(client->getFd()); // 여기서 파일디스크립터를 닫으면 반복문에서 block이 발생하는 듯 하다...
-	FD_CLR(client->getFd(), &this->readFds); // 여기도 파일디스크립터를 닫으면 block
-	// if (client->getStatus() != UNKNOWN)
-	// {
-		if (this->sendClients.count(client->getInfo(1)))
-			this->sendClients.erase(client->getInfo(1));
-		if (this->serverList.count(client->getInfo(1)))
-			this->serverList.erase(client->getInfo(1));
-		if (this->clientList.count(client->getInfo(1)))
-			this->clientList.erase(client->getInfo(1));
+	std::map<std::string, Client>::iterator	iterator;
 
-	// }
+	for(iterator = sendClients.begin(); iterator != sendClients.end(); ++iterator)
+	{
+		if (iterator->second.getInfo(UPLINKSERVER) == key)
+		{
+			if (iterator->second.getStatus() == SERVER)
+				getServerList(sendClients, serverList, iterator->second.getInfo(SERVERNAME));
+			serverList.push_back(iterator->second.getInfo(SERVERNAME));
+		}
+	}
+}
+
+void					Server::disconnectChild(const Message &message, Client *client)
+{
+	std::list<std::string>::iterator	iterator;
+	std::list<std::string>				serverList;
+
+	getServerList(this->sendClients, serverList, client->getInfo(SERVERNAME));
+	for(iterator = serverList.begin(); iterator != serverList.end(); ++iterator)
+	{
+		if (this->sendClients[*iterator].getStatus() == SERVER)
+		{
+			this->sendClients[*iterator].setInfo(UPLINKSERVER, client->getInfo(SERVERNAME));
+			(this->*(this->replies[RPL_SQUITBROADCAST]))(message, &this->sendClients[*iterator]);
+		}
+		this->sendClients.erase(*iterator);
+	}
+}
+
+void					Server::disconnectClient(const Message &message, Client *client)
+{
+	std::string stringKey;
+
+	stringKey = client->getInfo(SERVERNAME);
 	if (this->acceptClients.count(client->getFd()))
+	{
+		if (this->clientList.count(stringKey))
+		{
+			(this->*(this->replies[RPL_QUITBROADCAST]))(message, client);
+			this->clientList.erase(stringKey);
+		}
+		else if (this->serverList.count(stringKey))
+		{
+			this->disconnectChild(message, client);
+			(this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);
+			this->serverList.erase(stringKey);
+		}
+		close(client->getFd());
+		FD_CLR(client->getFd(), &this->readFds);
 		this->acceptClients.erase(client->getFd());
-	std::cout << "Disconnect client." << std::endl;
+	}
+	if (this->sendClients.count(stringKey))
+		this->sendClients.erase(stringKey);
 }
 
 void					Server::sendMessage(const Message &message, Client *client)

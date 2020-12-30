@@ -470,3 +470,196 @@ TEST(UserSendNickMessageTest, RegisterNickWithOutPrefix)
 			close(fd[i]);
 	}
 }
+
+TEST_GROUP(ServerSendNickMessageTest)
+{
+	Client		*client;
+	Message		sendMessage;
+
+	void			expect(Message message, int fd)
+	{
+		client = new Client(fd, true);
+		client->setStatus(SERVER);
+		client->setInfo(UPLINKSERVER, std::string("lo1"));
+		client->setInfo(SERVERNAME, std::string("lo2"));
+		client->setInfo(HOPCOUNT, std::string("1"));
+		client->setInfo(SERVERINFO, std::string("sexy server"));
+		sendMessage = message;
+	}
+	void			given(Server &server, int connection,
+					std::string nick, unsigned long sendClientNum)
+	{
+		server.prefix = std::string(":lo1");
+		server.serverName = std::string("lo1");
+		server.sendClients[client->getInfo(SERVERNAME)] = *client;
+		server.serverList[client->getInfo(SERVERNAME)] = &server.sendClients[client->getInfo(SERVERNAME)];
+		CHECK_EQUAL(connection, server.nickHandler(sendMessage, client));
+		CHECK_EQUAL(client->getStatus(), SERVER);
+		CHECK_EQUAL(client->getInfo(UPLINKSERVER), std::string("lo1"));
+		CHECK_EQUAL(client->getInfo(SERVERNAME), std::string("lo2"));
+		CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
+		CHECK_EQUAL(client->getInfo(SERVERINFO), std::string("sexy server"));
+		CHECK_EQUAL(server.sendClients.count(nick), sendClientNum);
+		CHECK_EQUAL(server.clientList.count(nick), 0);
+		delete client;
+	}
+};
+
+TEST(ServerSendNickMessageTest, PrefixError)
+{
+	int		fd[2];
+	char	*result;
+	Message	sendMessage;
+	Client	*otherServer;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+		free(result);
+		expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("dakim :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+		free(result);
+		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("dakim :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"dakim\"\r"));
+		free(result);
+		otherServer = new Client(1, true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo3"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.serverName = std::string("lo3");
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+		expect(Message(std::string(":lo3"), std::string("NICK"), std::string("")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo3\"\r"));
+		free(result);
+		delete otherServer;
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendNickMessageTest, ParameterError)
+{
+	int		fd[2];
+	char	*result;
+	Message	sendMessage;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		expect(Message(std::string(""), std::string("NICK"), std::string("")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
+		free(result);
+		expect(Message(std::string(""), std::string("NICK"), std::string("dakim")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
+		free(result);
+		expect(Message(std::string(""), std::string("NICK"), std::string("dakim 1 1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
+		free(result);
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendNickMessageTest, LocalUserNickOverlap)
+{
+	int		fd[4];
+	char	*result;
+	Message	sendMessage;
+	Client	*client;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1)
+	{
+		client = new Client(fd[3], true);
+		client->setStatus(USER);
+		client->setInfo(HOSTNAME, std::string("lo1"));
+		client->setInfo(NICK, std::string("dakim"));
+		client->setInfo(HOPCOUNT, std::string("1"));
+		client->setInfo(ADDRESS, std::string("127.0.0.1"));
+		client->setInfo(USERNAME, std::string("dak"));
+		client->setInfo(REALNAME, std::string("deok"));
+		server.acceptClients[fd[3]] = *client;
+		server.sendClients[std::string("dakim")] = *client;
+		server.clientList[std::string("dakim")] = &server.sendClients[std::string("dakim")];
+		expect(Message(std::string(""), std::string("NICK"), std::string("dakim :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		CHECK_EQUAL(server.acceptClients.count(fd[3]), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL dakim :Nick collision\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim QUIT :Nick collision\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 436 dakim :Nick collision\r"));
+		free(result);
+		delete client;
+		close(fd[0]);
+		close(fd[1]);
+		close(fd[2]);
+	}
+}
+
+TEST(ServerSendNickMessageTest, RemoteUserNickOverlap)
+{
+	int		fd[4];
+	char	*result;
+	Message	sendMessage;
+	Client	*otherServer;
+	Client	*client;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1)
+	{
+		otherServer = new Client(fd[3], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo3"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+		client = new Client(fd[3], true);
+		client->setStatus(USER);
+		client->setInfo(HOSTNAME, std::string("lo3"));
+		client->setInfo(NICK, std::string("dakim"));
+		client->setInfo(HOPCOUNT, std::string("2"));
+		client->setInfo(ADDRESS, std::string("127.0.0.1"));
+		client->setInfo(USERNAME, std::string("dak"));
+		client->setInfo(REALNAME, std::string("deok"));
+		server.sendClients[std::string("dakim")] = *client;
+		expect(Message(std::string(""), std::string("NICK"), std::string("dakim :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 0);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL dakim :Nick collision\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL dakim :Nick collision\r"));
+		free(result);
+		delete otherServer;
+		delete client;
+		close(fd[0]);
+		close(fd[1]);
+		close(fd[2]);
+		close(fd[3]);
+	}
+}

@@ -114,3 +114,17 @@ int		Server::ePrefixHandler(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::eNickCollisionHandler(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters = message.getParameter(0);
+	parameters += std::string(" :Nick collision");
+	sendMessage = Message(prefix, ERR_NICKCOLLISION, parameters);
+	this->sendMessage(sendMessage, client);
+	return (DISCONNECT);
+}
