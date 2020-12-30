@@ -71,4 +71,6 @@
 # define ERR_NOPERMFORHOST "463"
 # define ERR_PASSWDMISMATCH "464"
 
+# define ERR_CANTKILLSERVER "483"
+
 #endif

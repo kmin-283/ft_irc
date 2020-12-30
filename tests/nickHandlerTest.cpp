@@ -663,3 +663,130 @@ TEST(ServerSendNickMessageTest, RemoteUserNickOverlap)
 		close(fd[3]);
 	}
 }
+
+
+TEST(ServerSendNickMessageTest, RemoteUserNickAndServerNameOverlap)
+{
+	int		fd[6];
+	char	*result;
+	Message	sendMessage;
+	Client	*otherServer;
+	Client	*anotherServer;
+	Client	*client;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		otherServer = new Client(fd[3], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo3"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+		anotherServer = new Client(fd[5], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo4"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[anotherServer->getInfo(SERVERNAME)] = *anotherServer;
+		server.serverList[anotherServer->getInfo(SERVERNAME)] = &server.sendClients[anotherServer->getInfo(SERVERNAME)];
+		client = new Client(fd[3], true);
+		client->setStatus(USER);
+		client->setInfo(HOSTNAME, std::string("lo3"));
+		client->setInfo(NICK, std::string("dakim"));
+		client->setInfo(HOPCOUNT, std::string("2"));
+		client->setInfo(ADDRESS, std::string("127.0.0.1"));
+		client->setInfo(USERNAME, std::string("dak"));
+		client->setInfo(REALNAME, std::string("deok"));
+		server.sendClients[std::string("dakim")] = *client;
+		expect(Message(std::string(""), std::string("NICK"), std::string("lo1 :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo1 :Nick collision\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 483 lo1 :You can't kill a server!\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo1 :Nick collision\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo1 :Nick collision\r"));
+		free(result);
+		delete otherServer;
+		delete anotherServer;
+		delete client;
+		close(fd[0]);
+		close(fd[1]);
+		close(fd[2]);
+		close(fd[3]);
+		close(fd[4]);
+		close(fd[5]);
+	}
+}
+
+TEST(ServerSendNickMessageTest, RemoteUserNickAndOtherServerNameOverlap)
+{
+	int		fd[6];
+	char	*result;
+	Message	sendMessage;
+	Client	*otherServer;
+	Client	*anotherServer;
+	Client	*client;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		otherServer = new Client(fd[3], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo3"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+		anotherServer = new Client(fd[5], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo4"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[anotherServer->getInfo(SERVERNAME)] = *anotherServer;
+		server.serverList[anotherServer->getInfo(SERVERNAME)] = &server.sendClients[anotherServer->getInfo(SERVERNAME)];
+		client = new Client(fd[3], true);
+		client->setStatus(USER);
+		client->setInfo(HOSTNAME, std::string("lo3"));
+		client->setInfo(NICK, std::string("dakim"));
+		client->setInfo(HOPCOUNT, std::string("2"));
+		client->setInfo(ADDRESS, std::string("127.0.0.1"));
+		client->setInfo(USERNAME, std::string("dak"));
+		client->setInfo(REALNAME, std::string("deok"));
+		server.sendClients[std::string("dakim")] = *client;
+		expect(Message(std::string(""), std::string("NICK"), std::string("lo4 :1")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo4 :Nick collision\r"));
+		free(result);
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 483 lo4 :You can't kill a server!\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo4 :Nick collision\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 KILL lo4 :Nick collision\r"));
+		free(result);
+		delete otherServer;
+		delete anotherServer;
+		delete client;
+		close(fd[0]);
+		close(fd[1]);
+		close(fd[2]);
+		close(fd[3]);
+		close(fd[4]);
+		close(fd[5]);
+	}
+}

@@ -57,6 +57,7 @@ private:
 	int																	eErroneusUserNameHandler(const Message &message, Client *client);
 	int																	ePrefixHandler(const Message &message, Client *client);
 	int																	eNickCollisionHandler(const Message &message, Client *client);
+	int																	eCantKillServerHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);

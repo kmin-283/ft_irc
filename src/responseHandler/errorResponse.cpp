@@ -126,5 +126,20 @@ int		Server::eNickCollisionHandler(const Message &message, Client *client)
 	parameters += std::string(" :Nick collision");
 	sendMessage = Message(prefix, ERR_NICKCOLLISION, parameters);
 	this->sendMessage(sendMessage, client);
-	return (DISCONNECT);
+	this->disconnectClient(message, client);
+	return (CONNECT);
+}
+
+int		Server::eCantKillServerHandler(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters = message.getParameter(0);
+	parameters += std::string(" :You can't kill a server!");
+	sendMessage = Message(prefix, ERR_CANTKILLSERVER, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
 }

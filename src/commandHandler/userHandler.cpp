@@ -92,19 +92,20 @@ int					Server::nickHandler(const Message &message, Client *client)
 			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 		if (message.getParameters().size() != 2)
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (this->clientList.count(message.getParameter(0)))
-		{
+		if (this->sendClients.count(message.getParameter(0))
+		|| this->serverName == message.getParameter(0))
 			(this->*(this->replies[RPL_KILL]))(message, client);
-			(this->*(this->replies[ERR_NICKCOLLISION]))(message, this->clientList[message.getParameter(0)]);
-			this->disconnectClient(message, this->clientList[message.getParameter(0)]);
+		if (this->clientList.count(message.getParameter(0)))
+			return ((this->*(this->replies[ERR_NICKCOLLISION]))(message, this->clientList[message.getParameter(0)]));
+		if (this->sendClients[message.getParameter(0)].getStatus() == USER)
+		{
+			this->sendClients.erase(message.getParameter(0));
 			return (CONNECT);
 		}
-		if (this->sendClients.count(message.getParameter(0)))
-		{
-			(this->*(this->replies[RPL_KILL]))(message, &this->sendClients[message.getParameter(0)]);
-			this->sendClients.erase(message.getParameter(0));
-			return ((this->*(this->replies[RPL_KILL]))(message, client));
-		}
+		if (this->sendClients[message.getParameter(0)].getStatus() == SERVER
+		|| this->serverName == message.getParameter(0))
+			return ((this->*(this->replies[ERR_CANTKILLSERVER]))(message, client));
+
 	}
 	return (CONNECT);
 }
