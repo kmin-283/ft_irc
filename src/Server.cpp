@@ -57,16 +57,24 @@ void					Server::init(void)
 void					Server::start(void)
 {
 	struct timeval timeout;
+	clientIter it;
 
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
 	while(run)
 	{
-		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
+		it = this->acceptClients.begin();
+		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
+		{
 			this->renewFd(listenFd);
+			if (it == acceptClients.end())
+				break ;
+			listenFd = it->second.getFd();
+		}
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cerr << ERROR_SELECT_FAIL << std::endl;
-		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++listenFd)
+		it = this->acceptClients.begin();
+		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
@@ -75,6 +83,9 @@ void					Server::start(void)
 				else
 					this->receiveMessage(listenFd);
 			}
+			if (it == acceptClients.end())
+				break ;
+			listenFd = it->second.getFd();
 		}
 	}
 }
@@ -90,7 +101,7 @@ void					Server::connectClient(void)
 		throw Server::AcceptFailException();
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
-	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd, false)));
+	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd)));
 	std::cout << "Connect client." << std::endl;
 }
 
@@ -105,6 +116,7 @@ void					Server::receiveMessage(const int fd)
 	messageStr = "";
 	readResult = 0;
 	connectionStatus = CONNECT;
+	
 	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
 	{
 		messageStr += buffer;
@@ -119,7 +131,9 @@ void					Server::receiveMessage(const int fd)
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
 			break ;
 	}
-	if (connectionStatus == DISCONNECT || readResult == 0)
+	//if (connectionStatus == DISCONNECT || readResult == 0) // uplink client를 지우게 되는 문제가 있음
+	//	this->disconnectClient(&sender);
+	if (readResult == 0)
 		this->disconnectClient(&sender);
 	if (connectionStatus == TOTALDISCONNECT)
 		this->clearClient(&sender);
@@ -210,8 +224,8 @@ void					Server::clearClient(Client *client)
 
 void					Server::disconnectClient(Client *client)
 {
-	close(client->getFd());
-	FD_CLR(client->getFd(), &this->readFds);
+	close(client->getFd()); // 여기서 파일디스크립터를 닫으면 반복문에서 block이 발생하는 듯 하다...
+	FD_CLR(client->getFd(), &this->readFds); // 여기도 파일디스크립터를 닫으면 block
 	// if (client->getStatus() != UNKNOWN)
 	// {
 		if (this->sendClients.count(client->getInfo(1)))

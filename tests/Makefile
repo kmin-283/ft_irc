@@ -9,7 +9,7 @@ SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
-SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp
+SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp
 SRC_COM_DIR = ../src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))
 OBJS_COM = $(SRCS_COM:%.cpp=%.o)
@@ -19,7 +19,8 @@ SRC_RE_DIR = ../src/responseHandler/
 SRCS_RE = $(addprefix $(SRC_RE_DIR), $(SRC_RE))
 OBJS_RE = $(SRCS_RE:%.cpp=%.o)
 
-TEST = AllTests.cpp nickHandlerTest.cpp userHandlerTest.cpp registerUserTest.cpp serverHandlerTest.cpp
+TEST = AllTests.cpp nickHandlerTest.cpp userHandlerTest.cpp registerUserTest.cpp serverHandlerTest.cpp \
+squitHandlerTest.cpp
 OBJS_T = $(TEST:%.cpp=%.o)
 TEST_H = -I /usr/local/include/
 # TEST_H = -I ~/.brew/include

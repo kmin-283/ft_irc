@@ -43,6 +43,9 @@ private:
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
+	int																	wallopsHandler(const Message &message, Client *client);
+	int																	versionHandler(const Message &message, Client *client);	
+	
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -80,13 +83,17 @@ private:
 	void																connectClient(void);
 	void																disconnectClient(Client *client);
 	void																clearClient(Client *client);
-
+	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
 	void																receiveMessage(const int fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
+	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
 public:
+	typedef std::map<int, Client>::iterator clientIter; 
+	typedef std::map<std::string, Client>::iterator strClientIter;
+	typedef std::map<std::string, Client*>::iterator strClientPtrIter;
 																		Server(const char *pass, const char *port);
 																		~Server(void);
 	void																init(void);
