@@ -1,5 +1,24 @@
 #include "Server.hpp"
 
+/*
+ * VERSION 명령어만 단독으로 쓰이는 경우에는 operator만 사용할 수 있는 것 같음
+ * 
+ * 반면에 VERSION <servername>을 사용하는 것은 아무 서버나 가능
+ * 
+ */
+
+/*
+ * wildcard는 ? * & 가 있다.
+ * ?는 match a single character
+ * * matches everything except
+ * & matches a whole word if used alone
+ * 
+ * 
+ * [example]
+ *      *.se ---> .se로 끝나는 모든 서버
+ * 
+ */
+
 static bool match(char *first, char *second)
 {
 	if (*first == 0 && *second == 0)
@@ -15,6 +34,20 @@ static bool match(char *first, char *second)
 	if (*first == '&' && (*(first + 1) == '.' || *(first + 1) == 0) && (*second == '.' || *second == 0))
 		return match(first + 1, second);
 	return false;
+}
+
+std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
+{
+	std::vector<std::string> *ret = new std::vector<std::string>;
+	strClientIter it;
+
+	ret->reserve(50);
+	for (it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
+	{
+		if (match(const_cast<char *>(info.c_str()), const_cast<char *>(it->second.getInfo(SERVERNAME).c_str())))
+			ret->push_back(it->second.getInfo(SERVERNAME));
+	}
+	return ret;
 }
 
 int Server::versionHandler(const Message &message, Client *client)
@@ -42,13 +75,13 @@ int Server::versionHandler(const Message &message, Client *client)
 		// server에게선 prefix가 있는 경우만 처리하면 됨
 		if (message.getPrefix() != "")
 		{
-			if (message.getCommand() == RPL_VERSION && message.getParameter(0) == this->serverName)
-			{
-				std::cout << message.getPrefix() << " " << message.getCommand() << " " << message.getTotalMessage();
-				return (CONNECT);
-			}
 			if (message.getCommand() == RPL_VERSION)
 			{
+				if (message.getParameter(0) == this->serverName)
+				{
+					std::cout << message.getPrefix() << " " << message.getCommand() << " " << message.getTotalMessage();
+					return (CONNECT);
+				}
 				broadcastMessage(message, client); // sendclient를 돌면서 서버와 유저에게 메시지를 보냄
 				return (CONNECT);
 			}
@@ -76,35 +109,27 @@ int Server::versionHandler(const Message &message, Client *client)
 }
 
 /*
- * VERSION 명령어만 단독으로 쓰이는 경우에는 operator만 사용할 수 있는 것 같음
+ * STATS m 지원되는 명령어 사용횟수, 사용되는 바이트 크기를 리턴함
+ * :from STATS 212 to Command lcount(나에게 온 요청) bytes rcount(나를 경유해간 요청)
  * 
- * 반면에 VERSION <servername>을 사용하는 것은 아무 서버나 가능
  * 
  */
 
-/*
- * wildcard는 ? * & 가 있다.
- * ?는 match a single character
- * * matches everything except
- * & matches a whole word if used alone
- * 
- * 
- * [example]
- *      *.se ---> .se로 끝나는 모든 서버
- * 
- */
-
-
-std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
+int			Server::statsHandler(const Message &message, Client *client)
 {
-	std::vector<std::string> *ret = new std::vector<std::string>;
-	strClientIter it;
-
-	ret->reserve(50);
-	for (it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
+	if (client->getStatus() == USER)
 	{
-		if (match(const_cast<char *>(info.c_str()), const_cast<char *>(it->second.getInfo(SERVERNAME).c_str())))
-			ret->push_back(it->second.getInfo(SERVERNAME));
+		if (message.getParameters().size() > 0)
+		{
+			(this->*(this->replies["STATS_" + message.getParameter(0)]))(message, client);
+			sendMessage(Message(this->prefix, RPL_VERSION, client->getInfo(NICK) + " " + this->version + ". " + this->serverName), client);
+		}
+		(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
 	}
-	return ret;
+	else if (client->getStatus() == SERVER)
+	{
+
+	}
+	(this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	return (CONNECT);
 }

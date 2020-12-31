@@ -10,6 +10,25 @@
 class																	Server
 {
 private:
+	class Info
+	{
+	private:
+		size_t															bytes;
+		size_t															requestCount;
+		size_t															mediationCount;
+		std::string														cmd;
+	public:
+		Info();
+		~Info();
+		inline void															setBytes(const int &size);
+		inline std::string													getBytes() const;
+		inline void															setRequestCount(const int &size);
+		inline std::string													getRequestCount() const;
+		inline void															setMediationCount(const int &size);
+		inline std::string													getMediationCount() const;
+		inline std::string													getCmd() const;
+	};
+
 	std::string															prefix;
 
 	std::string															ipAddress;
@@ -36,6 +55,8 @@ private:
 
 	bool																run;
 
+	std::vector<Info>													infos;
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
@@ -45,6 +66,7 @@ private:
 	int																	squitHandler(const Message &message, Client *client);
 	int																	wallopsHandler(const Message &message, Client *client);
 	int																	versionHandler(const Message &message, Client *client);
+	int																	statsHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -82,6 +104,8 @@ private:
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 
+	int																	rStatsM(const Message &message, Client *client);
+
 	void																renewFd(const int fd);
 
 	void																connectClient(void);
@@ -95,6 +119,8 @@ private:
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
 	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
+
+	void																initInfo(void);
 public:
 	typedef std::map<int, Client>::iterator clientIter;
 	typedef std::map<std::string, Client>::iterator strClientIter;

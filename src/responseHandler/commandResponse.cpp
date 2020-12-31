@@ -503,3 +503,19 @@ int				Server::rKillHandler(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int				Server::rStatsM(const Message &message, Client *client)
+{
+	//for (std::vector<Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
+	//{
+		//sendMessage(Message(this->prefix
+		//, RPL_STATSCOMMANDS
+		//, message.getPrefix().substr(1, message.getPrefix().length())
+		//+ " " + it->getCmd()
+		//+ " " + it->getMediationCount()
+		//+ " " + it->getBytes()
+		//+ " " + it->getRequestCount())
+		//, client);
+	//}
+	//return (CONNECT);
+}

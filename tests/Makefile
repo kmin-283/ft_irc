@@ -3,13 +3,13 @@ CFLAGS = -Wall -Werror -Wextra
 NAME = test
 INCLUDE = -I ../include/
 
-SRC = Client.cpp Message.cpp Server.cpp ServerException.cpp utils.cpp
+SRC = Client.cpp Message.cpp Server.cpp ServerException.cpp utils.cpp Info.cpp
 SRC_DIR = ../src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
-SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp versionHandler.cpp
+SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp
 SRC_COM_DIR = ../src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))
 OBJS_COM = $(SRCS_COM:%.cpp=%.o)
