@@ -501,6 +501,7 @@ int				Server::rKillHandler(const Message &message, Client *client)
 	parameters += std::string(" :Nick collision");
 	sendMessage = Message(prefix, RPL_KILL, parameters);
 	this->sendMessage(sendMessage, client);
+	this->broadcastMessage(sendMessage, client);
 	return (CONNECT);
 }
 
