@@ -11,6 +11,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_ERRONEUSUSERNAME] = &Server::eErroneusUserNameHandler;
 	this->replies[ERR_PREFIX] = &Server::ePrefixHandler;
 	this->replies[ERR_NICKCOLLISION] = &Server::eNickCollisionHandler;
+	this->replies[ERR_CANTKILLSERVER] = &Server::eCantKillServerHandler;
 
 	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;
 	this->replies[RPL_WELCOMEMESSAGE] = &Server::rWelcomeMessageHandler;

@@ -39,6 +39,12 @@ private:
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
+	int																	setLocalNick(const Message &message, Client *client);
+	int																	resetLocalNick(const Message &message, Client *client);
+	int																	localNickHandler(const Message &message, Client *client);
+	int																	setRemoteNick(const Message &message, Client *client);
+	int																	resetRemoteNick(const Message &message, Client *client);
+	int																	remoteNickHandler(const Message &message, Client *client);
 	int																	nickHandler(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
@@ -57,6 +63,7 @@ private:
 	int																	eErroneusUserNameHandler(const Message &message, Client *client);
 	int																	ePrefixHandler(const Message &message, Client *client);
 	int																	eNickCollisionHandler(const Message &message, Client *client);
+	int																	eCantKillServerHandler(const Message &message, Client *client);
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
