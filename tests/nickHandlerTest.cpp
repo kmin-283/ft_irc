@@ -790,3 +790,16 @@ TEST(ServerSendNickMessageTest, RemoteUserNickAndOtherServerNameOverlap)
 		close(fd[5]);
 	}
 }
+
+TEST(ServerSendNickMessageTest, RegisterUser)
+{
+	Message	sendMessage;
+	Server	server("111", "3000");
+
+	expect(Message(std::string(""), std::string("NICK"), std::string("dakim :1")), 1);
+	given(server, CONNECT, std::string("dakim"), 1);
+	CHECK_EQUAL(server.sendClients[std::string("dakim")].getStatus(), UNKNOWN);
+	CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+	CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("1"));
+	CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
+}

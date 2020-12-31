@@ -30,7 +30,7 @@ static std::string	getHopCount(const Message &message)
 	return (hopCountStr);
 }
 
-static int			setNick(Client *client, const Message &message,
+static int			setNick(Client *client, const Message &message, bool isServer,
 					std::map<std::string, Client> &sendClients,
 					std::map<std::string, Client *> &clientList)
 {
@@ -39,75 +39,100 @@ static int			setNick(Client *client, const Message &message,
 	if (client->getInfo(NICK) != "")
 	{
 		sendClients.erase(client->getInfo(NICK));
-		clientList.erase(client->getInfo(NICK));
+		if (!isServer)
+			clientList.erase(client->getInfo(NICK));
 	}
 	if (client->getStatus() == UNKNOWN)
 		client->setInfo(HOPCOUNT, getHopCount(message));
 	client->setInfo(NICK, message.getParameter(0));
 	sendClients[message.getParameter(0)] = *client;
-	clientList[message.getParameter(0)] = client;
+	if (!isServer)
+		clientList[message.getParameter(0)] = &sendClients[message.getParameter(0)];
 	return (CONNECT);
+}
+
+int					Server::setLocalNick(const Message &message, Client *client)
+{
+	if (message.getParameters().empty())
+		return ((this->*(this->replies[ERR_NONICKNAMEGIVEN]))(message, client));
+	if (1 != message.getParameters().size())
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	if (!isValidNickName(message) || 9 < message.getParameter(0).length())
+		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
+	if (!client->getIsAuthorized())
+		return ((this->*(this->replies[ERR_PASSUNAUTHORIE]))(message, client));
+	if (this->sendClients.count(message.getParameter(0))
+	|| this->serverName == message.getParameter(0))
+		return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(message, client));
+	setNick(client, message, false, this->sendClients, this->clientList);
+	if (client->getInfo(USERNAME) == "")
+		return (CONNECT);
+	(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
+	return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
+}
+
+int					Server::resetLocalNick(const Message &message, Client *client)
+{
+	if (message.getPrefix() != ""
+	&& message.getPrefix() != std::string(":") + client->getInfo(SERVERNAME))
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	if (message.getParameters().size() != 1)
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	if (!isValidNickName(message) || 9 < message.getParameter(0).length())
+		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
+	if (this->sendClients.count(message.getParameter(0))
+	|| this->serverName == message.getParameter(0))
+		return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(message, client));
+	(this->*(this->replies[RPL_NICK]))(message, client);
+	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
+	return (setNick(client, message, false, this->sendClients, this->clientList));
+}
+
+int					Server::localNickHandler(const Message &message, Client *client)
+{
+	if (client->getStatus() == UNKNOWN)
+		return (this->setLocalNick(message, client));
+	else if (client->getStatus() == USER)
+		return (this->resetLocalNick(message, client));
+	return (CONNECT);
+}
+
+int					Server::setRemoteNick(const Message &message, Client *client)
+{
+	Client	remoteUser(client->getFd(),true);
+
+	if (message.getParameters().size() != 2)
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	if (this->sendClients.count(message.getParameter(0))
+	|| this->serverName == message.getParameter(0))
+		(this->*(this->replies[RPL_KILL]))(message, client);
+	if (this->clientList.count(message.getParameter(0)))
+		return ((this->*(this->replies[ERR_NICKCOLLISION]))(message, this->clientList[message.getParameter(0)]));
+	if (this->sendClients[message.getParameter(0)].getStatus() == USER)
+	{
+		this->sendClients.erase(message.getParameter(0));
+		return (CONNECT);
+	}
+	if (this->sendClients[message.getParameter(0)].getStatus() == SERVER
+	|| this->serverName == message.getParameter(0))
+		return ((this->*(this->replies[ERR_CANTKILLSERVER]))(message, client));
+	setNick(&remoteUser, message, true, this->sendClients, this->clientList);
+	return (CONNECT);
+}
+
+int					Server::remoteNickHandler(const Message &message, Client *client)
+{
+	if (message.getPrefix() == "")
+		return (this->setRemoteNick(message, client));
+	// TODO :dakim NICK :de 처리 필요
+	return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 }
 
 int					Server::nickHandler(const Message &message, Client *client)
 {
-	if (client->getStatus() == UNKNOWN)
-	{
-		if (message.getParameters().empty())
-			return ((this->*(this->replies[ERR_NONICKNAMEGIVEN]))(message, client));
-		if (1 != message.getParameters().size())
-			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (!isValidNickName(message) || 9 < message.getParameter(0).length())
-			return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
-		if (!client->getIsAuthorized())
-			return ((this->*(this->replies[ERR_PASSUNAUTHORIE]))(message, client));
-		if (this->sendClients.count(message.getParameter(0))
-		|| this->serverName == message.getParameter(0))
-			return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(message, client));
-		setNick(client, message, this->sendClients, this->clientList);
-		if (client->getInfo(USERNAME) == "")
-			return (CONNECT);
-		(this->*(this->replies[RPL_REGISTERUSER]))(message, client);
-		return ((this->*(this->replies[RPL_WELCOMEMESSAGE]))(message, client));
-	}
-	else if (client->getStatus() == USER)
-	{
-		if (message.getPrefix() != ""
-		&& message.getPrefix() != std::string(":") + client->getInfo(SERVERNAME))
-			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
-		if (message.getParameters().size() != 1)
-			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (!isValidNickName(message) || 9 < message.getParameter(0).length())
-			return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
-		if (this->sendClients.count(message.getParameter(0))
-		|| this->serverName == message.getParameter(0))
-			return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(message, client));
-		(this->*(this->replies[RPL_NICK]))(message, client);
-		(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
-		return (setNick(client, message, this->sendClients, this->clientList));
-	}
-	else if (client->getStatus() == SERVER)
-	{
-		if (message.getPrefix() != "")
-			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
-		if (message.getParameters().size() != 2)
-			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-		if (this->sendClients.count(message.getParameter(0))
-		|| this->serverName == message.getParameter(0))
-			(this->*(this->replies[RPL_KILL]))(message, client);
-		if (this->clientList.count(message.getParameter(0)))
-			return ((this->*(this->replies[ERR_NICKCOLLISION]))(message, this->clientList[message.getParameter(0)]));
-		if (this->sendClients[message.getParameter(0)].getStatus() == USER)
-		{
-			this->sendClients.erase(message.getParameter(0));
-			return (CONNECT);
-		}
-		if (this->sendClients[message.getParameter(0)].getStatus() == SERVER
-		|| this->serverName == message.getParameter(0))
-			return ((this->*(this->replies[ERR_CANTKILLSERVER]))(message, client));
-
-	}
-	return (CONNECT);
+	if (client->getStatus() == SERVER)
+		return (this->remoteNickHandler(message, client));
+	return (this->localNickHandler(message, client));
 }
 
 static bool			isVaildUserName(const Message &message)
