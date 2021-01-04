@@ -15,6 +15,9 @@ private:
 	void							setParameters(std::string::const_iterator &iterator, const std::string &message);
 	void							setVector(std::vector<std::string> &vector, std::string &parameter);
 	void							setTotalMessage(const std::string &prefix, const std::string &message, const std::string &parameters);
+	void							toUpper(std::string &command);
+	std::string						toUpper(const std::string &command);
+	std::string						getParameterStr(std::string::const_iterator iterator, const std::string &message);
 public:
 									Message(void);
 									Message(const std::string &message);
@@ -25,7 +28,6 @@ public:
 	const std::string				getCommand(void) const;
 	const std::string				getParameter(const int &index) const;
 	std::vector<std::string>		getParameters(void) const;
-
 	const std::string				&getTotalMessage(void) const;
 };
 

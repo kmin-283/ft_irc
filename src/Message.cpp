@@ -12,18 +12,19 @@
 Message::Message(void) {}
 
 Message::Message(const std::string &message)
- : totalMessage(message)
 {
 	std::string::const_iterator		messageIterator;
 	messageIterator = message.begin();
 	if (*messageIterator == ':')
 		this->setString(this->prefix, messageIterator, message);
 	this->setString(this->command, messageIterator, message);
+	this->toUpper(this->command);
+	this->setTotalMessage(this->prefix, this->command, this->getParameterStr(messageIterator, message));
 	this->setParameters(messageIterator, message);
 }
 
 Message::Message(const std::string &prefix, const std::string &command, const std::string &parameters)
- : prefix(prefix), command(command)
+ : prefix(prefix), command(this->toUpper(command))
 {
 	std::string	tmpParameters;
 	std::string::const_iterator	iterator;
@@ -31,12 +32,52 @@ Message::Message(const std::string &prefix, const std::string &command, const st
 	tmpParameters = parameters;
 	tmpParameters += CR_LF;
 	iterator = tmpParameters.begin();
-	this->setTotalMessage(prefix, command, parameters);
+	this->setTotalMessage(prefix, this->command, parameters);
 	this->setParameters(iterator, tmpParameters);
 }
 
 Message::~Message(void)
 {
+}
+
+std::string					Message::getParameterStr(std::string::const_iterator iterator, const std::string &message)
+{
+	std::string			returnStr;
+
+	returnStr = std::string("");
+	for(; iterator != message.end(); ++iterator)
+	{
+		if (*iterator == '\r' || *iterator == '\n')
+			break ;
+		returnStr += *iterator;
+	}
+	return (returnStr);
+}
+
+void						Message::toUpper(std::string &command)
+{
+	for(size_t i = 0; i < command.size(); i++)
+	{
+		if ('a' <= command[i] && command[i] <= 'z')
+			command[i] = command[i] - 32;
+		else
+			command[i] = command[i];
+	}
+}
+
+std::string					Message::toUpper(const std::string &command)
+{
+	std::string		returnString;
+
+	returnString = std::string("");
+	for(size_t i = 0; i < command.size(); i++)
+	{
+		if ('a' <= command[i] && command[i] <= 'z')
+			returnString += command[i] - 32;
+		else
+			returnString += command[i];
+	}
+	return (returnString);
 }
 
 Message						&Message::operator=(const Message &message)
@@ -108,17 +149,17 @@ void						Message::setVector(std::vector<std::string> &vector, std::string &para
 	parameter = "";
 }
 
-const std::string					Message::getPrefix(void) const
+const std::string			Message::getPrefix(void) const
 {
 	return (this->prefix);
 }
 
-const std::string					Message::getCommand(void) const
+const std::string			Message::getCommand(void) const
 {
 	return (this->command);
 }
 
-const std::string					Message::getParameter(const int &index) const
+const std::string			Message::getParameter(const int &index) const
 {
 	return (this->parameters[index]);
 }
@@ -131,17 +172,4 @@ std::vector<std::string>	Message::getParameters(void) const
 const std::string			&Message::getTotalMessage(void) const
 {
 	return (this->totalMessage);
-}
-
-void		printData(Message message)
-{
-	std::cout << "prefix = " << message.getPrefix() << std::endl;
-	std::cout << "command = " << message.getCommand() << std::endl;
-	int index = message.getParameters().size();
-	int i;
-	i = -1;
-	while (++i < index)
-	{
-		std::cout << "parameters = " << message.getParameter(i) << std::endl;
-	}
 }
