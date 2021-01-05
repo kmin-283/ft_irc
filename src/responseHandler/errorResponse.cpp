@@ -31,6 +31,11 @@ int		Server::eErroneusNickNameHandler(const Message &message, Client *client)
 	Message		sendMessage;
 
 	parameters = message.getParameter(0);
+	if (client->getStatus() == SERVER)
+	{
+		parameters += std::string(" ");
+		parameters += client->getInfo(SERVERNAME);
+	}
 	parameters += std::string(" :Erroneous nickname");
 	sendMessage = Message(this->prefix, ERR_ERRONEUSNICKNAME, parameters);
 	this->sendMessage(sendMessage, client);

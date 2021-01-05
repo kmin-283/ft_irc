@@ -14,17 +14,14 @@ static bool			isValidNickName(const Message &message)
 
 static std::string	getHopCount(const Message &message)
 {
-	int					hopCount;
 	std::stringstream	stream;
 	std::string			hopCountStr;
 
 	hopCountStr = std::string("1");
 	if (message.getParameters().size() == 2)
 	{
-		stream << message.getParameter(1)
-		.substr(1, message.getParameter(1).length());
-		stream >> hopCount;
-		stream << (++hopCount);
+		stream << ft_atoi(message.getParameter(1)
+		.substr(1, message.getParameter(1).length()).c_str()) + 1;
 		hopCountStr = stream.str();
 	}
 	return (hopCountStr);
@@ -103,6 +100,8 @@ int					Server::setRemoteNick(const Message &message, Client *client)
 
 	if (message.getParameters().size() != 2)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	if (!isValidNickName(message) || 9 < message.getParameter(0).length())
+		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(message, client));
 	if (this->sendClients.count(message.getParameter(0))
 	|| this->serverName == message.getParameter(0))
 		(this->*(this->replies[RPL_KILL]))(message, client);
@@ -120,11 +119,47 @@ int					Server::setRemoteNick(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int					Server::resetRemoteNick(const Message &message, Client *client)
+{
+	std::stringstream	stream;
+	std::string			prefix;
+	std::string			parameters;
+	Message				formatedMessage;
+	Client				remoteUser;
+
+	if (message.getParameters().size() != 1)
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	if (message.getParameter(0)[0] != ':')
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	prefix = message.getPrefix().substr(1, message.getPrefix().length());
+	parameters = message.getParameter(0).substr(1, message.getParameter(0).length());
+	parameters += std::string(" :");
+	stream << ft_atoi(this->sendClients[prefix].getInfo(HOPCOUNT).c_str()) - 1;
+	parameters += stream.str();
+	formatedMessage = Message(std::string(""), RPL_NICK, parameters);
+	remoteUser.setInfo(NICK, prefix);
+	if (!isValidNickName(formatedMessage) || 9 < formatedMessage.getParameter(0).length())
+		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(formatedMessage, client));
+	if (this->sendClients.count(formatedMessage.getParameter(0))
+	|| this->serverName == formatedMessage.getParameter(0))
+		return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(formatedMessage, &this->sendClients[prefix]));
+	setNick(&remoteUser, formatedMessage, true, this->sendClients, this->clientList);
+	if (this->sendClients[formatedMessage.getParameter(0)].getInfo(USERNAME) == "")
+		return (CONNECT);
+		// TODO user 등록 처리해야함
+	return (CONNECT);
+}
+
 int					Server::remoteNickHandler(const Message &message, Client *client)
 {
+	std::string	prefix;
+
 	if (message.getPrefix() == "")
 		return (this->setRemoteNick(message, client));
-	// TODO :dakim NICK :de 처리 필요
+	prefix = message.getPrefix().substr(1, message.getPrefix().length());
+	if (this->sendClients.count(prefix) && !this->clientList.count(prefix)
+	&& !this->serverList.count(prefix))
+		return (this->resetRemoteNick(message, client));
 	return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 }
 
