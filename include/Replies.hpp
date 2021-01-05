@@ -42,7 +42,10 @@
 # define RPL_STATSOLINE "243"
 # define RPL_STATSHLINE "244"
 
+# define STATS_L "STATS_l"
 # define STATS_M "STATS_m"
+# define STATS_O "STATS_o"
+# define STATS_U "STATS_u"
 
 
 

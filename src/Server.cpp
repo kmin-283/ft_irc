@@ -7,9 +7,9 @@ Server::Server(const char *pass, const char *port)
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 
-	this->initInfo();
 	this->registerCommands();
 	this->registerReplies();
+	this->initInfo();
 
 	this->serverName = std::string("localhost.") + this->port;
 }
@@ -19,9 +19,10 @@ Server::~Server(void)
 
 void					Server::initInfo(void)
 {
-	this->infos.reserve(NUM_OF_COMMANDS);
-	for (int i = CMD_PASS; i < END_OF_CMD; ++i)
-		this->infos.push_back(Info()); // cmd에 대한 정보를 입력해야 함 
+	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator it;
+	
+	for (it = this->commands.begin(); it != this->commands.end(); ++it)
+		this->infos.insert(std::pair<std::string, Info>(it->first, Info()));
 }
 
 void					Server::renewFd(const int fd)

@@ -80,7 +80,6 @@ int Server::serverHandler(const Message &message, Client *client)
 			newClient.setInfo(HOPCOUNT, message.getParameter(1));
 			this->sendClients[message.getParameter(0)] = newClient;
 		}
-		std::cout << message.getTotalMessage();
 		(this->*(this->replies[RPL_SERVERBROADCAST]))(message, client);
 	}
 	else if (client->getStatus() == USER)

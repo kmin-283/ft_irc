@@ -132,16 +132,3 @@ const std::string			&Message::getTotalMessage(void) const
 {
 	return (this->totalMessage);
 }
-
-void		printData(Message message)
-{
-	std::cout << "prefix = " << message.getPrefix() << std::endl;
-	std::cout << "command = " << message.getCommand() << std::endl;
-	int index = message.getParameters().size();
-	int i;
-	i = -1;
-	while (++i < index)
-	{
-		std::cout << "parameters = " << message.getParameter(i) << std::endl;
-	}
-}

@@ -1,37 +1,33 @@
 #include "Server.hpp"
 
 Server::Info::Info()
-    : bytes(0), requestCount(0), mediationCount(0)
+    : bytes(0), remoteCount(0), localCount(0)
 {
 }
 Server::Info::~Info()
 {
 }
-inline void Server::Info::setBytes(const int &size)
+void Server::Info::incrementBytes(const int &size)
 {
     this->bytes += size;
 }
-inline std::string Server::Info::getBytes() const
+std::string Server::Info::getBytes() const
 {
     return (std::to_string(this->bytes));
 }
-inline void Server::Info::setRequestCount(const int &size)
+void Server::Info::incrementRemoteCount(const int &size)
 {
-    this->requestCount += size;
+    this->remoteCount += size;
 }
-inline std::string Server::Info::getRequestCount() const
+std::string Server::Info::getRemoteCount() const
 {
-    return (std::to_string(this->requestCount));
+    return (std::to_string(this->remoteCount));
 }
-inline void Server::Info::setMediationCount(const int &size)
+void Server::Info::incrementLocalCount(const int &size)
 {
-    this->mediationCount += size;
+    this->localCount += size;
 }
-inline std::string Server::Info::getMediationCount() const
+std::string Server::Info::getLocalCount() const
 {
-    return (std::to_string(this->mediationCount));
-}
-inline std::string Server::Info::getCmd() const
-{
-    return (this->cmd);
+    return (std::to_string(this->localCount));
 }

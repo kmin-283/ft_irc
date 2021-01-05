@@ -507,16 +507,46 @@ int				Server::rKillHandler(const Message &message, Client *client)
 
 int				Server::rStatsM(const Message &message, Client *client)
 {
-	//for (std::vector<Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
-	//{
-		//sendMessage(Message(this->prefix
-		//, RPL_STATSCOMMANDS
-		//, message.getPrefix().substr(1, message.getPrefix().length())
-		//+ " " + it->getCmd()
-		//+ " " + it->getMediationCount()
-		//+ " " + it->getBytes()
-		//+ " " + it->getRequestCount())
-		//, client);
-	//}
-	//return (CONNECT);
+	std::string parameter;
+
+	if (message.getPrefix().empty())
+		parameter = client->getInfo(NICK);
+	else
+		message.getPrefix().substr(1, message.getPrefix().length());
+	for (std::map<std::string, Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
+	{
+		if (std::isalpha(it->first[0]) && (it->second.getLocalCount() != "0" || it->second.getRemoteCount() != "0"))
+		{
+			sendMessage(Message(this->prefix
+								, RPL_STATSCOMMANDS
+								, parameter + " " + it->first
+								+ " " + it->second.getLocalCount()
+								+ " " + it->second.getBytes()
+								+ " " + it->second.getRemoteCount())
+								, client);
+		}
+	}
+	return (CONNECT);
+}
+
+int				Server::rEndOfStats(const Message &message, Client *client)
+{
+	std::string option;
+	std::string parameter;
+
+	if (message.getParameters().empty())
+		option = "*";
+	else
+		option = message.getParameter(0)[0];
+	if (message.getPrefix().empty())
+		parameter = client->getInfo(NICK);
+	else
+		message.getPrefix().substr(1, message.getPrefix().length());
+	sendMessage(Message(this->prefix
+						, RPL_ENDOFSTATS
+						, parameter	+ " " + option
+						+ " " + ":End of STATS report"
+						)
+						, client);
+	return (CONNECT);
 }

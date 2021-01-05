@@ -9,6 +9,7 @@
 # include <stack>
 # include <map>
 # include <algorithm>
+# include <cctype>
 
 # include <sstream>
 # include <fstream>
@@ -56,36 +57,6 @@
 # define ERROR_PASS_FAIL "Error: Password invalid."
 # define ERROR_SEND_FAIL "Error: Send message fail."
 # define ERROR_FILE_OPEN_FAIL "Error: File open fail."
-
-enum            CMDS
-{
-    CMD_PASS = 0,
-    CMD_NICK,
-    CMD_USER,
-    CMD_SERVER,
-    CMD_OPERATOR,
-    CMD_QUIT,
-    CMD_SQUIT,
-    CMD_JOIN,
-    CMD_PART,
-    CMD_MODE,
-    CMD_CHANNEL_MODE,
-    CMD_USER_MODE,
-    CMD_TOPIC,
-    CMD_NAMES,
-    CMD_LISTS,
-    CMD_INVITES,
-    CMD_KICK,
-    CMD_VERSION,
-    CMD_STATS,
-    CMD_LINKS,
-    CMD_TIME,
-    CMD_CONNECT,
-    CMD_TRACE,
-    CMD_ADMIN,
-    CMD_INFO,
-    END_OF_CMD
-};
 
 class			Message;
 
