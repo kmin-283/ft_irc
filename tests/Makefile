@@ -19,7 +19,7 @@ SRC_RE_DIR = ../src/responseHandler/
 SRCS_RE = $(addprefix $(SRC_RE_DIR), $(SRC_RE))
 OBJS_RE = $(SRCS_RE:%.cpp=%.o)
 
-TEST = AllTests.cpp nickHandlerTest.cpp userHandlerTest.cpp registerUserTest.cpp serverHandlerTest.cpp disconnectClientTest.cpp squitHandlerTest.cpp
+TEST = AllTests.cpp nickHandlerTest.cpp userHandlerTest.cpp registerUserTest.cpp serverHandlerTest.cpp disconnectClientTest.cpp squitHandlerTest.cpp messageConstructTest.cpp messageParsingTest.cpp
 OBJS_T = $(TEST:%.cpp=%.o)
 TEST_H = -I /usr/local/include/
 # TEST_H = -I ~/.brew/include
