@@ -72,6 +72,8 @@ private:
 	int																	resetRemoteNick(const Message &message, Client *client);
 	int																	remoteNickHandler(const Message &message, Client *client);
 	int																	nickHandler(const Message &message, Client *client);
+	int																	setLocalUser(const Message &message, Client *client);
+	int																	setRemoteUser(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);

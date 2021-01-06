@@ -908,6 +908,45 @@ TEST(ServerResendNickMessageNotUserTest, ParameterSizeError)
 	}
 }
 
+TEST(ServerResendNickMessageNotUserTest, PrefixIsServer)
+{
+	int		fd[2];
+	char	*result;
+	Client	*localServer;
+	Client	*remoteServer;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		localServer = new Client(0, true);
+		localServer->setStatus(SERVER);
+		localServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		localServer->setInfo(SERVERNAME, std::string("lo3"));
+		localServer->setInfo(HOPCOUNT, std::string("1"));
+		localServer->setInfo(SERVERINFO, std::string("123"));
+		server.sendClients[localServer->getInfo(SERVERNAME)] = *localServer;
+		server.serverList[localServer->getInfo(SERVERNAME)] = &server.sendClients[localServer->getInfo(SERVERNAME)];
+		remoteServer = new Client(0, true);
+		remoteServer->setStatus(SERVER);
+		remoteServer->setInfo(UPLINKSERVER, std::string("lo3"));
+		remoteServer->setInfo(SERVERNAME, std::string("lo4"));
+		remoteServer->setInfo(HOPCOUNT, std::string("2"));
+		remoteServer->setInfo(SERVERINFO, std::string("123"));
+		server.sendClients[remoteServer->getInfo(SERVERNAME)] = *remoteServer;
+		expect(Message(std::string(":lo4"), std::string("NICK"), std::string(":deok")), fd[1]);
+		given(server, CONNECT, std::string("deok"), 0, 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo4\"\r"));
+		free(result);
+		delete localServer;
+		delete remoteServer;
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
 TEST(ServerResendNickMessageNotUserTest, ParameterFormError)
 {
 	int		fd[2];
