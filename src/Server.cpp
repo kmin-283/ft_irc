@@ -9,12 +9,21 @@ Server::Server(const char *pass, const char *port)
 
 	this->registerCommands();
 	this->registerReplies();
+	this->initInfo();
 
 	this->serverName = std::string("localhost.") + this->port;
 }
 
 Server::~Server(void)
 {}
+
+void					Server::initInfo(void)
+{
+	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator it;
+	
+	for (it = this->commands.begin(); it != this->commands.end(); ++it)
+		this->infos.insert(std::pair<std::string, Info>(it->first, Info()));
+}
 
 void					Server::renewFd(const int fd)
 {
@@ -83,7 +92,7 @@ void					Server::start(void)
 				else
 					this->receiveMessage(listenFd);
 			}
-			if (it == acceptClients.end())
+			if (it == acceptClients.end() || !run)
 				break ;
 			listenFd = it->second.getFd();
 		}

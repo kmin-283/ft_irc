@@ -149,3 +149,35 @@ int		Server::eCantKillServerHandler(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::eNoSuchServer(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters = message.getPrefix().substr(1, message.getPrefix().length());
+	parameters += " ";
+	parameters += message.getParameter(0);
+	parameters += " :No such server";
+	sendMessage = Message(prefix, ERR_NOSUCHSERVER, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::eUnknownCommand(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters = message.getPrefix().substr(1, message.getPrefix().length());
+	parameters += " ";
+	parameters += message.getParameter(0);
+	parameters += " :Unknown command";
+	sendMessage = Message(prefix, ERR_NOSUCHSERVER, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}

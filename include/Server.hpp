@@ -9,7 +9,30 @@
 
 class																	Server
 {
+public:
+	typedef std::map<int, Client>::iterator clientIter;
+	typedef std::map<std::string, Client>::iterator strClientIter;
+	typedef std::map<std::string, Client*>::iterator strClientPtrIter;
 private:
+	class Info
+	{
+	private:
+		size_t															bytes;
+		size_t															remoteCount;
+		size_t															localCount;
+		std::string														cmd;
+	public:
+																			Info();
+																			~Info();
+		void															incrementBytes(const int &size);
+		std::string													getBytes() const;
+		void															incrementRemoteCount(const int &size);
+		std::string													getRemoteCount() const;
+		void															incrementLocalCount(const int &size);
+		std::string													getLocalCount() const;
+	};
+	std::vector<std::string>											cmd;
+
 	std::string															prefix;
 
 	std::string															ipAddress;
@@ -25,6 +48,7 @@ private:
 	const char															*port;
 	int																	mainSocket;
 	int																	maxFd;
+
 	fd_set																readFds;
 
 	std::map<int, Client>												acceptClients;
@@ -35,6 +59,8 @@ private:
 	std::map<std::string, Channel>										channelList;
 
 	bool																run;
+
+	std::map<std::string, Info>											infos;
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
@@ -53,6 +79,7 @@ private:
 	int																	squitHandler(const Message &message, Client *client);
 	int																	wallopsHandler(const Message &message, Client *client);
 	int																	versionHandler(const Message &message, Client *client);
+	int																	statsHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -66,6 +93,10 @@ private:
 	int																	ePrefixHandler(const Message &message, Client *client);
 	int																	eNickCollisionHandler(const Message &message, Client *client);
 	int																	eCantKillServerHandler(const Message &message, Client *client);
+	int																	eNoSuchServer(const Message &message, Client *client);	
+	int																	eUnknownCommand(const Message &message, Client *client);
+
+
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
 	int																	rWelcomeHandler(const Message &message, Client *client);
@@ -91,6 +122,12 @@ private:
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 
+	int																	rStatsL(const Message &message, Client *client);
+	int																	rStatsM(const Message &message, Client *client);
+	int																	rStatsO(const Message &message, Client *client);
+	int																	rStatsU(const Message &message, Client *client);
+	int																	rEndOfStats(const Message &message, Client *client);
+
 	void																renewFd(const int fd);
 
 	void																connectClient(void);
@@ -104,10 +141,14 @@ private:
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
 	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
+
+	void																initInfo(void);
+	void																incrementLcountAndByte(const Message &message);
+	void																incrementRcountAndByte(const Message &message);
+
+
+	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
 public:
-	typedef std::map<int, Client>::iterator clientIter;
-	typedef std::map<std::string, Client>::iterator strClientIter;
-	typedef std::map<std::string, Client*>::iterator strClientPtrIter;
 																		Server(const char *pass, const char *port);
 																		~Server(void);
 	void																init(void);
