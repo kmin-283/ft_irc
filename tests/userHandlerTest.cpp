@@ -318,3 +318,204 @@ TEST(UserSendUserMessageTest, ParameterError)
 	expect(Message(std::string(":dakim"), std::string("USER"), std::string("d d d d d d d d")));
 	given(server, CONNECT, std::string(":localhost.3000 462 dakim :Connection already registered\r"));
 }
+
+
+TEST_GROUP(ServerSendUserMessageNotUserTest)
+{
+	Client		*client;
+	Client		*setUser;
+	Message		sendMessage;
+
+	void			expect(Message message, int fd)
+	{
+		client = new Client(fd, true);
+		client->setStatus(SERVER);
+		client->setInfo(UPLINKSERVER, std::string("lo1"));
+		client->setInfo(SERVERNAME, std::string("lo2"));
+		client->setInfo(HOPCOUNT, std::string("1"));
+		client->setInfo(SERVERINFO, std::string("sexy server"));
+		setUser = new Client(fd, true);
+		setUser->setInfo(NICK, std::string("dakim"));
+		setUser->setInfo(HOPCOUNT, std::string("2"));
+		sendMessage = message;
+	}
+	void			given(Server &server, int connection,
+					std::string nick, unsigned long sendClientNum)
+	{
+		server.prefix = std::string(":lo1");
+		server.serverName = std::string("lo1");
+		server.sendClients[client->getInfo(SERVERNAME)] = *client;
+		server.serverList[client->getInfo(SERVERNAME)] = &server.sendClients[client->getInfo(SERVERNAME)];
+		server.sendClients[setUser->getInfo(NICK)] = *setUser;
+		CHECK_EQUAL(connection, server.userHandler(sendMessage, client));
+		CHECK_EQUAL(client->getStatus(), SERVER);
+		CHECK_EQUAL(client->getInfo(UPLINKSERVER), std::string("lo1"));
+		CHECK_EQUAL(client->getInfo(SERVERNAME), std::string("lo2"));
+		CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
+		CHECK_EQUAL(client->getInfo(SERVERINFO), std::string("sexy server"));
+		CHECK_EQUAL(server.sendClients.count(nick), sendClientNum);
+		CHECK_EQUAL(server.clientList.count(nick), 0);
+		delete client;
+		delete setUser;
+	}
+};
+
+TEST(ServerSendUserMessageNotUserTest, PrefixError)
+{
+	int		fd[2];
+	char	*result;
+	Message	sendMessage;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		expect(Message(std::string(""), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"\"\r"));
+		free(result);
+		expect(Message(std::string(":"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"\"\r"));
+		free(result);
+		expect(Message(std::string(":sdsdfsdf"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdsdfsdf\"\r"));
+		free(result);
+		expect(Message(std::string(":lo1"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo1\"\r"));
+		free(result);
+		expect(Message(std::string(":lo2"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo2\"\r"));
+		free(result);
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendUserMessageNotUserTest, PrefixIsServer)
+{
+	int		fd[2];
+	char	*result;
+	Client	*localServer;
+	Client	*remoteServer;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		localServer = new Client(0, true);
+		localServer->setStatus(SERVER);
+		localServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		localServer->setInfo(SERVERNAME, std::string("lo3"));
+		localServer->setInfo(HOPCOUNT, std::string("1"));
+		localServer->setInfo(SERVERINFO, std::string("123"));
+		server.sendClients[localServer->getInfo(SERVERNAME)] = *localServer;
+		server.serverList[localServer->getInfo(SERVERNAME)] = &server.sendClients[localServer->getInfo(SERVERNAME)];
+		remoteServer = new Client(0, true);
+		remoteServer->setStatus(SERVER);
+		remoteServer->setInfo(UPLINKSERVER, std::string("lo3"));
+		remoteServer->setInfo(SERVERNAME, std::string("lo4"));
+		remoteServer->setInfo(HOPCOUNT, std::string("2"));
+		remoteServer->setInfo(SERVERINFO, std::string("123"));
+		server.sendClients[remoteServer->getInfo(SERVERNAME)] = *remoteServer;
+		expect(Message(std::string(":lo4"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo4\"\r"));
+		free(result);
+		delete localServer;
+		delete remoteServer;
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendUserMessageNotUserTest, PrefixIsLocalUser)
+{
+	int		fd[2];
+	char	*result;
+	Client	*remoteUser;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		remoteUser = new Client(0, true);
+		remoteUser->setStatus(USER);
+		remoteUser->setInfo(UPLINKSERVER, std::string("lo2"));
+		remoteUser->setInfo(NICK, std::string("lo4"));
+		remoteUser->setInfo(HOPCOUNT, std::string("2"));
+		remoteUser->setInfo(REALNAME, std::string("123"));
+		remoteUser->setInfo(USERNAME, std::string("123"));
+		remoteUser->setInfo(ADDRESS, std::string("123"));
+		server.sendClients[remoteUser->getInfo(SERVERNAME)] = *remoteUser;
+		expect(Message(std::string(":lo4"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 462 :Unauthorized command (already registered)\r"));
+		free(result);
+		delete remoteUser;
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendUserMessageNotUserTest, PrefixIsRemoteUser)
+{
+	int		fd[2];
+	char	*result;
+	Client	*localServer;
+	Client	*remoteUser;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		localServer = new Client(0, true);
+		localServer->setStatus(SERVER);
+		localServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		localServer->setInfo(SERVERNAME, std::string("lo3"));
+		localServer->setInfo(HOPCOUNT, std::string("1"));
+		localServer->setInfo(SERVERINFO, std::string("123"));
+		server.sendClients[localServer->getInfo(SERVERNAME)] = *localServer;
+		server.serverList[localServer->getInfo(SERVERNAME)] = &server.sendClients[localServer->getInfo(SERVERNAME)];
+		remoteUser = new Client(0, true);
+		remoteUser->setStatus(USER);
+		remoteUser->setInfo(UPLINKSERVER, std::string("lo3"));
+		remoteUser->setInfo(NICK, std::string("lo4"));
+		remoteUser->setInfo(HOPCOUNT, std::string("2"));
+		remoteUser->setInfo(REALNAME, std::string("123"));
+		remoteUser->setInfo(USERNAME, std::string("123"));
+		remoteUser->setInfo(ADDRESS, std::string("123"));
+		server.sendClients[remoteUser->getInfo(SERVERNAME)] = *remoteUser;
+		expect(Message(std::string(":lo4"), std::string("USER"), std::string("~deok 211.117.140.153 lo2 :sdfsdd")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
+		get_next_line(fd[0], &result);
+		CHECK_EQUAL(std::string(result), std::string(":lo1 462 :Unauthorized command (already registered)\r"));
+		free(result);
+		delete localServer;
+		delete remoteUser;
+		close(fd[0]);
+		close(fd[1]);
+	}
+}

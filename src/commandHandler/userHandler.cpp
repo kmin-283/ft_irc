@@ -119,24 +119,36 @@ int					Server::setRemoteNick(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-int					Server::resetRemoteNick(const Message &message, Client *client)
+
+static Message		getMessage(const Message &message, const Client &client)
 {
 	std::stringstream	stream;
-	std::string			prefix;
 	std::string			parameters;
-	Message				formatedMessage;
-	Client				remoteUser;
+	Message				returnMessage;
 
+	parameters = message.getParameter(0).substr(1, message.getParameter(0).length());
+	parameters += std::string(" :");
+	stream << ft_atoi(client.getInfo(HOPCOUNT).c_str()) - 1;
+	parameters += stream.str();
+	returnMessage = Message(std::string(""), RPL_NICK, parameters);
+	return (returnMessage);
+}
+
+int					Server::resetRemoteNick(const Message &message, Client *client)
+{
+	std::string			prefix;
+	Message				formatedMessage;
+	Client				remoteUser(client->getFd(), true);
+
+	prefix = message.getPrefix().substr(1, message.getPrefix().length());
+	if (this->sendClients[prefix].getStatus() != UNKNOWN
+	&& this->sendClients[prefix].getStatus() != USER)
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 	if (message.getParameters().size() != 1)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 	if (message.getParameter(0)[0] != ':')
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	prefix = message.getPrefix().substr(1, message.getPrefix().length());
-	parameters = message.getParameter(0).substr(1, message.getParameter(0).length());
-	parameters += std::string(" :");
-	stream << ft_atoi(this->sendClients[prefix].getInfo(HOPCOUNT).c_str()) - 1;
-	parameters += stream.str();
-	formatedMessage = Message(std::string(""), RPL_NICK, parameters);
+	formatedMessage = getMessage(message, this->sendClients[prefix]);
 	remoteUser.setInfo(NICK, prefix);
 	if (!isValidNickName(formatedMessage) || 9 < formatedMessage.getParameter(0).length())
 		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(formatedMessage, client));
@@ -144,9 +156,8 @@ int					Server::resetRemoteNick(const Message &message, Client *client)
 	|| this->serverName == formatedMessage.getParameter(0))
 		return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(formatedMessage, &this->sendClients[prefix]));
 	setNick(&remoteUser, formatedMessage, true, this->sendClients, this->clientList);
-	if (this->sendClients[formatedMessage.getParameter(0)].getInfo(USERNAME) == "")
-		return (CONNECT);
-		// TODO user 등록 처리해야함
+	// TODO USER 재 등록
+	// TODO UNKNOWN -> USER 등록
 	return (CONNECT);
 }
 
@@ -196,11 +207,11 @@ static void			setUser(const Message &message, Client *client, std::string addres
 	}
 }
 
-int					Server::userHandler(const Message &message, Client *client)
+int					Server::setLocalUser(const Message &message, Client *client)
 {
 	if (client->getStatus() == UNKNOWN)
 	{
-		if (message.getParameters().empty() || message.getParameters().size() != 4)
+		if (message.getParameters().size() != 4)
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 		if (!client->getIsAuthorized())
 			return ((this->*(this->replies[ERR_PASSUNAUTHORIE]))(message, client));
@@ -217,13 +228,37 @@ int					Server::userHandler(const Message &message, Client *client)
 	}
 	else if (client->getStatus() == USER)
 	{
-		if (message.getPrefix() != ""
-		&& message.getPrefix() != std::string(":") + client->getInfo(SERVERNAME))
+		if (!message.getPrefix().empty()
+		&& message.getPrefix() != std::string(":") + client->getInfo(NICK))
 			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 		return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
 	}
-	else if (client->getStatus() == SERVER)
-	{
-	}
 	return (CONNECT);
+}
+
+int					Server::setRemoteUser(const Message &message, Client *client)
+{
+	std::string		prefix;
+
+	if (message.getPrefix().empty())
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	prefix = message.getPrefix().substr(1, message.getPrefix().length());
+	if (!this->sendClients.count(prefix) || this->clientList.count(prefix)
+	|| this->serverList.count(prefix))
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	if (this->sendClients[prefix].getStatus() == USER)
+		return ((this->*(this->replies[ERR_ALREADYREGISTRED]))(message, client));
+	if (this->sendClients[prefix].getStatus() != UNKNOWN)
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	if (message.getParameters().size() != 4)
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	return (CONNECT);
+	//TODO nick message 에서 받아온 hopCount와 user message에서 받아온 uplink server의 hopcount가 일치하는지 확인해야함
+}
+
+int					Server::userHandler(const Message &message, Client *client)
+{
+	if (client->getStatus() == SERVER)
+		return (this->setRemoteUser(message, client));
+	return (this->setLocalUser(message, client));
 }
