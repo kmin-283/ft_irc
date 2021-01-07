@@ -154,15 +154,14 @@ TEST_GROUP(NickHandlerTest)
 			client->setInfo(NICK, nick);
 		}
 	}
-	void		given(Server &server, int expectConnection, std::string nick,
-									std::string hopCount, ClientStatus status)
+	void		given(Server &server, int expectConnection,
+						std::string nick, ClientStatus status)
 	{
 		if (message != NULL && client != NULL)
 		{
 			connectStatus = server.nickHandler(*message, client);
 			CHECK_EQUAL(connectStatus, expectConnection);
 			CHECK_EQUAL(client->getInfo(NICK), nick);
-			CHECK_EQUAL(client->getInfo(HOPCOUNT), hopCount);
 			CHECK_EQUAL(client->getStatus(), status);
 			close(fd[1]);
 			close(fd[0]);
@@ -179,7 +178,7 @@ TEST(NickHandlerTest, RegisterNick)
 	expect("", "NICK dakim\r\n", true, UNKNOWN);
 	CHECK_EQUAL(server.sendClients.size(), 0);
 	CHECK_EQUAL(server.clientList.size(), 0);
-	given(server, CONNECT, "dakim", "1", UNKNOWN);
+	given(server, CONNECT, "dakim", UNKNOWN);
 	if (server.sendClients.find("dakim") != server.sendClients.end())
 		CHECK_EQUAL(1,1);
 	else
@@ -187,7 +186,7 @@ TEST(NickHandlerTest, RegisterNick)
 	CHECK_EQUAL(server.sendClients.size(), 1);
 	CHECK_EQUAL(server.clientList.size(), 1);
 	expect("dakim", "NICK dakim1\r\n", true, UNKNOWN);
-	given(server, CONNECT, "dakim1", "1", UNKNOWN);
+	given(server, CONNECT, "dakim1", UNKNOWN);
 	if (server.sendClients.find("dakim") == server.sendClients.end())
 		CHECK_EQUAL(1,1);
 	else
@@ -219,7 +218,6 @@ TEST_GROUP(UserSendNickMessageTest)
 			client->setStatus(USER);
 			client->setInfo(HOSTNAME, std::string("lo1"));
 			client->setInfo(NICK, std::string("dakim"));
-			client->setInfo(HOPCOUNT, std::string("1"));
 			client->setInfo(ADDRESS, std::string("127.0.0.1"));
 			client->setInfo(USERNAME, std::string("dak"));
 			client->setInfo(REALNAME, std::string("deok"));
@@ -240,7 +238,6 @@ TEST_GROUP(UserSendNickMessageTest)
 			free(result);
 			CHECK_EQUAL(client->getInfo(HOSTNAME), std::string("lo1"));
 			CHECK_EQUAL(client->getInfo(NICK), nick);
-			CHECK_EQUAL(client->getInfo(HOPCOUNT), std::string("1"));
 			CHECK_EQUAL(client->getInfo(ADDRESS), std::string("127.0.0.1"));
 			CHECK_EQUAL(client->getInfo(USERNAME), std::string("dak"));
 			CHECK_EQUAL(client->getInfo(REALNAME), std::string("deok"));
@@ -341,7 +338,6 @@ TEST(UserSendNickMessageTest, NickOverlap)
 	remoteUser.setStatus(USER);
 	remoteUser.setInfo(HOSTNAME, std::string("lo2"));
 	remoteUser.setInfo(NICK, std::string("da"));
-	remoteUser.setInfo(HOPCOUNT, std::string("2"));
 	remoteUser.setInfo(ADDRESS, std::string("127.0.0.10"));
 	remoteUser.setInfo(USERNAME, std::string("dak"));
 	remoteUser.setInfo(REALNAME, std::string("deok"));
@@ -350,7 +346,6 @@ TEST(UserSendNickMessageTest, NickOverlap)
 	localUser.setStatus(USER);
 	localUser.setInfo(HOSTNAME, std::string("lo1"));
 	localUser.setInfo(NICK, std::string("d"));
-	localUser.setInfo(HOPCOUNT, std::string("1"));
 	localUser.setInfo(ADDRESS, std::string("127.0.0.10"));
 	localUser.setInfo(USERNAME, std::string("dak"));
 	localUser.setInfo(REALNAME, std::string("deok"));
@@ -590,7 +585,6 @@ TEST(ServerSendNickMessageTest, LocalUserNickOverlap)
 		client->setStatus(USER);
 		client->setInfo(HOSTNAME, std::string("lo1"));
 		client->setInfo(NICK, std::string("dakim"));
-		client->setInfo(HOPCOUNT, std::string("1"));
 		client->setInfo(ADDRESS, std::string("127.0.0.1"));
 		client->setInfo(USERNAME, std::string("dak"));
 		client->setInfo(REALNAME, std::string("deok"));
@@ -638,7 +632,6 @@ TEST(ServerSendNickMessageTest, RemoteUserNickOverlap)
 		client->setStatus(USER);
 		client->setInfo(HOSTNAME, std::string("lo3"));
 		client->setInfo(NICK, std::string("dakim"));
-		client->setInfo(HOPCOUNT, std::string("2"));
 		client->setInfo(ADDRESS, std::string("127.0.0.1"));
 		client->setInfo(USERNAME, std::string("dak"));
 		client->setInfo(REALNAME, std::string("deok"));
@@ -692,7 +685,6 @@ TEST(ServerSendNickMessageTest, RemoteUserNickAndServerNameOverlap)
 		client->setStatus(USER);
 		client->setInfo(HOSTNAME, std::string("lo3"));
 		client->setInfo(NICK, std::string("dakim"));
-		client->setInfo(HOPCOUNT, std::string("2"));
 		client->setInfo(ADDRESS, std::string("127.0.0.1"));
 		client->setInfo(USERNAME, std::string("dak"));
 		client->setInfo(REALNAME, std::string("deok"));
@@ -754,7 +746,6 @@ TEST(ServerSendNickMessageTest, RemoteUserNickAndOtherServerNameOverlap)
 		client->setStatus(USER);
 		client->setInfo(HOSTNAME, std::string("lo3"));
 		client->setInfo(NICK, std::string("dakim"));
-		client->setInfo(HOPCOUNT, std::string("2"));
 		client->setInfo(ADDRESS, std::string("127.0.0.1"));
 		client->setInfo(USERNAME, std::string("dak"));
 		client->setInfo(REALNAME, std::string("deok"));
@@ -793,7 +784,6 @@ TEST(ServerSendNickMessageTest, RegisterUser)
 	given(server, CONNECT, std::string("dakim"), 1);
 	CHECK_EQUAL(server.sendClients[std::string("dakim")].getStatus(), UNKNOWN);
 	CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-	CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 	CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
 }
 
@@ -813,7 +803,6 @@ TEST_GROUP(ServerResendNickMessageNotUserTest)
 		client->setInfo(SERVERINFO, std::string("sexy server"));
 		setUser = new Client(fd, true);
 		setUser->setInfo(NICK, std::string("dakim"));
-		setUser->setInfo(HOPCOUNT, std::string("2"));
 		sendMessage = message;
 	}
 	void			given(Server &server, int connection,
@@ -850,21 +839,18 @@ TEST(ServerResendNickMessageNotUserTest, PrefixError)
 		expect(Message(std::string(":sdsdfsdf"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdsdfsdf\"\r"));
 		free(result);
 		expect(Message(std::string(":lo1"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo1\"\r"));
 		free(result);
 		expect(Message(std::string(":lo2"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo2\"\r"));
 		free(result);
@@ -885,21 +871,18 @@ TEST(ServerResendNickMessageNotUserTest, ParameterSizeError)
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
 		free(result);
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("1 1")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
 		free(result);
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("1 1 1")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
 		free(result);
@@ -936,7 +919,6 @@ TEST(ServerResendNickMessageNotUserTest, PrefixIsServer)
 		expect(Message(std::string(":lo4"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo4\"\r"));
 		free(result);
@@ -959,7 +941,6 @@ TEST(ServerResendNickMessageNotUserTest, ParameterFormError)
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 461 lo2 NICK :Syntax error\r"));
 		free(result);
@@ -979,14 +960,12 @@ TEST(ServerResendNickMessageNotUserTest, NotVaildNick)
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string(":!de")), fd[1]);
 		given(server, CONNECT, std::string("!de"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 432 !de lo2 :Erroneous nickname\r"));
 		free(result);
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string(":sdfsdffssfde")), fd[1]);
 		given(server, CONNECT, std::string("sdfsdffssfde"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(HOPCOUNT), std::string("2"));
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":lo1 432 sdfsdffssfde lo2 :Erroneous nickname\r"));
 		free(result);
@@ -1008,7 +987,6 @@ TEST(ServerResendNickMessageNotUserTest, NickOverlap)
 		localUser->setStatus(USER);
 		localUser->setInfo(UPLINKSERVER, std::string("lo1"));
 		localUser->setInfo(NICK, std::string("deok"));
-		localUser->setInfo(HOPCOUNT, std::string("1"));
 		localUser->setInfo(REALNAME, std::string("deok"));
 		localUser->setInfo(USERNAME, std::string("deok"));
 		localUser->setInfo(ADDRESS, std::string("127.0.0.1"));
@@ -1044,6 +1022,5 @@ TEST(ServerResendNickMessageNotUserTest, RegisterNick)
 	given(server, CONNECT, std::string("deok"), 1, 0);
 	CHECK_EQUAL(server.sendClients[std::string("deok")].getStatus(), UNKNOWN);
 	CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(NICK), std::string("deok"));
-	CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(HOPCOUNT), std::string("2"));
 	CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
 }
