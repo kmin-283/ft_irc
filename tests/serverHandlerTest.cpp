@@ -170,7 +170,6 @@ TEST(LocalServerTest, RegisterServerBroadCastUserOne)
 		localUser->setStatus(USER);
 		localUser->setInfo(HOSTNAME, std::string("localhost.3000"));
 		localUser->setInfo(NICK, std::string("dakim"));
-		localUser->setInfo(HOPCOUNT, std::string("1"));
 		localUser->setInfo(ADDRESS, std::string("127.0.0.1"));
 		localUser->setInfo(USERNAME, std::string("deok"));
 		localUser->setInfo(REALNAME, std::string("dek"));
@@ -288,7 +287,6 @@ TEST(LocalServerTest, RegisterServerBroadCastUserTwo)
  		localUser->setStatus(USER);
  		localUser->setInfo(HOSTNAME, std::string("localhost.3000"));
  		localUser->setInfo(NICK, std::string("dakim"));
- 		localUser->setInfo(HOPCOUNT, std::string("1"));
  		localUser->setInfo(ADDRESS, std::string("127.0.0.1"));
  		localUser->setInfo(USERNAME, std::string("deok"));
  		localUser->setInfo(REALNAME, std::string("dek"));

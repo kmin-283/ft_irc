@@ -12,21 +12,6 @@ static bool			isValidNickName(const Message &message)
 	return true;
 }
 
-static std::string	getHopCount(const Message &message)
-{
-	std::stringstream	stream;
-	std::string			hopCountStr;
-
-	hopCountStr = std::string("1");
-	if (message.getParameters().size() == 2)
-	{
-		stream << ft_atoi(message.getParameter(1)
-		.substr(1, message.getParameter(1).length()).c_str()) + 1;
-		hopCountStr = stream.str();
-	}
-	return (hopCountStr);
-}
-
 static int			setNick(Client *client, const Message &message, bool isServer,
 					std::map<std::string, Client> &sendClients,
 					std::map<std::string, Client *> &clientList)
@@ -39,8 +24,6 @@ static int			setNick(Client *client, const Message &message, bool isServer,
 		if (!isServer)
 			clientList.erase(client->getInfo(NICK));
 	}
-	if (client->getStatus() == UNKNOWN)
-		client->setInfo(HOPCOUNT, getHopCount(message));
 	client->setInfo(NICK, message.getParameter(0));
 	sendClients[message.getParameter(0)] = *client;
 	if (!isServer)
@@ -120,16 +103,14 @@ int					Server::setRemoteNick(const Message &message, Client *client)
 }
 
 
-static Message		getMessage(const Message &message, const Client &client)
+static Message		getMessage(const Message &message)
 {
-	std::stringstream	stream;
+	// std::stringstream	stream;
 	std::string			parameters;
 	Message				returnMessage;
 
 	parameters = message.getParameter(0).substr(1, message.getParameter(0).length());
-	parameters += std::string(" :");
-	stream << ft_atoi(client.getInfo(HOPCOUNT).c_str()) - 1;
-	parameters += stream.str();
+	parameters += std::string(" :1");
 	returnMessage = Message(std::string(""), RPL_NICK, parameters);
 	return (returnMessage);
 }
@@ -148,7 +129,7 @@ int					Server::resetRemoteNick(const Message &message, Client *client)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 	if (message.getParameter(0)[0] != ':')
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	formatedMessage = getMessage(message, this->sendClients[prefix]);
+	formatedMessage = getMessage(message);
 	remoteUser.setInfo(NICK, prefix);
 	if (!isValidNickName(formatedMessage) || 9 < formatedMessage.getParameter(0).length())
 		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(formatedMessage, client));
