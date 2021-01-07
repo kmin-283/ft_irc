@@ -283,8 +283,8 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 	{
 		prefix = std::string("");
 		parameters = client->getInfo(NICK);
-		parameters += std::string(" :");
-		parameters += client->getInfo(HOPCOUNT);
+		parameters += std::string(" :1");
+		// parameters += client->getInfo(HOPCOUNT);
 	}
 	else
 	{
@@ -434,8 +434,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			{
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
-				parameters += std::string(" :");
-				parameters += it->second.getInfo(DISTANCE);
+				parameters += std::string(" :1");
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();

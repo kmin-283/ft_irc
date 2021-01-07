@@ -15,7 +15,6 @@ enum UserIndex
 {
 	HOSTNAME,
 	NICK,
-	DISTANCE,
 	ADDRESS,
 	USERNAME,
 	REALNAME,
