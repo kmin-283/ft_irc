@@ -4,51 +4,64 @@ Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN)
 {
 	this->info.assign(DEFAULT_SIZE, "");
+	this->queryData.assign(6, 0);
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN)
 {
 	this->info.assign(DEFAULT_SIZE, "");
+	this->queryData.assign(6, 0);
 }
 Client::~Client(void)
-{}
+{
+}
 
-int							Client::getFd(void) const
+const int &Client::getFd(void) const
 {
 	return (this->fd);
 }
 
-ClientStatus				Client::getStatus(void) const
+const ClientStatus &Client::getStatus(void) const
 {
 	return (this->status);
 }
 
-void						Client::setStatus(const ClientStatus &status)
+void Client::setStatus(const ClientStatus &status)
 {
 	this->status = status;
 }
 
-bool						Client::getIsAuthorized(void) const
+const bool &Client::getIsAuthorized(void) const
 {
 	return (this->isAuthorized);
 }
 
-void						Client::setIsAuthorized(bool isAuthorized)
+void Client::setIsAuthorized(bool isAuthorized)
 {
 	this->isAuthorized = isAuthorized;
 }
 
-void						Client::setInfo(const int &index, const std::string &value)
+void Client::setInfo(const int &index, const std::string &value)
 {
 	this->info[index] = value;
 }
 
-std::string					Client::getInfo(const int &index) const
+const std::string &Client::getInfo(const int &index) const
 {
 	return (this->info[index]);
 }
 
-std::vector<std::string>	Client::getInfo(void) const
+const std::vector<std::string> &Client::getInfo(void) const
 {
 	return (this->info);
+}
+
+void Client::incrementQueryData(const int &index, const int &val)
+{
+	this->queryData[index] += val;
+}
+
+std::string Client::getQueryData(const int &index) const
+{
+	return (std::to_string(this->queryData[index]));
 }

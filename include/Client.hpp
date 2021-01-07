@@ -1,9 +1,9 @@
 #ifndef CLIENT_HPP
-# define CLIENT_HPP
+#define CLIENT_HPP
 
-# include "utils.hpp"
+#include "utils.hpp"
 
-enum				ClientStatus
+enum ClientStatus
 {
 	UNKNOWN,
 	SERVER,
@@ -11,7 +11,7 @@ enum				ClientStatus
 	SERVICE
 };
 
-enum				UserIndex
+enum UserIndex
 {
 	HOSTNAME,
 	NICK,
@@ -21,7 +21,7 @@ enum				UserIndex
 	REALNAME,
 };
 
-enum				ServerIndex
+enum ServerIndex
 {
 	UPLINKSERVER,
 	SERVERNAME,
@@ -30,6 +30,15 @@ enum				ServerIndex
 	TOKEN,
 };
 
+enum QueryData
+{
+	SENDQUEUE,
+	SENDMSG,
+	SENDBYTES,
+	RECVMSG,
+	RECVBYTES,
+	CONN_START_TIME
+};
 // D -- A -- B -- C
 
 // : A SERVER D 1 :123123
@@ -58,7 +67,6 @@ enum				ServerIndex
 // Client(fd)	-> User -> User
 // 			-> Host -> Host
 
-
 //  Sa - Sb - Sc(:irc.example.net SERVER localhost.6671 2 3 : 123123/r/n) - Cc
 // 	|	 |
 // 	Ca	 Cb (NICK dakim :1/r/n:dakim USER ~dakim localhost irc.example.net :123/r/n)
@@ -70,31 +78,35 @@ enum				ServerIndex
 // :dakim PRIVMSG dakim1 :hello (Cb)
 // :localhost.6671 PRIVMSG dakim2 :hello (Cc)
 
-class				Client
+class Client
 {
 private:
-	int							fd;
-	bool						isAuthorized;
+	int fd;
+	bool isAuthorized;
 
 	// 추가
 
-	ClientStatus				status;
-	std::vector<std::string>	info;
+	ClientStatus status;
+	std::vector<std::string> info;
+	std::vector<size_t> queryData;
 
 public:
-								Client(void);
-								Client(const int fd, const bool isAuthorized = false);
-								~Client(void);
+	Client(void);
+	Client(const int fd, const bool isAuthorized = false);
+	~Client(void);
 
-	int							getFd(void) const;
-	ClientStatus				getStatus(void) const;
-	void						setStatus(const ClientStatus &status);
-	bool						getIsAuthorized(void) const;
-	void						setIsAuthorized(bool isAuthorized);
-	void						setInfo(const int &index, const std::string &myPrefix);
+	const int &getFd(void) const;
+	const ClientStatus &getStatus(void) const;
+	void setStatus(const ClientStatus &status);
+	const bool &getIsAuthorized(void) const;
+	void setIsAuthorized(bool isAuthorized);
+	void setInfo(const int &index, const std::string &myPrefix);
 
-	std::string					getInfo(const int &index) const;
-	std::vector<std::string>	getInfo(void) const;
+	const std::string &getInfo(const int &index) const;
+	const std::vector<std::string> &getInfo(void) const;
+
+	void incrementQueryData(const int &index, const int &val);
+	std::string getQueryData(const int &index) const;
 };
 
 #endif
