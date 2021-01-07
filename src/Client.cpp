@@ -4,13 +4,15 @@ Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN)
 {
 	this->info.assign(DEFAULT_SIZE, "");
-	this->queryData.assign(6, 0);
+	this->queryData.assign(5, 0);
+	this->startTime = std::time(NULL);
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN)
 {
 	this->info.assign(DEFAULT_SIZE, "");
-	this->queryData.assign(6, 0);
+	this->queryData.assign(5, 0);
+	this->startTime = std::time(NULL);
 }
 Client::~Client(void)
 {
@@ -64,4 +66,9 @@ void Client::incrementQueryData(const int &index, const int &val)
 std::string Client::getQueryData(const int &index) const
 {
 	return (std::to_string(this->queryData[index]));
+}
+
+std::time_t	Client::getStartTime(void) const
+{
+	return (this->startTime);
 }

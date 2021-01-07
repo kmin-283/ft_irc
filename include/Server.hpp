@@ -38,7 +38,6 @@ private:
 	std::string															ipAddress;
 	std::string															serverName;
 	std::string															version;
-	std::string															startTime;
 	std::string															userMode;
 	std::string															channelMode;
 	std::string															motdDir;
@@ -59,6 +58,8 @@ private:
 	std::map<std::string, Channel>										channelList;
 
 	bool																run;
+
+	std::time_t															startTime;
 
 	std::map<std::string, Info>											infos;
 

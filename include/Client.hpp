@@ -36,7 +36,6 @@ enum QueryData
 	SENDBYTES,
 	RECVMSG,
 	RECVBYTES,
-	CONN_START_TIME
 };
 // D -- A -- B -- C
 
@@ -88,6 +87,7 @@ private:
 	ClientStatus status;
 	std::vector<std::string> info;
 	std::vector<size_t> queryData;
+	std::time_t			startTime;
 
 public:
 	Client(void);
@@ -106,6 +106,8 @@ public:
 
 	void incrementQueryData(const int &index, const int &val);
 	std::string getQueryData(const int &index) const;
+	
+	std::time_t	getStartTime(void) const;
 };
 
 #endif
