@@ -44,10 +44,10 @@ void			Server::registerReplies(void)
 	this->replies[RPL_SQUITBROADCAST] = &Server::rSquitBroadcastHandler;
 	this->replies[RPL_QUITBROADCAST] = &Server::rQuitBroadcastHandler;
 
-	// this->replies[RPL_STATSCOMMANDS] = &Server::rStatsHandler;
 	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
-//	this->replies[STATS_L] = &Server::rStatsL;
+	this->replies[STATS_L] = &Server::rStatsL;
 	this->replies[STATS_M] = &Server::rStatsM;
+	this->replies[STATS_U] = &Server::rStatsU;
+
 //	this->replies[STATS_O] = &Server::rStatsO;
-//	this->replies[STATS_U] = &Server::rStatsU;
 }
