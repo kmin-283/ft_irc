@@ -12,6 +12,7 @@ Server::Server(const char *pass, const char *port)
 	this->initInfo();
 
 	this->serverName = std::string("localhost.") + this->port;
+	this->startTime = std::time(NULL);
 }
 
 Server::~Server(void)
@@ -135,7 +136,19 @@ void					Server::receiveMessage(const int fd)
 			sendMessage = Message(messageStr);
 			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
 			if (this->commands.find(sendMessage.getCommand()) != this->commands.end())
+			{
+				if (sender.getStatus() == USER)
+				{
+					sender.incrementQueryData(SENDMSG, 1);
+					sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
+				}
+				else if (sender.getStatus() == SERVER)
+				{
+					sender.incrementQueryData(SENDMSG, 1);
+					sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
+				}
 				connectionStatus = (this->*(this->commands[sendMessage.getCommand()]))(sendMessage, &sender);
+			}
 			messageStr.clear();
 		}
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
@@ -212,8 +225,8 @@ void					Server::connectServer(std::string address)
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
 	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF); //토큰 추가
-	this->sendMessage(passMessage, &newClient);
-	this->sendMessage(serverMessage, &newClient);
+	this->sendMessage(passMessage, &this->acceptClients[newFd]);
+	this->sendMessage(serverMessage, &this->acceptClients[newFd]);
 	std::cout << "Connect other server." << std::endl;
 
 
@@ -293,6 +306,17 @@ void					Server::disconnectClient(const Message &message, Client *client)
 void					Server::sendMessage(const Message &message, Client *client)
 {
 	//TODO 512자가 넘은 경우 나누어 전송해야함
+
+	if (client->getStatus() == USER)
+	{
+		client->incrementQueryData(RECVMSG, 1);
+		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
+	}
+	else if (client->getStatus() == SERVER)
+	{
+		client->incrementQueryData(RECVMSG, 1);
+		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
+	}
 	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
 		std::cerr << ERROR_SEND_FAIL << std::endl;
 }

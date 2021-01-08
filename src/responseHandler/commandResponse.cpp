@@ -433,7 +433,8 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			{
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
-				parameters += std::string(" :1");
+				parameters += std::string(" :");
+				// parameters += it->second.getInfo(DISTANCE);
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();
@@ -527,6 +528,130 @@ int				Server::rStatsM(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+//  :irc.example.net 211 localhost.6670 localhost.3000 0 5 290 3 92 :25
+//  :irc.example.net 211 localhost.6670 localhost.3001 0 5 290 3 92 :23
+//  :irc.example.net 211 localhost.6670 localhost.6670 138 7 462 3 77 :21
+//  :irc.example.net 219 localhost.6670 l :End of STATS report
+
+
+//  :irc.example.net 211 localhost.6670 localhost.3000 0 5 290 3 92 :33
+//  :irc.example.net 211 localhost.6670 localhost.3001 0 5 290 3 92 :31
+//  :irc.example.net 211 localhost.6670 localhost.6670 138 11 731 4 117 :29
+//  :irc.example.net 219 localhost.6670 l :End of STATS reportt
+
+int				Server::rStatsL(const Message &message, Client *client)
+{
+	std::string parameter;
+	std::time_t	current;
+
+	current = std::time(NULL);
+	for (strClientPtrIter it = this->clientList.begin(); it != this->clientList.end(); ++it)
+	{
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
+		parameter += " ";
+		parameter += it->second->getInfo(NICK);
+		parameter += "!~";
+		parameter += it->second->getInfo(USERNAME);
+		parameter += "@";
+		parameter += it->second->getInfo(HOSTNAME);
+		it->second->incrementQueryData(RECVMSG, 1);
+		it->second->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
+		sendMessage(Message(this->prefix
+							, RPL_STATSLINKINFO
+							, parameter
+							+ " " + it->second->getQueryData(SENDQUEUE)
+							+ " " + it->second->getQueryData(SENDMSG)
+							+ " " + it->second->getQueryData(SENDBYTES)
+							+ " " + it->second->getQueryData(RECVMSG)
+							+ " " + it->second->getQueryData(RECVBYTES)
+							+ " :" + std::to_string(current - it->second->getStartTime()))
+							, client);
+		it->second->incrementQueryData(RECVMSG, -1);
+		it->second->incrementQueryData(RECVBYTES, -message.getTotalMessage().length());
+	}
+
+	for (strClientPtrIter it = this->serverList.begin(); it != this->serverList.end(); ++it)
+	{
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
+		parameter += " ";
+		parameter += it->second->getInfo(SERVERNAME);
+		it->second->incrementQueryData(RECVMSG, 1);
+		it->second->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
+		sendMessage(Message(this->prefix
+							, RPL_STATSLINKINFO
+							, parameter
+							+ " " + it->second->getQueryData(SENDQUEUE)
+							+ " " + it->second->getQueryData(SENDMSG)
+							+ " " + it->second->getQueryData(SENDBYTES)
+							+ " " + it->second->getQueryData(RECVMSG)
+							+ " " + it->second->getQueryData(RECVBYTES)
+							+ " :" + std::to_string(current - it->second->getStartTime()))
+							, client);
+		it->second->incrementQueryData(RECVMSG, -1);
+		it->second->incrementQueryData(RECVBYTES, -message.getTotalMessage().length());
+	}
+	return (CONNECT);
+}
+
+//int				Server::rStatsO(const Message &message, Client *client)
+//{
+
+	//return (CONNECT);
+//}
+
+static std::time_t t_diff(time_t *t, const time_t d)
+{
+	time_t diff, remain;
+
+	diff = *t / d;
+	remain = diff * d;
+	*t -= remain;
+
+	return diff;
+}
+
+static std::time_t uptime_days(time_t *now)
+{
+	return t_diff(now, 60 * 60 * 24);
+}
+
+static std::time_t uptime_hrs(time_t *now)
+{
+	return t_diff(now, 60 * 60);
+}
+
+static std::time_t uptime_mins(time_t *now)
+{
+	return t_diff(now, 60);
+}
+
+int				Server::rStatsU(const Message &message, Client *client)
+{
+	std::time_t	uptime;
+	std::string days;
+	std::string hrs;
+	std::string mins;
+	std::string parameter;
+
+	uptime = std::time(NULL) - this->startTime;
+	days = std::to_string(uptime_days(&uptime));
+	hrs = std::to_string(uptime_hrs(&uptime));
+	mins = std::to_string(uptime_mins(&uptime));
+	parameter = message.getPrefix().substr(1, message.getPrefix().length());
+	parameter += " :Server Up ";
+	parameter += days;
+	parameter += " days ";
+	parameter += hrs;
+	parameter += ":";
+	parameter += mins;
+	parameter += ":";
+	parameter += std::to_string(uptime);
+	sendMessage(Message(this->prefix
+						, RPL_STATSUPTIME
+						, parameter), client);
+	return (CONNECT);
+}
+
 int				Server::rEndOfStats(const Message &message, Client *client)
 {
 	std::string option;
@@ -539,7 +664,7 @@ int				Server::rEndOfStats(const Message &message, Client *client)
 	if (message.getPrefix().empty())
 		parameter = client->getInfo(NICK);
 	else
-		message.getPrefix().substr(1, message.getPrefix().length());
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
 	sendMessage(Message(this->prefix
 						, RPL_ENDOFSTATS
 						, parameter	+ " " + option

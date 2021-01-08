@@ -10,6 +10,7 @@
 # include <map>
 # include <algorithm>
 # include <cctype>
+# include <ctime>
 
 # include <sstream>
 # include <fstream>
