@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -fsanitize=address -g -Wall -Werror -Wextra
 NAME = test
 INCLUDE = -I ../include/
 

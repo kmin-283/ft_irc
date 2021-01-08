@@ -82,7 +82,7 @@ void					Server::start(void)
 			listenFd = it->second.getFd();
 		}
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
-			std::cerr << ERROR_SELECT_FAIL << std::endl;
+			std::cout << ERROR_SELECT_FAIL << std::endl;
 		it = this->acceptClients.begin();
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
 		{
