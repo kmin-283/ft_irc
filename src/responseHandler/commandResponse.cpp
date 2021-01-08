@@ -283,8 +283,7 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 	{
 		prefix = std::string("");
 		parameters = client->getInfo(NICK);
-		parameters += std::string(" :");
-		parameters += client->getInfo(HOPCOUNT);
+		parameters += std::string(" :1");
 	}
 	else
 	{
