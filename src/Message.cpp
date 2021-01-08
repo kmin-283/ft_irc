@@ -85,7 +85,8 @@ Message						&Message::operator=(const Message &message)
 	this->totalMessage = message.totalMessage;
 	this->prefix = message.prefix;
 	this->command = message.command;
-	this->parameters = message.parameters;
+	this->parameters.resize(message.parameters.size());
+	std::copy(message.parameters.begin(), message.parameters.end(), this->parameters.begin());
 	return (*this);
 }
 
