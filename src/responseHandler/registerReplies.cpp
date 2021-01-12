@@ -50,4 +50,5 @@ void			Server::registerReplies(void)
 	this->replies[STATS_U] = &Server::rStatsU;
 
 //	this->replies[STATS_O] = &Server::rStatsO;
+	this->replies[RPL_ENDOFLINKS] = &Server::rEndOfLinks;
 }

@@ -63,8 +63,7 @@ std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
 	std::vector<std::string> *ret = new std::vector<std::string>;
 	strClientIter it;
 
-	ret->reserve(50);
-
+	ret->reserve(10);
 	for (it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
 	{
 		if (it->second.getStatus() == SERVER && match(const_cast<char *>(info.c_str()), const_cast<char *>(it->second.getInfo(SERVERNAME).c_str())))
@@ -237,6 +236,73 @@ int			Server::statsHandler(const Message &message, Client *client)
 			}
 		}
 	}
+	delete list;
+	return (CONNECT);
+}
+
+int			Server::linksHandler(const Message &message, Client *client)
+{
+
+	std::vector<std::string> *list;
+
+	if (message.getParameters().empty())
+		list = getInfoFromWildcard("*");
+	else
+		list = getInfoFromWildcard(message.getParameter(0));
+	if (!list)
+	{
+		delete list;
+		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+	}
+	else if (client->getStatus() == USER)
+	{
+		incrementLcountAndByte(message);
+		if (!message.getPrefix().empty())
+		{
+			delete list;
+			return (this->*(this->replies[ERR_UNKNOWNCOMMAND]))(message, client);
+		}
+	}
+	else if (client->getStatus() == SERVER)
+	{
+		incrementRcountAndByte(message);
+		if (message.getPrefix().empty())
+		{
+			delete list;
+			return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+		}
+	}
+	std::string parameter;
+
+	for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
+	{
+		if (message.getPrefix().empty())
+			parameter = client->getInfo(NICK);
+		else
+			parameter = message.getPrefix().substr(1, message.getPrefix().length());
+		if (*it == this->serverName)
+		{
+				sendMessage(Message(this->prefix
+									, RPL_LINKS
+									, parameter
+									+ " " + this->serverName
+									+ " " + this->serverName // this->uplink로 고쳐야 함
+									+ " :0 " + this->info)
+									, client);
+		}
+		else
+		{
+			sendMessage(Message(this->prefix
+							, RPL_LINKS
+							, parameter
+							+ " " + this->sendClients[*it].getInfo(SERVERNAME)
+							+ " " + this->sendClients[*it].getInfo(UPLINKSERVER)
+							+ " :" + this->sendClients[*it].getInfo(HOPCOUNT)
+							+ " " + this->sendClients[*it].getInfo(SERVERINFO))
+							, client);
+		}
+	}
+	(this->*(this->replies[RPL_ENDOFLINKS]))(message, client);
 	delete list;
 	return (CONNECT);
 }
