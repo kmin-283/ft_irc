@@ -36,14 +36,14 @@
 # define USER_FORMAT "\r\n @"
 
 # define SSL_PORT "6669"
-# define ERROR -2
+# define ERROR -1
 # define ERROR_STR "ERROR"
 
 # define CR_LF "\r\n"
 
 # define CONNECT 1
 # define DISCONNECT 0
-# define TOTALDISCONNECT -1
+# define TOTALDISCONNECT -2
 
 # define DEFAULT_SIZE 10
 # define NUM_OF_COMMANDS 30

@@ -82,7 +82,7 @@ void					Server::start(void)
 			listenFd = it->second.getFd();
 		}
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
-			std::cerr << ERROR_SELECT_FAIL << std::endl;
+			std::cout << ERROR_SELECT_FAIL << std::endl;
 		it = this->acceptClients.begin();
 		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
 		{
@@ -154,8 +154,6 @@ void					Server::receiveMessage(const int fd)
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
 			break ;
 	}
-	//if (connectionStatus == DISCONNECT || readResult == 0) // uplink client를 지우게 되는 문제가 있음
-	//	this->disconnectClient(&sender);
 	if (readResult == 0)
 		this->disconnectClient(sendMessage, &sender);
 	if (connectionStatus == TOTALDISCONNECT)
