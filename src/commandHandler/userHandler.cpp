@@ -16,8 +16,6 @@ static int			setNick(Client *client, const Message &message, bool isServer,
 					std::map<std::string, Client> &sendClients,
 					std::map<std::string, Client *> &clientList)
 {
-	std::stringstream	stream;
-
 	if (client->getInfo(NICK) != "")
 	{
 		sendClients.erase(client->getInfo(NICK));
@@ -115,11 +113,12 @@ static Message		getMessage(const Message &message)
 	return (returnMessage);
 }
 
+
 int					Server::resetRemoteNick(const Message &message, Client *client)
 {
 	std::string			prefix;
 	Message				formatedMessage;
-	Client				remoteUser(client->getFd(), true);
+	Client				remoteUser;
 
 	prefix = message.getPrefix().substr(1, message.getPrefix().length());
 	if (this->sendClients[prefix].getStatus() != UNKNOWN
@@ -130,17 +129,18 @@ int					Server::resetRemoteNick(const Message &message, Client *client)
 	if (message.getParameter(0)[0] != ':')
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 	formatedMessage = getMessage(message);
-	remoteUser.setInfo(NICK, prefix);
+	remoteUser = this->sendClients[prefix];
 	if (!isValidNickName(formatedMessage) || 9 < formatedMessage.getParameter(0).length())
 		return ((this->*(this->replies[ERR_ERRONEUSNICKNAME]))(formatedMessage, client));
 	if (this->sendClients.count(formatedMessage.getParameter(0))
 	|| this->serverName == formatedMessage.getParameter(0))
 		return ((this->*(this->replies[ERR_NICKNAMEINUSE]))(formatedMessage, &this->sendClients[prefix]));
+	if (remoteUser.getStatus() == USER)
+		(this->*(this->replies[RPL_NICKBROADCAST]))(formatedMessage, &remoteUser);
 	setNick(&remoteUser, formatedMessage, true, this->sendClients, this->clientList);
-	// TODO USER 재 등록
-	// TODO UNKNOWN -> USER 등록
 	return (CONNECT);
 }
+
 
 int					Server::remoteNickHandler(const Message &message, Client *client)
 {
@@ -172,19 +172,29 @@ static bool			isVaildUserName(const Message &message)
 	return true;
 }
 
+
 static void			setUser(const Message &message, Client *client, std::string address,
 					std::map<std::string, Client> &sendClients, std::string serverName)
 {
-	client->setInfo(USERNAME, message.getParameter(0));
-	client->setInfo(HOSTNAME, serverName);
+	std::string		realName;
+	std::string		userName;
+
+	userName = (message.getParameter(0)[0] == '~' ?
+	message.getParameter(0).substr(1, message.getParameter(0).length())
+	: message.getParameter(0));
+	realName = (message.getParameter(3)[0] == ':' ?
+	message.getParameter(3).substr(1, message.getParameter(3).length())
+	: message.getParameter(3));
+	client->setInfo(USERNAME, userName);
+	client->setInfo(UPLINKSERVER, serverName);
 	client->setInfo(ADDRESS, address);
-	client->setInfo(REALNAME, message.getParameter(3));
+	client->setInfo(REALNAME, realName);
 	if (client->getInfo(NICK) != "")
 	{
-		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, message.getParameter(0));
-		(sendClients[client->getInfo(NICK)]).setInfo(HOSTNAME, serverName);
+		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, userName);
+		(sendClients[client->getInfo(NICK)]).setInfo(UPLINKSERVER, serverName);
 		(sendClients[client->getInfo(NICK)]).setInfo(ADDRESS, address);
-		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, message.getParameter(3));
+		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, realName);
 	}
 }
 
@@ -217,9 +227,25 @@ int					Server::setLocalUser(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+static bool			isVaildIpAddress(const Message &message)
+{
+	for(size_t i = 0; i < message.getParameter(1).length(); i++)
+	{
+		if (i == 0 && !isValidFormat(std::string(DIGIT), message.getParameter(1)[i]))
+			return (false);
+		if (i == message.getParameter(1).length() - 1 && isValidFormat(std::string(".:"), message.getParameter(1)[i]))
+			return (false);
+		else if (!isValidFormat(std::string(DIGIT) + std::string(".:"), message.getParameter(1)[i]))
+			return (false);
+	}
+	return (true);
+}
+
 int					Server::setRemoteUser(const Message &message, Client *client)
 {
-	std::string		prefix;
+	std::string							prefix;
+	std::list<std::string>::iterator	iterator;
+	std::list<std::string>				serverList;
 
 	if (message.getPrefix().empty())
 		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
@@ -233,8 +259,15 @@ int					Server::setRemoteUser(const Message &message, Client *client)
 		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 	if (message.getParameters().size() != 4)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	return (CONNECT);
-	//TODO nick message 에서 받아온 hopCount와 user message에서 받아온 uplink server의 hopcount가 일치하는지 확인해야함
+	if (!isVaildIpAddress(message))
+		return (CONNECT);
+	this->getChildServer(serverList, client->getInfo(SERVERNAME));
+	serverList.push_back(client->getInfo(SERVERNAME));
+	iterator = std::find(serverList.begin(), serverList.end(), message.getParameter(2));
+	if (iterator == serverList.end() || this->sendClients[*iterator].getStatus() != SERVER)
+		return (CONNECT);
+	setUser(message, &this->sendClients[prefix], message.getParameter(1), this->sendClients, message.getParameter(2));
+	return (this->*(this->replies[RPL_REGISTERUSER]))(message, &this->sendClients[prefix]);
 }
 
 int					Server::userHandler(const Message &message, Client *client)

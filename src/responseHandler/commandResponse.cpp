@@ -60,11 +60,13 @@ int		Server::rCreatedHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
 	Message			sendMessage;
+	std::time_t		current;
 
 	(void)message;
+	current = std::time(NULL);
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" :This server has been started ");
-	parameters += this->startTime;
+	parameters += std::to_string(current - this->startTime);
 	sendMessage = Message(this->prefix, RPL_CREATED, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
@@ -293,7 +295,8 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 		parameters += message.getParameter(0);
 	}
 	sendMessage = Message(prefix, RPL_NICK, parameters);
-	this->broadcastMessage(sendMessage, client);
+	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
+	? &this->acceptClients[client->getFd()] : client));
 	return (CONNECT);
 }
 
@@ -352,7 +355,8 @@ int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-int		Server::rUserBroadcastHandler(const Message &message, Client *client)
+
+int				Server::rUserBroadcastHandler(const Message &message, Client *client)
 {
 	std::string		prefix;
 	std::string		parameters;
@@ -366,13 +370,16 @@ int		Server::rUserBroadcastHandler(const Message &message, Client *client)
 	parameters += std::string(" ");
 	parameters += client->getInfo(ADDRESS);
 	parameters += std::string(" ");
-	parameters += client->getInfo(HOSTNAME);
-	parameters += std::string(" ");
+	parameters += (!this->clientList.count(client->getInfo(NICK))
+	? this->acceptClients[client->getFd()].getInfo(SERVERNAME) : client->getInfo(UPLINKSERVER));
+	parameters += std::string(" :");
 	parameters += client->getInfo(REALNAME);
 	sendMessage = Message(prefix, RPL_USER, parameters);
-	this->broadcastMessage(sendMessage, client);
+	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
+	? &this->acceptClients[client->getFd()] : client));
 	return (CONNECT);
 }
+
 
 int		Server::rPassHandler(const Message &message, Client *client)
 {
@@ -433,8 +440,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			{
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
-				parameters += std::string(" :");
-				// parameters += it->second.getInfo(DISTANCE);
+				parameters += std::string(" :1");
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();

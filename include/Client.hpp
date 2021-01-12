@@ -93,7 +93,7 @@ public:
 	Client(void);
 	Client(const int fd, const bool isAuthorized = false);
 	~Client(void);
-
+	Client &operator=(const Client &client);
 	const int &getFd(void) const;
 	const ClientStatus &getStatus(void) const;
 	void setStatus(const ClientStatus &status);
@@ -106,7 +106,7 @@ public:
 
 	void incrementQueryData(const int &index, const int &val);
 	std::string getQueryData(const int &index) const;
-	
+
 	std::time_t	getStartTime(void) const;
 };
 
