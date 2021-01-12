@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -fsanitize=address -O1 -fno-omit-frame-pointer -g -Wall -Werror -Wextra
+CFLAGS = -fsanitize=address -g -Wall -Werror -Wextra
 NAME = test
 INCLUDE = -I ../include/
 

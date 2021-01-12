@@ -146,6 +146,7 @@ void Server::deleteSubServers(const std::string &targetServer, const std::string
 int Server::squitHandler(const Message &message, Client *client)
 {
 	std::map<std::string, Client *>::iterator it;
+	int tmpFd;
 
 	if (message.getParameters().size() != 2)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
@@ -190,7 +191,12 @@ int Server::squitHandler(const Message &message, Client *client)
 				sendMessage(Message(":" + message.getParameter(0), "SQUIT", parameters), iter->second);
 			}
 		}
+		tmpFd = this->sendClients[message.getParameter(0)].getFd();
+		this->acceptClients.erase(tmpFd);
+		this->serverList.erase(message.getParameter(0));
 		deleteSubServers(message.getParameter(0), message.getParameter(1));
+		FD_CLR(tmpFd, &this->readFds);
+		close(tmpFd);
 		// disconnectClient(this->serverList[message.getParameter(0)]);
 		return (DISCONNECT);
 	}

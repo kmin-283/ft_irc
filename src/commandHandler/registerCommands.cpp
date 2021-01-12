@@ -17,4 +17,8 @@ void	Server::registerCommands(void)
 	this->commands[RPL_STATSCOMMANDS] = &Server::statsHandler;
 	this->commands[RPL_STATSUPTIME] = &Server::statsHandler;
 	this->commands[RPL_ENDOFSTATS] = &Server::statsHandler;
+
+	this->commands["LINKS"] = &Server::linksHandler;
+	this->commands[RPL_LINKS] = &Server::linksHandler;
+	this->commands[RPL_ENDOFLINKS] = &Server::linksHandler;
 }

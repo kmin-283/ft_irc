@@ -595,7 +595,6 @@ int				Server::rStatsL(const Message &message, Client *client)
 
 //int				Server::rStatsO(const Message &message, Client *client)
 //{
-
 	//return (CONNECT);
 //}
 
@@ -668,8 +667,29 @@ int				Server::rEndOfStats(const Message &message, Client *client)
 	sendMessage(Message(this->prefix
 						, RPL_ENDOFSTATS
 						, parameter	+ " " + option
-						+ " " + ":End of STATS report"
+						+ " :End of STATS report"
 						)
+						, client);
+	return (CONNECT);
+}
+
+int				Server::rEndOfLinks(const Message &message, Client *client)
+{
+	std::string option;
+	std::string parameter;
+
+	if (message.getParameters().empty())
+		option = "*";
+	else
+		option = message.getParameter(0);
+	if (message.getPrefix().empty())
+		parameter = client->getInfo(NICK);
+	else
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
+	sendMessage(Message(this->prefix
+						, RPL_ENDOFLINKS
+						, parameter + " " + option
+						+ " :End of LINKS list")
 						, client);
 	return (CONNECT);
 }

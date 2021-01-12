@@ -81,6 +81,7 @@ private:
 	int																	wallopsHandler(const Message &message, Client *client);
 	int																	versionHandler(const Message &message, Client *client);
 	int																	statsHandler(const Message &message, Client *client);
+	int																	linksHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -128,6 +129,7 @@ private:
 	int																	rStatsO(const Message &message, Client *client);
 	int																	rStatsU(const Message &message, Client *client);
 	int																	rEndOfStats(const Message &message, Client *client);
+	int																	rEndOfLinks(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
 

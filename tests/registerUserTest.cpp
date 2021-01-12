@@ -46,7 +46,7 @@ TEST(RegisterUser, NickFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+	//	server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -129,7 +129,7 @@ TEST(RegisterUser, UserFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		//server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -222,7 +222,7 @@ TEST(RegisterUser, BroadCastUserFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		//server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -285,7 +285,7 @@ TEST(RegisterUser, BroadCastNickFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		//server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");

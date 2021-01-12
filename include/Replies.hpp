@@ -55,6 +55,9 @@
 
 # define RPL_VERSION "351"
 
+# define RPL_LINKS "364"
+# define RPL_ENDOFLINKS "365"
+
 # define RPL_MOTDCONTENT "372"
 # define RPL_MOTDSTART "375"
 # define RPL_ENDOFMOTD "376"
