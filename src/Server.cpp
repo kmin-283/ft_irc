@@ -10,7 +10,7 @@ Server::Server(const char *pass, const char *port)
 	this->registerCommands();
 	this->registerReplies();
 	this->initInfo();
-
+	this->motdDir = std::string("./ft_irc.motd");
 	this->serverName = std::string("localhost.") + this->port;
 	this->startTime = std::time(NULL);
 }
