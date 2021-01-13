@@ -18,6 +18,16 @@ Client::~Client(void)
 {
 }
 
+Client						&Client::operator=(const Client &client)
+{
+	this->fd = client.fd;
+	this->isAuthorized = client.isAuthorized;
+	this->status = client.status;
+	this->info.resize(client.info.size());
+	std::copy(client.info.begin(), client.info.end(), this->info.begin());
+	return (*this);
+}
+
 const int &Client::getFd(void) const
 {
 	return (this->fd);

@@ -10,7 +10,7 @@ Server::Server(const char *pass, const char *port)
 	this->registerCommands();
 	this->registerReplies();
 	this->initInfo();
-
+	this->motdDir = std::string("./ft_irc.motd");
 	this->serverName = std::string("localhost.") + this->port;
 	this->startTime = std::time(NULL);
 }
@@ -21,7 +21,7 @@ Server::~Server(void)
 void					Server::initInfo(void)
 {
 	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator it;
-	
+
 	for (it = this->commands.begin(); it != this->commands.end(); ++it)
 		this->infos.insert(std::pair<std::string, Info>(it->first, Info()));
 }
@@ -243,16 +243,16 @@ void					Server::clearClient(Client *client)
 	this->acceptClients.clear();
 }
 
-static void				getServerList(std::map<std::string, Client> &sendClients, std::list<std::string> &serverList, std::string key)
+void				Server::getChildServer(std::list<std::string> &serverList, std::string key)
 {
 	std::map<std::string, Client>::iterator	iterator;
 
-	for(iterator = sendClients.begin(); iterator != sendClients.end(); ++iterator)
+	for(iterator = this->sendClients.begin(); iterator != this->sendClients.end(); ++iterator)
 	{
 		if (iterator->second.getInfo(UPLINKSERVER) == key)
 		{
 			if (iterator->second.getStatus() == SERVER)
-				getServerList(sendClients, serverList, iterator->second.getInfo(SERVERNAME));
+				this->getChildServer(serverList, iterator->second.getInfo(SERVERNAME));
 			serverList.push_back(iterator->second.getInfo(SERVERNAME));
 		}
 	}
@@ -263,7 +263,7 @@ void					Server::disconnectChild(const Message &message, Client *client)
 	std::list<std::string>::iterator	iterator;
 	std::list<std::string>				serverList;
 
-	getServerList(this->sendClients, serverList, client->getInfo(SERVERNAME));
+	this->getChildServer(serverList, client->getInfo(SERVERNAME));
 	for(iterator = serverList.begin(); iterator != serverList.end(); ++iterator)
 	{
 		if (this->sendClients[*iterator].getStatus() == SERVER)
@@ -279,7 +279,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 {
 	std::string stringKey;
 
-	stringKey = client->getInfo(SERVERNAME);
+	stringKey = client->getInfo(NICK);
 	if (this->acceptClients.count(client->getFd()))
 	{
 		if (this->clientList.count(stringKey))

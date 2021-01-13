@@ -95,7 +95,7 @@ private:
 	int																	ePrefixHandler(const Message &message, Client *client);
 	int																	eNickCollisionHandler(const Message &message, Client *client);
 	int																	eCantKillServerHandler(const Message &message, Client *client);
-	int																	eNoSuchServer(const Message &message, Client *client);	
+	int																	eNoSuchServer(const Message &message, Client *client);
 	int																	eUnknownCommand(const Message &message, Client *client);
 
 
@@ -133,9 +133,11 @@ private:
 
 	void																renewFd(const int fd);
 
+	void																getChildServer(std::list<std::string> &serverList, std::string key);
+
 	void																connectClient(void);
-	void																disconnectChild(const Message &message, Client *client);
 	void																disconnectClient(const Message &message, Client *client);
+	void																disconnectChild(const Message &message, Client *client);
 	void																clearClient(Client *client);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 

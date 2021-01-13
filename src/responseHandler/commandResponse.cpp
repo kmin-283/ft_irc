@@ -64,7 +64,7 @@ int		Server::rCreatedHandler(const Message &message, Client *client)
 	(void)message;
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" :This server has been started ");
-	parameters += this->startTime;
+	parameters += getTimestamp(this->startTime);
 	sendMessage = Message(this->prefix, RPL_CREATED, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
@@ -293,7 +293,8 @@ int		Server::rNickBroadcastHandler(const Message &message, Client *client)
 		parameters += message.getParameter(0);
 	}
 	sendMessage = Message(prefix, RPL_NICK, parameters);
-	this->broadcastMessage(sendMessage, client);
+	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
+	? &this->acceptClients[client->getFd()] : client));
 	return (CONNECT);
 }
 
@@ -352,7 +353,8 @@ int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-int		Server::rUserBroadcastHandler(const Message &message, Client *client)
+
+int				Server::rUserBroadcastHandler(const Message &message, Client *client)
 {
 	std::string		prefix;
 	std::string		parameters;
@@ -366,13 +368,16 @@ int		Server::rUserBroadcastHandler(const Message &message, Client *client)
 	parameters += std::string(" ");
 	parameters += client->getInfo(ADDRESS);
 	parameters += std::string(" ");
-	parameters += client->getInfo(HOSTNAME);
-	parameters += std::string(" ");
+	parameters += (!this->clientList.count(client->getInfo(NICK))
+	? this->acceptClients[client->getFd()].getInfo(SERVERNAME) : client->getInfo(UPLINKSERVER));
+	parameters += std::string(" :");
 	parameters += client->getInfo(REALNAME);
 	sendMessage = Message(prefix, RPL_USER, parameters);
-	this->broadcastMessage(sendMessage, client);
+	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
+	? &this->acceptClients[client->getFd()] : client));
 	return (CONNECT);
 }
+
 
 int		Server::rPassHandler(const Message &message, Client *client)
 {
@@ -433,8 +438,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			{
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
-				parameters += std::string(" :");
-				// parameters += it->second.getInfo(DISTANCE);
+				parameters += std::string(" :1");
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();
@@ -598,53 +602,13 @@ int				Server::rStatsL(const Message &message, Client *client)
 	//return (CONNECT);
 //}
 
-static std::time_t t_diff(time_t *t, const time_t d)
-{
-	time_t diff, remain;
-
-	diff = *t / d;
-	remain = diff * d;
-	*t -= remain;
-
-	return diff;
-}
-
-static std::time_t uptime_days(time_t *now)
-{
-	return t_diff(now, 60 * 60 * 24);
-}
-
-static std::time_t uptime_hrs(time_t *now)
-{
-	return t_diff(now, 60 * 60);
-}
-
-static std::time_t uptime_mins(time_t *now)
-{
-	return t_diff(now, 60);
-}
-
 int				Server::rStatsU(const Message &message, Client *client)
 {
-	std::time_t	uptime;
-	std::string days;
-	std::string hrs;
-	std::string mins;
 	std::string parameter;
 
-	uptime = std::time(NULL) - this->startTime;
-	days = std::to_string(uptime_days(&uptime));
-	hrs = std::to_string(uptime_hrs(&uptime));
-	mins = std::to_string(uptime_mins(&uptime));
 	parameter = message.getPrefix().substr(1, message.getPrefix().length());
 	parameter += " :Server Up ";
-	parameter += days;
-	parameter += " days ";
-	parameter += hrs;
-	parameter += ":";
-	parameter += mins;
-	parameter += ":";
-	parameter += std::to_string(uptime);
+	parameter += getTimestamp(this->startTime);
 	sendMessage(Message(this->prefix
 						, RPL_STATSUPTIME
 						, parameter), client);

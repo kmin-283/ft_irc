@@ -1024,3 +1024,80 @@ TEST(ServerResendNickMessageNotUserTest, RegisterNick)
 	CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(NICK), std::string("deok"));
 	CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
 }
+
+TEST(ServerResendNickMessageNotUserTest, ReRegisterNick)
+{
+	int		i;
+	int		fd[6];
+	char	*result;
+	Client	*remoteUser;
+	Client	*otherServer;
+	Client	*localServer;
+	Client	*anotherServer;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		server.prefix = std::string(":lo1");
+		server.serverName = std::string("lo1");
+
+		localServer = new Client(fd[1], true);
+		localServer->setStatus(SERVER);
+		localServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		localServer->setInfo(SERVERNAME, std::string("lo3"));
+		localServer->setInfo(HOPCOUNT, std::string("1"));
+		localServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[localServer->getInfo(SERVERNAME)] = *localServer;
+		server.serverList[localServer->getInfo(SERVERNAME)] = &server.sendClients[localServer->getInfo(SERVERNAME)];
+
+		otherServer = new Client(fd[3], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo4"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+
+		anotherServer = new Client(fd[5], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo5"));
+		anotherServer->setInfo(HOPCOUNT, std::string("1"));
+		anotherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[anotherServer->getInfo(SERVERNAME)] = *anotherServer;
+		server.serverList[anotherServer->getInfo(SERVERNAME)] = &server.sendClients[anotherServer->getInfo(SERVERNAME)];
+
+		remoteUser = new Client(fd[1], true);
+		remoteUser->setStatus(USER);
+		remoteUser->setInfo(UPLINKSERVER, std::string("lo2"));
+		remoteUser->setInfo(NICK ,std::string("dakim"));
+		remoteUser->setInfo(USERNAME, std::string("deok1"));
+		remoteUser->setInfo(REALNAME, std::string("deok2"));
+		remoteUser->setInfo(ADDRESS, std::string("127.0.0"));
+		server.sendClients[remoteUser->getInfo(NICK)] = *remoteUser;
+
+		server.nickHandler(Message(std::string(":dakim"), std::string("NICK"), std::string(":deok")), localServer);
+		CHECK_EQUAL(server.sendClients.count(std::string("dakim")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 1);
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getStatus(), USER);
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(NICK), std::string("deok"));
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(UPLINKSERVER), std::string("lo2"));
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(USERNAME), std::string("deok1"));
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(REALNAME), std::string("deok2"));
+		CHECK_EQUAL(server.sendClients[std::string("deok")].getInfo(ADDRESS), std::string("127.0.0"));
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim NICK :deok\r"));
+		free(result);
+		delete remoteUser;
+		delete localServer;
+		delete otherServer;
+		delete anotherServer;
+		i = -1;
+		while (++i < 6)
+			close(fd[i]);
+	}
+}
