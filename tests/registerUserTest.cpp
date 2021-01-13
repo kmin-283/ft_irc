@@ -46,7 +46,7 @@ TEST(RegisterUser, NickFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		// server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.startTime = std::time(NULL);
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -69,7 +69,7 @@ TEST(RegisterUser, NickFirst)
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 002 dakim :Your host is localhost.3000, running version ircserv.1.0\r"));
 		free(result);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started 0\r"));
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started ") + getTimestamp(server.startTime) + std::string("\r"));
 		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 004 dakim localhost.3000 ircserv.1.0 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz\r"));
@@ -129,7 +129,7 @@ TEST(RegisterUser, UserFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		// server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.startTime = std::time(NULL);
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -152,7 +152,7 @@ TEST(RegisterUser, UserFirst)
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 002 dakim :Your host is localhost.3000, running version ircserv.1.0\r"));
 		free(result);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started 0\r"));
+		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started ") + getTimestamp(server.startTime) + std::string("\r"));
 		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 004 dakim localhost.3000 ircserv.1.0 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz\r"));
@@ -222,7 +222,7 @@ TEST(RegisterUser, BroadCastUserFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		// server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.startTime = std::time(NULL);
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");
@@ -285,7 +285,7 @@ TEST(RegisterUser, BroadCastNickFirst)
 		server.prefix = std::string(":localhost.3000");
 		server.serverName = std::string("localhost.3000");
 		server.version = std::string("ircserv.1.0");
-		// server.startTime = std::string("Thu Dec 17 2020 at 11:55:13 (UTC)");
+		server.startTime = std::time(NULL);
 		server.userMode = std::string("abBcCFiIoqrRswx");
 		server.channelMode = std::string("abehiIklmMnoOPqQrRstvVz");
 		server.motdDir = std::string("./ft_irc.motd");

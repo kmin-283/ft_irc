@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-static int		ft_check_range(unsigned long long number, int sign)
+static int			ft_check_range(unsigned long long number, int sign)
 {
 	if (number > LLONG_MAX - 1 && sign == -1)
 		return (0);
@@ -9,7 +9,7 @@ static int		ft_check_range(unsigned long long number, int sign)
 	return (number * sign);
 }
 
-int				ft_atoi(const char *str)
+int					ft_atoi(const char *str)
 {
 	unsigned long long	number_value;
 	int					sign_value;
@@ -34,7 +34,7 @@ int				ft_atoi(const char *str)
 	return (ft_check_range(number_value, sign_value));
 }
 
-bool			ft_isdigit(char *str)
+bool				ft_isdigit(char *str)
 {
 	int			i;
 
@@ -47,7 +47,7 @@ bool			ft_isdigit(char *str)
 	return (true);
 }
 
-void			*ft_memset(void *s, int c, size_t n)
+void				*ft_memset(void *s, int c, size_t n)
 {
 		size_t	i;
 		char	*str;
@@ -60,9 +60,41 @@ void			*ft_memset(void *s, int c, size_t n)
 		return (s);
 }
 
-bool			isValidFormat(const std::string &key, const char &value)
+bool				isValidFormat(const std::string &key, const char &value)
 {
 	if (std::string::npos == key.find(value))
 		return (false);
 	return (true);
+}
+
+std::string		getTimestamp(std::time_t &startTime)
+{
+	struct tm	*parsedTime;
+	std::string	returnString;
+
+	startTime = time(NULL);
+	parsedTime = localtime(&startTime);
+	returnString = std::to_string(1900 + parsedTime->tm_year);
+	returnString += "/";
+	if (parsedTime->tm_mon + 1 < 10)
+		returnString += "0";
+	returnString += std::to_string(parsedTime->tm_mon + 1);
+	returnString += "/";
+	if (parsedTime->tm_mday < 10)
+		returnString += "0";
+	returnString += std::to_string(parsedTime->tm_mday);
+	returnString +=  " at ";
+	if (parsedTime->tm_hour < 10)
+		returnString +=  "0";
+	returnString += std::to_string(parsedTime->tm_hour);
+	returnString += ":";
+	if (parsedTime->tm_min < 10)
+		returnString +=  "0";
+	returnString += std::to_string(parsedTime->tm_min);
+	returnString += ":";
+	if (parsedTime->tm_sec < 10)
+		returnString +=  "0";
+	returnString += std::to_string(parsedTime->tm_sec);
+	returnString += " (KST)";
+	return (returnString);
 }
