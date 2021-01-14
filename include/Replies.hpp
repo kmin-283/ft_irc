@@ -62,6 +62,8 @@
 # define RPL_MOTDSTART "375"
 # define RPL_ENDOFMOTD "376"
 
+# define RPL_TIME "391"
+
 # define ERR_NOSUCHNICK "401"
 # define ERR_NOSUCHSERVER "402"
 # define ERR_NOSUCHCHANNEL "403"

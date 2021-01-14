@@ -29,16 +29,16 @@ Client		*Server::hasTarget(const std::string &target, strClientPtrIter start, st
 	return (NULL);
 }
 
-void		Server::incrementLcountAndByte(const Message &message)
+void		Server::incrementLcountAndByte(const std::string &command, const Message &message)
 {
-	this->infos[message.getCommand()].incrementLocalCount(1);
-	this->infos[message.getCommand()].incrementBytes(message.getTotalMessage().length());
+	this->infos[command].incrementLocalCount(1);
+	this->infos[command].incrementBytes(message.getTotalMessage().length());
 }
 
-void		Server::incrementRcountAndByte(const Message &message)
+void		Server::incrementRcountAndByte(const std::string &command, const Message &message)
 {
-	this->infos[message.getCommand()].incrementRemoteCount(1);
-	this->infos[message.getCommand()].incrementBytes(message.getTotalMessage().length());
+	this->infos[command].incrementRemoteCount(1);
+	this->infos[command].incrementBytes(message.getTotalMessage().length());
 }
 
 static bool match(char *first, char *second)
@@ -71,7 +71,12 @@ std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
 	}
 	if (match(const_cast<char *>(info.c_str()), const_cast<char *>(this->serverName.c_str())))
 		ret->push_back(this->serverName);
-	return ret;
+	if (ret->empty())
+	{
+		delete ret;
+		return (NULL);
+	}
+	return (ret);
 }
 
 /*
@@ -82,19 +87,20 @@ std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
 
 int Server::versionHandler(const Message &message, Client *client)
 {
-	std::vector<std::string> *list;
+	std::vector<std::string>	*list;
+	std::string					check;
 
+	client->setCurrentCommand("VERSION");
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
 	if (!message.getParameters().empty())
 		list = getInfoFromWildcard(message.getParameter(0));
 	else
 		list = NULL;
 	if (client->getStatus() == USER)
 	{
-		incrementLcountAndByte(message);
 		// user에게선 prefix가 없는 경우만 옴
-		if (!message.getPrefix().empty())
-			(this->*(this->replies[ERR_UNKNOWNCOMMAND]))(message, client);
-		else if (!list || *(--list->end()) == this->serverName)
+		if (!list || *(--list->end()) == this->serverName)
 		{
 			sendMessage(Message(this->prefix, RPL_VERSION, client->getInfo(NICK) + " " + this->version + ". " + this->serverName), client);
 			if (list && !list->empty())
@@ -112,43 +118,37 @@ int Server::versionHandler(const Message &message, Client *client)
 	}
 	else if (client->getStatus() == SERVER)
 	{
-		incrementRcountAndByte(message);
 		// server에게선 prefix가 있는 경우만 처리하면 됨
-		if (message.getPrefix().empty())
-			(this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
-		else
+		if (message.getCommand() == RPL_VERSION)
 		{
-			if (message.getCommand() == RPL_VERSION)
+			Client *ret;
+			
+			if (message.getParameter(0) != this->serverName)
 			{
-				Client *ret;
-				
-				if (message.getParameter(0) != this->serverName)
-				{
-					ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-					if (ret == NULL)
-						ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-					if (ret != NULL)
-						sendMessage(message, ret);
-					else
-						broadcastMessage(message, client);
-				}
-				delete list;
-				return (CONNECT);
+				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
+				if (ret == NULL)
+					ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
+				if (ret != NULL)
+					sendMessage(message, ret);
+				else
+					broadcastMessage(message, client);
 			}
-			if (list->empty())
-				(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-			else if (!list || *(--list->end()) == this->serverName)
-			{
-				sendMessage(Message(this->prefix
-							, RPL_VERSION
-							, message.getPrefix().substr(1, message.getPrefix().length()) + " " + this->version + ". " + this->serverName)
-							, client);
-				if (list && !list->empty())
-					list->pop_back();
-			}
-			for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
-				broadcastMessage(Message(message.getPrefix(), "VERSION", *it), client);
+			delete list;
+			return (CONNECT);
 		}
+		if (list->empty())
+			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+		else if (!list || *(--list->end()) == this->serverName)
+		{
+			sendMessage(Message(this->prefix
+						, RPL_VERSION
+						, message.getPrefix().substr(1, message.getPrefix().length()) + " " + this->version + ". " + this->serverName)
+						, client);
+			if (list && !list->empty())
+				list->pop_back();
+		}
+		for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
+			broadcastMessage(Message(message.getPrefix(), "VERSION", *it), client);
 	}
 	delete list;
 	return (CONNECT);
@@ -167,18 +167,19 @@ int Server::versionHandler(const Message &message, Client *client)
 // stats 은 무조건 1개의 서버를 대상으로 함
 int			Server::statsHandler(const Message &message, Client *client)
 {
-	std::vector<std::string> *list;
-
+	std::vector<std::string>	*list;
+	std::string					check;
+	
+	client->setCurrentCommand("STATS");
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
 	if (message.getParameters().size() == 2)
 		list = getInfoFromWildcard(message.getParameter(1));
 	else
 		list = NULL;
 	if (client->getStatus() == USER)
 	{
-		incrementLcountAndByte(message);
-		if (!message.getPrefix().empty())
-			(this->*(this->replies[ERR_UNKNOWNCOMMAND]))(message, client);
-		else if (message.getParameters().size() == 0)
+		if (message.getParameters().size() == 0)
 			(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
 		else if (!list || *(--list->end()) == this->serverName)
 		{
@@ -195,44 +196,38 @@ int			Server::statsHandler(const Message &message, Client *client)
 	}
 	else if (client->getStatus() == SERVER)
 	{
-		incrementRcountAndByte(message);
-		if (message.getPrefix().empty())
-			(this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+		if (message.getCommand() == "STATS")
+		{
+			if (message.getParameters().empty())
+				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+			else if (!this->replies.count(std::string("STATS_") + message.getParameter(0)[0]))
+				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+			else if (!list || *(--list->end()) == this->serverName)
+			{
+				(this->*(this->replies[std::string("STATS_") + message.getParameter(0)[0]]))(message, client);
+				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+			}
+			else if (list->empty())
+				return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+			else
+				broadcastMessage(Message(message.getPrefix()
+										, message.getCommand()
+										, message.getParameter(0)[0]
+										+ std::string(" ") + *(--list->end())), client);
+		}
 		else
 		{
-			if (message.getCommand() == "STATS")
+			Client *ret;
+			
+			if (message.getParameter(0) != this->serverName)
 			{
-				if (message.getParameters().empty())
-					(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-				else if (!this->replies.count(std::string("STATS_") + message.getParameter(0)[0]))
-					(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-				else if (!list || *(--list->end()) == this->serverName)
-				{
-					(this->*(this->replies[std::string("STATS_") + message.getParameter(0)[0]]))(message, client);
-					(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-				}
-				else if (list->empty())
-					return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
+				if (ret == NULL)
+					ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
+				if (ret != NULL)
+					sendMessage(message, ret);
 				else
-					broadcastMessage(Message(message.getPrefix()
-											, message.getCommand()
-											, message.getParameter(0)[0]
-											+ std::string(" ") + *(--list->end())), client);
-			}
-			else
-			{
-				Client *ret;
-				
-				if (message.getParameter(0) != this->serverName)
-				{
-					ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-					if (ret == NULL)
-						ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-					if (ret != NULL)
-						sendMessage(message, ret);
-					else
-						broadcastMessage(message, client);
-				}
+					broadcastMessage(message, client);
 			}
 		}
 	}
@@ -242,35 +237,20 @@ int			Server::statsHandler(const Message &message, Client *client)
 
 int			Server::linksHandler(const Message &message, Client *client)
 {
+	std::string					check;
+	std::vector<std::string>	*list;
 
-	std::vector<std::string> *list;
-
-	if (message.getParameters().empty())
-		list = getInfoFromWildcard("*");
-	else
+	client->setCurrentCommand("LINKS");
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
+	if (!message.getParameters().empty())
 		list = getInfoFromWildcard(message.getParameter(0));
+	else
+		list = getInfoFromWildcard("*");
 	if (!list)
 	{
 		delete list;
 		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-	}
-	else if (client->getStatus() == USER)
-	{
-		incrementLcountAndByte(message);
-		if (!message.getPrefix().empty())
-		{
-			delete list;
-			return (this->*(this->replies[ERR_UNKNOWNCOMMAND]))(message, client);
-		}
-	}
-	else if (client->getStatus() == SERVER)
-	{
-		incrementRcountAndByte(message);
-		if (message.getPrefix().empty())
-		{
-			delete list;
-			return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
-		}
 	}
 	std::string parameter;
 
@@ -286,7 +266,7 @@ int			Server::linksHandler(const Message &message, Client *client)
 									, RPL_LINKS
 									, parameter
 									+ " " + this->serverName
-									+ " " + this->serverName // this->uplink로 고쳐야 함
+									+ " " + this->serverName
 									+ " :0 " + this->info)
 									, client);
 		}
@@ -305,4 +285,78 @@ int			Server::linksHandler(const Message &message, Client *client)
 	(this->*(this->replies[RPL_ENDOFLINKS]))(message, client);
 	delete list;
 	return (CONNECT);
+}
+
+int			Server::timeHandler(const Message &message, Client *client)
+{
+	std::string					check;
+	std::vector<std::string>	*list;
+	time_t						now;
+
+	client->setCurrentCommand("TIME");
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
+	now = time(NULL);
+	if (message.getParameters().size() == 1)
+		list = getInfoFromWildcard(message.getParameter(0));
+	else if (message.getParameters().size() > 1)
+		list = new std::vector<std::string>;
+	else
+		list = getInfoFromWildcard(this->serverName);
+	if (!list)
+		(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+	else if (client->getStatus() == USER)
+	{
+		if (message.getParameters().empty() || *(--list->end()) == this->serverName)
+		{
+			sendMessage(Message(this->prefix
+								, RPL_TIME
+								, this->serverName
+								+ " :" + getTimestamp(now, false))
+								, client);
+		}
+		else
+		{
+			broadcastMessage(Message(":" + client->getInfo(NICK)
+									, "TIME"
+									, message.getParameter(0))
+									, client);
+		}
+	}
+	else if (client->getStatus() == SERVER)
+	{
+		if (message.getCommand() == "TIME")
+		{
+			if (message.getParameters().empty() || message.getParameter(0) == this->serverName)
+			{
+				sendMessage(Message(this->prefix
+									, RPL_TIME
+									, message.getPrefix().substr(1, message.getPrefix().length())
+									+ " " + this->serverName
+									+ " :" + getTimestamp(now, false))
+									, client);
+			}
+			else
+				broadcastMessage(message, client);
+		}
+		else
+		{
+			Client *ret;
+
+			ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
+			if (ret == NULL)
+				ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
+			if (ret != NULL)
+				sendMessage(message, ret);
+			else
+				broadcastMessage(message, client);
+		}
+	}
+	delete list;
+	return (CONNECT);
+}
+
+int				Server::connectHandler(const Message &message, Client *client)
+{
+	std::string ret;
 }

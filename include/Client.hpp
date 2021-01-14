@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include "utils.hpp"
+#include "Replies.hpp"
 
 enum ClientStatus
 {
@@ -90,6 +91,7 @@ private:
 	std::vector<size_t> queryData;
 	std::time_t			startTime;
 
+	std::string			currentCommand;
 public:
 	Client(void);
 	Client(const int fd, const bool isAuthorized = false);
@@ -112,6 +114,11 @@ public:
 	std::string getQueryData(const int &index) const;
 
 	std::time_t	getStartTime(void) const;
+
+	std::string prefixCheck(const Message &message);
+
+	void				setCurrentCommand(const std::string &command);	
+	const std::string	getCurrentCommand(void) const;
 };
 
 #endif

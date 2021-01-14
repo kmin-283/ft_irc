@@ -157,6 +157,7 @@ int					Server::remoteNickHandler(const Message &message, Client *client)
 
 int					Server::nickHandler(const Message &message, Client *client)
 {
+	client->setCurrentCommand("NICK");
 	if (client->getStatus() == SERVER)
 		return (this->remoteNickHandler(message, client));
 	return (this->localNickHandler(message, client));
@@ -272,6 +273,7 @@ int					Server::setRemoteUser(const Message &message, Client *client)
 
 int					Server::userHandler(const Message &message, Client *client)
 {
+	client->setCurrentCommand("USER");
 	if (client->getStatus() == SERVER)
 		return (this->setRemoteUser(message, client));
 	return (this->setLocalUser(message, client));
