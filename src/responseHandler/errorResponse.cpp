@@ -157,7 +157,10 @@ int		Server::eNoSuchServer(const Message &message, Client *client)
 	Message			sendMessage;
 
 	prefix = this->prefix;
-	parameters = message.getPrefix().substr(1, message.getPrefix().length());
+	if (message.getPrefix().empty())
+		parameters = client->getInfo(NICK);
+	else
+		parameters = message.getPrefix().substr(1, message.getPrefix().length());
 	parameters += " ";
 	parameters += message.getParameter(0);
 	parameters += " :No such server";
@@ -173,11 +176,15 @@ int		Server::eUnknownCommand(const Message &message, Client *client)
 	Message			sendMessage;
 
 	prefix = this->prefix;
-	parameters = message.getPrefix().substr(1, message.getPrefix().length());
+	if (message.getPrefix().empty())
+		parameters = client->getInfo(NICK);
+	else
+		parameters = message.getPrefix().substr(1, message.getPrefix().length());
 	parameters += " ";
-	parameters += message.getParameter(0);
+	if (!message.getParameters().empty())
+		parameters += message.getParameter(0);
 	parameters += " :Unknown command";
-	sendMessage = Message(prefix, ERR_NOSUCHSERVER, parameters);
+	sendMessage = Message(prefix, ERR_UNKNOWNCOMMAND, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }

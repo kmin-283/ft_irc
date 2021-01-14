@@ -82,3 +82,31 @@ std::time_t	Client::getStartTime(void) const
 {
 	return (this->startTime);
 }
+
+std::string	Client::prefixCheck(const Message &message)
+{
+	std::string ret;
+
+	if (this->status == USER)
+	{
+		if (!message.getPrefix().empty())
+			return (ERR_UNKNOWNCOMMAND);
+		if (message.getParameters().size() > 1)
+			return (ERR_NEEDMOREPARAMS);
+	}
+	else if (this->status == SERVER)
+	{
+		if (message.getPrefix().empty())
+			return (ERR_NEEDMOREPARAMS);
+	}
+	return ("ok");
+}
+
+void				Client::setCurrentCommand(const std::string &command)	
+{
+	this->currentCommand = command;
+}
+const std::string	Client::getCurrentCommand(void) const
+{
+	return (this->currentCommand);
+}

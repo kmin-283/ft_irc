@@ -304,14 +304,15 @@ void					Server::disconnectClient(const Message &message, Client *client)
 void					Server::sendMessage(const Message &message, Client *client)
 {
 	//TODO 512자가 넘은 경우 나누어 전송해야함
-
 	if (client->getStatus() == USER)
 	{
+		incrementLcountAndByte(client->getCurrentCommand(), message);
 		client->incrementQueryData(RECVMSG, 1);
 		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 	}
 	else if (client->getStatus() == SERVER)
 	{
+		incrementRcountAndByte(client->getCurrentCommand(), message);
 		client->incrementQueryData(RECVMSG, 1);
 		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 	}

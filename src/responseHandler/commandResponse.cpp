@@ -64,7 +64,7 @@ int		Server::rCreatedHandler(const Message &message, Client *client)
 	(void)message;
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" :This server has been started ");
-	parameters += getTimestamp(this->startTime);
+	parameters += getTimestamp(this->startTime, false);
 	sendMessage = Message(this->prefix, RPL_CREATED, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
@@ -605,10 +605,15 @@ int				Server::rStatsL(const Message &message, Client *client)
 int				Server::rStatsU(const Message &message, Client *client)
 {
 	std::string parameter;
+	time_t		timeDiff;
 
-	parameter = message.getPrefix().substr(1, message.getPrefix().length());
+	timeDiff = std::time(NULL) - this->startTime;
+	if (message.getPrefix().empty())
+		parameter = client->getInfo(NICK);
+	else
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
 	parameter += " :Server Up ";
-	parameter += getTimestamp(this->startTime);
+	parameter += getTimestamp(timeDiff, true);
 	sendMessage(Message(this->prefix
 						, RPL_STATSUPTIME
 						, parameter), client);

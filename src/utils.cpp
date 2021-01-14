@@ -67,26 +67,67 @@ bool				isValidFormat(const std::string &key, const char &value)
 	return (true);
 }
 
-std::string		getTimestamp(std::time_t &startTime)
+//static std::time_t t_diff(time_t *t, const time_t d)
+//{
+	//time_t diff, remain;
+
+	//diff = *t / d;
+	//remain = diff * d;
+	//*t -= remain;
+
+	//return diff;
+//}
+
+//static std::time_t uptime_days(time_t *now)
+//{
+	//return t_diff(now, 60 * 60 * 24);
+//}
+
+//static std::time_t uptime_hrs(time_t *now)
+//{
+	//return t_diff(now, 60 * 60);
+//}
+
+//static std::time_t uptime_mins(time_t *now)
+//{
+	//return t_diff(now, 60);
+//}
+
+std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
 {
 	struct tm	*parsedTime;
 	std::string	returnString;
+	struct tm	uptime;
 
-	startTime = time(NULL);
+	if (forUptime)
+	{
+		uptime.tm_year = 1970;
+		uptime.tm_mon = 1;
+		uptime.tm_mday = 1;
+		uptime.tm_hour = 9;
+
+	}
+	else
+	{
+		uptime.tm_year = 1970;
+		uptime.tm_mon = 1;
+		uptime.tm_mday = 1;
+		uptime.tm_hour = 9;
+	}
 	parsedTime = localtime(&startTime);
-	returnString = std::to_string(1900 + parsedTime->tm_year);
+	returnString = std::to_string(1900 + parsedTime->tm_year - uptime.tm_year);
 	returnString += "/";
 	if (parsedTime->tm_mon + 1 < 10)
 		returnString += "0";
-	returnString += std::to_string(parsedTime->tm_mon + 1);
+	returnString += std::to_string(parsedTime->tm_mon + 1 - uptime.tm_mon);
 	returnString += "/";
 	if (parsedTime->tm_mday < 10)
 		returnString += "0";
-	returnString += std::to_string(parsedTime->tm_mday);
+	returnString += std::to_string(parsedTime->tm_mday - uptime.tm_mday);
 	returnString +=  " at ";
 	if (parsedTime->tm_hour < 10)
 		returnString +=  "0";
-	returnString += std::to_string(parsedTime->tm_hour);
+	returnString += std::to_string(parsedTime->tm_hour - uptime.tm_hour);
 	returnString += ":";
 	if (parsedTime->tm_min < 10)
 		returnString +=  "0";

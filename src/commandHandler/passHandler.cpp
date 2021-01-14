@@ -2,6 +2,7 @@
 
 int					Server::passHandler(const Message &message, Client *client)
 {
+	client->setCurrentCommand("PASS");
 	if (message.getParameters().empty())
 		this->sendMessage(Message(this->prefix, ERR_NEEDMOREPARAMS, " :Not enough parameters"), client);
 	else if (client->getIsAuthorized())
@@ -11,7 +12,5 @@ int					Server::passHandler(const Message &message, Client *client)
 		this->sendMessage(Message("", "Password accepted", ""), client);
 		client->setIsAuthorized(true);
 	}
-	// else
-	// 	this->sendMessage(Message("", ERROR_STR, ": You put a wrong Password"), client);
 	return (CONNECT);
 }
