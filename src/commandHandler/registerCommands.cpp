@@ -21,4 +21,7 @@ void	Server::registerCommands(void)
 	this->commands["LINKS"] = &Server::linksHandler;
 	this->commands[RPL_LINKS] = &Server::linksHandler;
 	this->commands[RPL_ENDOFLINKS] = &Server::linksHandler;
+
+	this->commands["TIME"] = &Server::timeHandler;
+	this->commands[RPL_TIME] = &Server::timeHandler;
 }

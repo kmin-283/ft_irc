@@ -82,6 +82,8 @@ private:
 	int																	versionHandler(const Message &message, Client *client);
 	int																	statsHandler(const Message &message, Client *client);
 	int																	linksHandler(const Message &message, Client *client);
+	int																	timeHandler(const Message &message, Client *client);
+	int																	connectHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -148,9 +150,8 @@ private:
 	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
 
 	void																initInfo(void);
-	void																incrementLcountAndByte(const Message &message);
-	void																incrementRcountAndByte(const Message &message);
-
+	void																incrementLcountAndByte(const std::string &command, const Message &message);
+	void																incrementRcountAndByte(const std::string &command, const Message &message);
 
 	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
 public:

@@ -35,6 +35,7 @@ void Server::settingClient(const Message &message, Client *client)
 
 int Server::serverHandler(const Message &message, Client *client)
 {
+	client->setCurrentCommand("SERVER");
 	if (client->getStatus() == UNKNOWN)
 	{
 		if (!client->getIsAuthorized() || (3 > message.getParameters().size()) // nc로 입력할 때 토큰 없이 입력하는 경우 3
@@ -145,6 +146,7 @@ void Server::deleteSubServers(const std::string &targetServer, const std::string
 
 int Server::squitHandler(const Message &message, Client *client)
 {
+	client->setCurrentCommand("SQUIT");
 	std::map<std::string, Client *>::iterator it;
 	int tmpFd;
 

@@ -65,6 +65,6 @@ int				ft_atoi(const char *str);
 bool			ft_isdigit(char *str);
 void			*ft_memset(void *s, int c, size_t n);
 bool			isValidFormat(const std::string &key, const char &value);
-std::string		getTimestamp(std::time_t &startTime);
+std::string		getTimestamp(std::time_t &startTime, const bool &forUptime);
 
 #endif
