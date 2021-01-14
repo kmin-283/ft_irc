@@ -119,21 +119,18 @@ void					Server::receiveMessage(const int fd)
 {
 	char		buffer;
 	int			readResult;
-	std::string	messageStr;
 	int			connectionStatus;
 	Client 		&sender = this->acceptClients[fd];
 	Message		sendMessage;
 
-	messageStr = "";
 	readResult = 0;
 	connectionStatus = CONNECT;
-
 	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
 	{
-		messageStr += buffer;
+		sender.addReceivedMessageStr(buffer);
 		if (buffer == '\n')
 		{
-			sendMessage = Message(messageStr);
+			sendMessage = Message(sender.getReceivedMessageStr());
 			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
 			if (this->commands.find(sendMessage.getCommand()) != this->commands.end())
 			{
@@ -149,7 +146,7 @@ void					Server::receiveMessage(const int fd)
 				}
 				connectionStatus = (this->*(this->commands[sendMessage.getCommand()]))(sendMessage, &sender);
 			}
-			messageStr.clear();
+			sender.clearReceivedMessageStr();
 		}
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
 			break ;

@@ -1,14 +1,14 @@
 #include "Client.hpp"
 
 Client::Client()
-	: fd(0), isAuthorized(false), status(UNKNOWN)
+	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
 	this->startTime = std::time(NULL);
 }
 Client::Client(const int fd, const bool isAuthorized)
-	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN)
+	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -46,6 +46,21 @@ void Client::setStatus(const ClientStatus &status)
 const bool &Client::getIsAuthorized(void) const
 {
 	return (this->isAuthorized);
+}
+
+std::string	Client::getReceivedMessageStr(void) const
+{
+	return (this->receivedMessageStr);
+}
+
+void		Client::addReceivedMessageStr(char buffer)
+{
+	this->receivedMessageStr += buffer;
+}
+
+void		Client::clearReceivedMessageStr(void)
+{
+	this->receivedMessageStr.clear();
 }
 
 void Client::setIsAuthorized(bool isAuthorized)

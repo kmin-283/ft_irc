@@ -85,6 +85,7 @@ private:
 	// 추가
 
 	ClientStatus status;
+	std::string	receivedMessageStr;
 	std::vector<std::string> info;
 	std::vector<size_t> queryData;
 	std::time_t			startTime;
@@ -100,6 +101,9 @@ public:
 	const bool &getIsAuthorized(void) const;
 	void setIsAuthorized(bool isAuthorized);
 	void setInfo(const int &index, const std::string &myPrefix);
+	std::string		getReceivedMessageStr() const;
+	void			addReceivedMessageStr(char buffer);
+	void			clearReceivedMessageStr(void);
 
 	const std::string &getInfo(const int &index) const;
 	const std::vector<std::string> &getInfo(void) const;
