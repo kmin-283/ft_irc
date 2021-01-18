@@ -34,7 +34,37 @@ int					ft_atoi(const char *str)
 	return (ft_check_range(number_value, sign_value));
 }
 
-bool				ft_isdigit(char *str)
+bool			isInTheMask(const char &target, const char *mask)
+{
+	int i;
+
+	i = 0;
+	while (mask[i])
+	{
+		if (target == mask[i])
+			return (true);
+		++i;
+	}
+	return (false);
+}
+
+bool            stringCheck(const char *str, const char *mask, const char &notRepeatChar)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (!isInTheMask(str[i], mask))
+			return (false);
+		if (str[i + 1] && str[i] == notRepeatChar && str[i + 1] == notRepeatChar)
+			return (false);
+		++i;
+	}
+	return (true);
+}
+
+bool				ft_isdigit(const char *str)
 {
 	int			i;
 
@@ -66,32 +96,6 @@ bool				isValidFormat(const std::string &key, const char &value)
 		return (false);
 	return (true);
 }
-
-//static std::time_t t_diff(time_t *t, const time_t d)
-//{
-	//time_t diff, remain;
-
-	//diff = *t / d;
-	//remain = diff * d;
-	//*t -= remain;
-
-	//return diff;
-//}
-
-//static std::time_t uptime_days(time_t *now)
-//{
-	//return t_diff(now, 60 * 60 * 24);
-//}
-
-//static std::time_t uptime_hrs(time_t *now)
-//{
-	//return t_diff(now, 60 * 60);
-//}
-
-//static std::time_t uptime_mins(time_t *now)
-//{
-	//return t_diff(now, 60);
-//}
 
 std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
 {
@@ -138,4 +142,18 @@ std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
 	returnString += std::to_string(parsedTime->tm_sec);
 	returnString += " (KST)";
 	return (returnString);
+}
+
+bool			isValidAddress(const std::string &address)
+{
+	size_t	passIdx;
+	size_t	portIdx;
+
+	passIdx = address.rfind(':');
+	portIdx = address.rfind(':', passIdx - 1);
+	if (!stringCheck(address.substr(portIdx + 1, passIdx - portIdx - 1).c_str(), "0123456789", '.')) // 반복되지 말아야 할 문자가 없으므로 상관없는 문자를 넣어둠
+		return (false);
+	if (!stringCheck(address.substr(0, portIdx - 1).c_str(), ".0123456789", '.'))
+		return (false);
+	return (passIdx != std::string::npos && portIdx != std::string::npos);
 }

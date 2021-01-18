@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: version("ft-irc1.0"), pass(std::string(pass)), info(": kmin seunkim dakim made this server.")
+	: version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
 	, port(port), mainSocket(0), maxFd(0), run(true)
 {
 	FD_ZERO(&this->readFds);
@@ -112,7 +112,7 @@ void					Server::connectClient(void)
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd)));
-	std::cout << "Connect client." << std::endl;
+	std::cout << "Connect client. fd is " << newFd << std::endl;
 }
 
 void					Server::receiveMessage(const int fd)

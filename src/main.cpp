@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		networkIndex = 1;
 		portIndex = argc - 2;
 		passIndex = argc - 1;
-		if (ft_isdigit(argv[portIndex]))
+		if (stringCheck(argv[portIndex], "0123456789", '.'))
 		{
 			server = new Server(argv[passIndex], argv[portIndex]);
 			try

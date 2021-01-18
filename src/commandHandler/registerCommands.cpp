@@ -24,4 +24,6 @@ void	Server::registerCommands(void)
 
 	this->commands["TIME"] = &Server::timeHandler;
 	this->commands[RPL_TIME] = &Server::timeHandler;
+
+	this->commands["CONNECT"] = &Server::connectHandler;
 }

@@ -111,6 +111,7 @@ int		Server::ePrefixHandler(const Message &message, Client *client)
 	std::string	parameters;
 	Message		sendMessage;
 
+	std::cout << "in prefix error handler " << message.getTotalMessage();
 	parameters = std::string(":Invaild prefix \"");
 	if (!message.getPrefix().empty())
 		parameters += message.getPrefix().length() == 2 ? message.getPrefix()

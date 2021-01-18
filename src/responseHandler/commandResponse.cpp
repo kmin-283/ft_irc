@@ -386,7 +386,7 @@ int		Server::rPassHandler(const Message &message, Client *client)
 
 	(void)message;
 	parameters = this->pass;
-	sendMessage = Message(this->prefix, RPL_PASS, parameters);
+	sendMessage = Message("", RPL_PASS, parameters + " " + this->version + " ada|sdasdasd");
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
@@ -515,7 +515,7 @@ int				Server::rStatsM(const Message &message, Client *client)
 	if (message.getPrefix().empty())
 		parameter = client->getInfo(NICK);
 	else
-		message.getPrefix().substr(1, message.getPrefix().length());
+		parameter = message.getPrefix().substr(1, message.getPrefix().length());
 	for (std::map<std::string, Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
 	{
 		if (std::isalpha(it->first[0]) && (it->second.getLocalCount() != "0" || it->second.getRemoteCount() != "0"))
@@ -551,7 +551,10 @@ int				Server::rStatsL(const Message &message, Client *client)
 	current = std::time(NULL);
 	for (strClientPtrIter it = this->clientList.begin(); it != this->clientList.end(); ++it)
 	{
-		parameter = message.getPrefix().substr(1, message.getPrefix().length());
+		if (message.getPrefix().empty())
+			parameter = client->getInfo(NICK);
+		else
+			parameter = message.getPrefix().substr(1, message.getPrefix().length());
 		parameter += " ";
 		parameter += it->second->getInfo(NICK);
 		parameter += "!~";
@@ -576,7 +579,10 @@ int				Server::rStatsL(const Message &message, Client *client)
 
 	for (strClientPtrIter it = this->serverList.begin(); it != this->serverList.end(); ++it)
 	{
-		parameter = message.getPrefix().substr(1, message.getPrefix().length());
+		if (message.getPrefix().empty())
+			parameter = client->getInfo(NICK);
+		else
+			parameter = message.getPrefix().substr(1, message.getPrefix().length());
 		parameter += " ";
 		parameter += it->second->getInfo(SERVERNAME);
 		it->second->incrementQueryData(RECVMSG, 1);
