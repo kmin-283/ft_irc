@@ -1,0 +1,20 @@
+:localhost.3000 001 asd :Welcome to the Internet Relay Network asd!~asd@localhost.3000
+:localhost.3000 002 asd :Your host is localhost.3000, running version ft-irc1.0
+:localhost.3000 003 asd :This server has been started 51/00/16 at 10:16:16 (KST)
+:localhost.3000 004 asd localhost.3000 ft-irc1.0  
+:localhost.3000 251 asd :There are 1 users and 0 services on 1 servers
+:localhost.3000 254 asd 0 :channels formed
+:localhost.3000 255 asd :I have 1 users, 0 services and 0 servers
+:localhost.3000 375 asd :- localhost.3000 message of the day
+:localhost.3000 372 asd :- **************************************************
+:localhost.3000 372 asd :- *             H    E    L    L    O              *
+:localhost.3000 372 asd :- **************************************************
+:localhost.3000 372 asd :- *  42cursus c5 ft_irc                            *
+:localhost.3000 372 asd :- *  Made by kmin seunkim dakim                    *
+:localhost.3000 372 asd :- **************************************************
+:localhost.3000 376 asd :End of MOTD command
+:localhost.3000 351 asd ft-irc1.0. localhost.3000
+:localhost.3000 351 asd ft-irc1.0. localhost.3000
+:localhost.3000 351 asd ft-irc1.0. localhost.3000
+:localhost.3000 351 asd ft-irc1.0. localhost.3000
+:localhost.3002 351 asd ft-irc1.0. localhost.3002

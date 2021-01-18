@@ -152,7 +152,8 @@ int					Server::remoteNickHandler(const Message &message, Client *client)
 	if (this->sendClients.count(prefix) && !this->clientList.count(prefix)
 	&& !this->serverList.count(prefix))
 		return (this->resetRemoteNick(message, client));
-	return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	//return ((this->*(this->replies[ERR_PREFIX]))(message, client)); // 이 부분에서 에러가 발생하는 중
+	return (CONNECT);
 }
 
 int					Server::nickHandler(const Message &message, Client *client)

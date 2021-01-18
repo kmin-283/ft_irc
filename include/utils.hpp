@@ -49,6 +49,7 @@
 # define NUM_OF_COMMANDS 30
 
 
+
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
 # define ERROR_SOCKET_OPEN_FAIL "Error: Socket open fail."
@@ -62,9 +63,11 @@
 class			Message;
 
 int				ft_atoi(const char *str);
-bool			ft_isdigit(char *str);
+bool			isInTheMask(const char &target, const char *mask);
+bool            stringCheck(const char *str, const char *mask, const char &notRepeatChar);
 void			*ft_memset(void *s, int c, size_t n);
 bool			isValidFormat(const std::string &key, const char &value);
 std::string		getTimestamp(std::time_t &startTime, const bool &forUptime);
+bool            isValidAddress(const std::string &address);
 
 #endif

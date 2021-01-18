@@ -9,7 +9,7 @@ int					Server::passHandler(const Message &message, Client *client)
 		this->sendMessage(Message(this->prefix, ERR_ALREADYREGISTRED, " :You already reregistered"), client);
 	else if (this->pass == message.getParameter(0))
 	{
-		this->sendMessage(Message("", "Password accepted", ""), client);
+		//this->sendMessage(Message("", "Password accepted", ""), client);
 		client->setIsAuthorized(true);
 	}
 	return (CONNECT);
