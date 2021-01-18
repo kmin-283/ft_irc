@@ -96,7 +96,7 @@ int Server::versionHandler(const Message &message, Client *client)
 	if (!message.getParameters().empty())
 		list = getInfoFromWildcard(message.getParameter(0));
 	else
-		list = NULL;
+		list = getInfoFromWildcard(this->serverName);
 	if (client->getStatus() == USER)
 	{
 		// user에게선 prefix가 없는 경우만 옴
@@ -112,7 +112,8 @@ int Server::versionHandler(const Message &message, Client *client)
 		else if (list)
 		{
 			for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
-				broadcastMessage(Message(":" + client->getInfo(NICK), "VERSION", *it), client);
+				sendMessage(Message(":" + client->getInfo(NICK), "VERSION", *it)
+							, &this->sendClients[*it]);
 		// 다른 서버에 version 요청
 		}
 	}
@@ -131,7 +132,7 @@ int Server::versionHandler(const Message &message, Client *client)
 				if (ret != NULL)
 					sendMessage(message, ret);
 				else
-					broadcastMessage(message, client);
+					sendMessage(message, &this->sendClients[message.getParameter(0)]);
 			}
 			delete list;
 			return (CONNECT);
@@ -148,7 +149,8 @@ int Server::versionHandler(const Message &message, Client *client)
 				list->pop_back();
 		}
 		for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
-			broadcastMessage(Message(message.getPrefix(), "VERSION", *it), client);
+			sendMessage(Message(message.getPrefix(), "VERSION", *it)
+						, &this->sendClients[*it]);
 	}
 	delete list;
 	return (CONNECT);
@@ -191,7 +193,8 @@ int			Server::statsHandler(const Message &message, Client *client)
 		else if (list->empty())
 			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
 		else if (!list->empty())
-			broadcastMessage(Message(":" + client->getInfo(NICK), "VERSION", *(--list->end())), client);
+			sendMessage(Message(":" + client->getInfo(NICK), "VERSION", *(--list->end()))
+						, &this->sendClients[*(--list->end())]);
 		// 다른 서버에 version 요청
 	}
 	else if (client->getStatus() == SERVER)
@@ -210,10 +213,11 @@ int			Server::statsHandler(const Message &message, Client *client)
 			else if (list->empty())
 				return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
 			else
-				broadcastMessage(Message(message.getPrefix()
-										, message.getCommand()
-										, message.getParameter(0)[0]
-										+ std::string(" ") + *(--list->end())), client);
+				sendMessage(Message(message.getPrefix()
+									, message.getCommand()
+									, message.getParameter(0)[0]
+									+ std::string(" ") + *(--list->end()))
+									, &this->sendClients[*(--list->end())]);
 		}
 		else
 		{
@@ -227,7 +231,7 @@ int			Server::statsHandler(const Message &message, Client *client)
 				if (ret != NULL)
 					sendMessage(message, ret);
 				else
-					broadcastMessage(message, client);
+					sendMessage(message, &this->sendClients[message.getParameter(0)]);
 			}
 		}
 	}
@@ -317,10 +321,10 @@ int			Server::timeHandler(const Message &message, Client *client)
 		}
 		else
 		{
-			broadcastMessage(Message(":" + client->getInfo(NICK)
-									, "TIME"
-									, message.getParameter(0))
-									, client);
+			sendMessage(Message(":" + client->getInfo(NICK)
+								, "TIME"
+								, message.getParameter(0))
+								, &this->sendClients[message.getParameter(0)]);
 		}
 	}
 	else if (client->getStatus() == SERVER)
@@ -337,7 +341,7 @@ int			Server::timeHandler(const Message &message, Client *client)
 									, client);
 			}
 			else
-				broadcastMessage(message, client);
+				broadcastMessage(message, &this->sendClients[message.getParameter(0)]);
 		}
 		else
 		{
@@ -349,15 +353,61 @@ int			Server::timeHandler(const Message &message, Client *client)
 			if (ret != NULL)
 				sendMessage(message, ret);
 			else
-				broadcastMessage(message, client);
+				broadcastMessage(message, &this->sendClients[message.getParameter(0)]);
 		}
 	}
 	delete list;
 	return (CONNECT);
 }
 
-// int				Server::connectHandler(const Message &message, Client *client)
-// {
-// 	(void)client;
-// 	std::string ret;
-// }
+/*
+ * connect 명령어를 위해선 ngircd conf파일에 있는 host에 127.0.0.1, port에 해당 포트 3000, 3001등을 입력해두어야 한다.
+ * 그 후 ngircd에 접속하여 OPER oper oper 명령어, oper아이디, oper비밀번호를 입력하여 관리자 권한으로 connect명령어를 수행할 수 있다.
+ *
+ * 예를들어 3001번 포트에 자체제작한 서버를 실행시키고 관리자가 ngircd에 connect localhost.3001을 하면
+ *
+ * 스스로 돌아가고 있는 3001번 서버에 입력이 들어온다.
+ */
+
+int				Server::connectHandler(const Message &message, Client *client)
+{
+	std::string check;
+
+	client->setCurrentCommand("CONNECT");
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
+	if (message.getParameters().empty() || message.getParameters().size() == 2)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	if (!isValidAddress(message.getParameter(0)))
+		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+	if (client->getStatus() == USER)
+	{
+		//if (client->getMode() != OPER)
+			//return noprivileges
+		if (message.getParameters().size() == 1)
+		{
+			this->connectServer(message.getParameter(0));
+			// wallops message
+		}
+		else
+		{
+			sendMessage(Message(":" + client->getInfo(NICK)
+								, "CONNECT"
+								, message.getParameter(0)
+								+ " " + message.getParameter(1)
+								+ " " + message.getParameter(2))
+								, &this->sendClients[message.getParameter(2)]);
+		}
+	}
+	else if (client->getStatus() == SERVER)
+	{
+		if (message.getParameter(2) == this->serverName)
+		{
+			this->connectServer(message.getParameter(0));
+			// wallops message
+		}
+		else
+			sendMessage(message, &this->sendClients[message.getParameter(2)]);
+	}
+	return (CONNECT);
+}

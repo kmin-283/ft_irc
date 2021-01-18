@@ -38,7 +38,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	client->setCurrentCommand("SERVER");
 	if (client->getStatus() == UNKNOWN)
 	{
-		if (!client->getIsAuthorized() || (3 > message.getParameters().size()) // nc로 입력할 때 토큰 없이 입력하는 경우 3
+		if (!client->getIsAuthorized() || (message.getParameters().size() < 2) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 			|| (message.getParameter(0).find('.') == std::string::npos) || client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
@@ -141,15 +141,14 @@ void Server::deleteSubServers(const std::string &targetServer, const std::string
 	}
 	if (this->sendClients.count(targetServer))
 		this->sendClients.erase(targetServer);
-	std::cout << targetServer << " SQUIT " << targetServer << " " << info << std::endl;
 }
 
 int Server::squitHandler(const Message &message, Client *client)
 {
-	client->setCurrentCommand("SQUIT");
 	std::map<std::string, Client *>::iterator it;
 	int tmpFd;
 
+	client->setCurrentCommand("SQUIT");
 	if (message.getParameters().size() != 2)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 
@@ -163,7 +162,6 @@ int Server::squitHandler(const Message &message, Client *client)
 			if (it->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
 				sendMessage(Message("", "SQUIT", it->second->getInfo(SERVERNAME) + " " + message.getParameter(1)), it->second);
 		}
-		std::cout << "ERROR: " << message.getParameter(1) << std::endl;
 		return (TOTALDISCONNECT);
 	}
 	if (this->serverList.count(message.getParameter(0))) // 직접적으로 연결된 서버
@@ -199,7 +197,6 @@ int Server::squitHandler(const Message &message, Client *client)
 		deleteSubServers(message.getParameter(0), message.getParameter(1));
 		FD_CLR(tmpFd, &this->readFds);
 		close(tmpFd);
-		// disconnectClient(this->serverList[message.getParameter(0)]);
 		return (DISCONNECT);
 	}
 	// 직접적으로 연결되지 않은 클라이언트 ---> operator 이거나 다른 server이거나

@@ -1,0 +1,23 @@
+PASS 123 ft-irc1.0 ada|sdasdasd
+:localhost.3000 SERVER localhost.3000 1 :kmin seunkim dakim made this server.
+NICK asd :1
+:asd USER ~asd  localhost.3000 :asd
+:localhost.3000 SERVER localhost.3001 2 0 :kmin seunkim dakim made this server.
+:localhost.3001 SERVER localhost.3002 3 0 :kmin seunkim dakim made this server.
+:localhost.3000 SERVER localhost.3003 2 0 :kmin seunkim dakim made this server.
+:localhost.3000 351 localhost.123 ft-irc1.0. localhost.3000
+:localhost.3000 351 localhost.123 ft-irc1.0. localhost.3000
+:localhost.123 VERSION localhost.123
+:localhost.3000 351 localhost.123 ft-irc1.0. localhost.3000
+:localhost.123 VERSION localhost.123
+:localhost.3000 351 localhost.123 ft-irc1.0. localhost.3000
+:localhost.3001 351 localhost.123 ft-irc1.0. localhost.3001
+:localhost.3001 351 localhost.123 ft-irc1.0. localhost.3001
+:localhost.3003 351 localhost.123 ft-irc1.0. localhost.3003
+:localhost.3003 351 localhost.123 ft-irc1.0. localhost.3003
+:localhost.3003 351 localhost.123 ft-irc1.0. localhost.3003
+:localhost.3001 351 localhost.123 ft-irc1.0. localhost.3001
+:localhost.3002 351 localhost.123 ft-irc1.0. localhost.3002
+:localhost.3002 351 localhost.123 ft-irc1.0. localhost.3002
+:localhost.3002 351 localhost.123 ft-irc1.0. localhost.3002
+:localhost.3002 351 localhost.123 ft-irc1.0. localhost.3002
