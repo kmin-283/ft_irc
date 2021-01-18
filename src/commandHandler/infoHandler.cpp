@@ -2,9 +2,9 @@
 
 /*
  * VERSION 명령어만 단독으로 쓰이는 경우에는 operator만 사용할 수 있는 것 같음
- * 
+ *
  * 반면에 VERSION <servername>을 사용하는 것은 아무 서버나 가능
- * 
+ *
  */
 
 /*
@@ -12,11 +12,11 @@
  * ?는 match a single character
  * * matches everything except
  * & matches a whole word if used alone
- * 
- * 
+ *
+ *
  * [example]
  *      *.se ---> .se로 끝나는 모든 서버
- * 
+ *
  */
 
 Client		*Server::hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end)
@@ -123,7 +123,7 @@ int Server::versionHandler(const Message &message, Client *client)
 		if (message.getCommand() == RPL_VERSION)
 		{
 			Client *ret;
-			
+
 			if (message.getParameter(0) != this->serverName)
 			{
 				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
@@ -159,8 +159,8 @@ int Server::versionHandler(const Message &message, Client *client)
 /*
  * STATS m 지원되는 명령어 사용횟수, 사용되는 바이트 크기를 리턴함
  * :from STATS 212 to Command lcount(나에게 온 요청) bytes rcount(remote server에서 온 요청)
- * 
- * 
+ *
+ *
  */
 
 // VERSION, STATS에서 와일드 카드 문제 해결하기
@@ -171,7 +171,7 @@ int			Server::statsHandler(const Message &message, Client *client)
 {
 	std::vector<std::string>	*list;
 	std::string					check;
-	
+
 	client->setCurrentCommand("STATS");
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
@@ -222,7 +222,7 @@ int			Server::statsHandler(const Message &message, Client *client)
 		else
 		{
 			Client *ret;
-			
+
 			if (message.getParameter(0) != this->serverName)
 			{
 				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
@@ -363,16 +363,16 @@ int			Server::timeHandler(const Message &message, Client *client)
 /*
  * connect 명령어를 위해선 ngircd conf파일에 있는 host에 127.0.0.1, port에 해당 포트 3000, 3001등을 입력해두어야 한다.
  * 그 후 ngircd에 접속하여 OPER oper oper 명령어, oper아이디, oper비밀번호를 입력하여 관리자 권한으로 connect명령어를 수행할 수 있다.
- * 
+ *
  * 예를들어 3001번 포트에 자체제작한 서버를 실행시키고 관리자가 ngircd에 connect localhost.3001을 하면
- * 
+ *
  * 스스로 돌아가고 있는 3001번 서버에 입력이 들어온다.
  */
 
 int				Server::connectHandler(const Message &message, Client *client)
 {
 	std::string check;
-	
+
 	client->setCurrentCommand("CONNECT");
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);

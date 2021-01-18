@@ -338,21 +338,51 @@ int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
 	Message				sendMessage;
 
 	prefix = std::string(":");
-	if (!message.getParameters().empty())
+	parameters = std::string(":");
+	if (!message.getParameters().empty() && message.getCommand() == RPL_NICK)
 	{
 		prefix += message.getParameter(0);
-		parameters = std::string(":Nick collision");
+		parameters += std::string("Nick collision");
+	}
+	else if (!message.getParameters().empty() && message.getCommand() == RPL_QUIT)
+	{
+		prefix += client->getInfo(NICK);
+		parameters += std::string("\"");
+		parameters += message.getParameter(0)[0] == ':'
+		? message.getParameter(0).substr(1, message.getParameter(0).length())
+		: message.getParameter(0);
+		parameters += std::string("\"");
 	}
 	else
 	{
 		prefix += client->getInfo(NICK);
-		parameters = std::string(":Client closed connection");
+		parameters += std::string("Client closed connection");
 	}
 	sendMessage = Message(prefix, RPL_QUIT, parameters);
 	this->broadcastMessage(sendMessage, client);
 	return (CONNECT);
 }
 
+int				Server::rQuitHandler(const Message &message, Client *client)
+{
+	std::string			parameters;
+	Message				sendMessage;
+
+	parameters = std::string(":");
+	if (message.getParameters().empty())
+		parameters += std::string("Closing connection");
+	else
+	{
+		parameters += std::string("\"");
+		parameters += message.getParameter(0)[0] == ':'
+		? message.getParameter(0).substr(1, message.getParameter(0).length())
+		: message.getParameter(0);
+		parameters += std::string("\"");
+	}
+	sendMessage = Message(std::string(""), ERROR_STR, parameters);
+	this->sendMessage(sendMessage, client);
+	return (DISCONNECT);
+}
 
 int				Server::rUserBroadcastHandler(const Message &message, Client *client)
 {

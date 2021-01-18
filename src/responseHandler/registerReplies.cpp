@@ -43,6 +43,8 @@ void			Server::registerReplies(void)
 	this->replies[RPL_KILL] = &Server::rKillHandler;
 	this->replies[RPL_SQUITBROADCAST] = &Server::rSquitBroadcastHandler;
 	this->replies[RPL_QUITBROADCAST] = &Server::rQuitBroadcastHandler;
+	this->replies[RPL_QUIT] = &Server::rQuitHandler;
+
 
 	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 	this->replies[STATS_L] = &Server::rStatsL;
