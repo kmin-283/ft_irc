@@ -2,9 +2,9 @@
 
 /*
  * VERSION 명령어만 단독으로 쓰이는 경우에는 operator만 사용할 수 있는 것 같음
- * 
+ *
  * 반면에 VERSION <servername>을 사용하는 것은 아무 서버나 가능
- * 
+ *
  */
 
 /*
@@ -12,11 +12,11 @@
  * ?는 match a single character
  * * matches everything except
  * & matches a whole word if used alone
- * 
- * 
+ *
+ *
  * [example]
  *      *.se ---> .se로 끝나는 모든 서버
- * 
+ *
  */
 
 Client		*Server::hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end)
@@ -122,7 +122,7 @@ int Server::versionHandler(const Message &message, Client *client)
 		if (message.getCommand() == RPL_VERSION)
 		{
 			Client *ret;
-			
+
 			if (message.getParameter(0) != this->serverName)
 			{
 				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
@@ -157,8 +157,8 @@ int Server::versionHandler(const Message &message, Client *client)
 /*
  * STATS m 지원되는 명령어 사용횟수, 사용되는 바이트 크기를 리턴함
  * :from STATS 212 to Command lcount(나에게 온 요청) bytes rcount(remote server에서 온 요청)
- * 
- * 
+ *
+ *
  */
 
 // VERSION, STATS에서 와일드 카드 문제 해결하기
@@ -169,7 +169,7 @@ int			Server::statsHandler(const Message &message, Client *client)
 {
 	std::vector<std::string>	*list;
 	std::string					check;
-	
+
 	client->setCurrentCommand("STATS");
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
@@ -218,7 +218,7 @@ int			Server::statsHandler(const Message &message, Client *client)
 		else
 		{
 			Client *ret;
-			
+
 			if (message.getParameter(0) != this->serverName)
 			{
 				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
@@ -356,7 +356,8 @@ int			Server::timeHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-int				Server::connectHandler(const Message &message, Client *client)
-{
-	std::string ret;
-}
+// int				Server::connectHandler(const Message &message, Client *client)
+// {
+// 	(void)client;
+// 	std::string ret;
+// }

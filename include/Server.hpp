@@ -76,6 +76,7 @@ private:
 	int																	setLocalUser(const Message &message, Client *client);
 	int																	setRemoteUser(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
+	int																	quitHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
 	int																	wallopsHandler(const Message &message, Client *client);
@@ -125,6 +126,7 @@ private:
 	int																	rKillHandler(const Message &message, Client *client);
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
+	int																	rQuitHandler(const Message &message, Client *client);
 
 	int																	rStatsL(const Message &message, Client *client);
 	int																	rStatsM(const Message &message, Client *client);

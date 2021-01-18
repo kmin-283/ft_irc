@@ -252,21 +252,21 @@ TEST(UserSendNickMessageTest, PrefixError)
 	Server server("111", "3000");
 
 	expect(Message(std::string(":"), std::string("NICK"), std::string("")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"\"\r"), std::string("dakim"));
 	expect(Message(std::string(":d"), std::string("NICK"), std::string("")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \":d\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"d\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 	expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("d d d d d d d d")));
-	given(server, CONNECT, std::string("ERROR :Invaild prefix \"sdfss\"\r"), std::string("dakim"));
+	given(server, CONNECT, std::string("ERROR :Invalid prefix \"sdfss\"\r"), std::string("dakim"));
 }
 
 TEST(UserSendNickMessageTest, ParameterError)
@@ -512,17 +512,17 @@ TEST(ServerSendNickMessageTest, PrefixError)
 		expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("")), fd[1]);
 		given(server, CONNECT, std::string("dakim"), 0);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"sdfss\"\r"));
 		free(result);
 		expect(Message(std::string(":sdfss"), std::string("NICK"), std::string("dakim :1")), fd[1]);
 		given(server, CONNECT, std::string("dakim"), 0);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdfss\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"sdfss\"\r"));
 		free(result);
 		expect(Message(std::string(":dakim"), std::string("NICK"), std::string("dakim :1")), fd[1]);
 		given(server, CONNECT, std::string("dakim"), 0);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"dakim\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"dakim\"\r"));
 		free(result);
 		otherServer = new Client(1, true);
 		otherServer->setStatus(SERVER);
@@ -536,7 +536,7 @@ TEST(ServerSendNickMessageTest, PrefixError)
 		expect(Message(std::string(":lo3"), std::string("NICK"), std::string("")), fd[1]);
 		given(server, CONNECT, std::string("dakim"), 0);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo3\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"lo3\"\r"));
 		free(result);
 		delete otherServer;
 		close(fd[0]);
@@ -840,19 +840,19 @@ TEST(ServerResendNickMessageNotUserTest, PrefixError)
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"sdsdfsdf\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"sdsdfsdf\"\r"));
 		free(result);
 		expect(Message(std::string(":lo1"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo1\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"lo1\"\r"));
 		free(result);
 		expect(Message(std::string(":lo2"), std::string("NICK"), std::string(":deok")), fd[1]);
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo2\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"lo2\"\r"));
 		free(result);
 		close(fd[0]);
 		close(fd[1]);
@@ -920,7 +920,7 @@ TEST(ServerResendNickMessageNotUserTest, PrefixIsServer)
 		given(server, CONNECT, std::string("deok"), 0, 1);
 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getInfo(NICK), std::string("dakim"));
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string("ERROR :Invaild prefix \"lo4\"\r"));
+		CHECK_EQUAL(std::string(result), std::string("ERROR :Invalid prefix \"lo4\"\r"));
 		free(result);
 		delete localServer;
 		delete remoteServer;

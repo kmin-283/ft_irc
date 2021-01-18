@@ -278,3 +278,25 @@ int					Server::userHandler(const Message &message, Client *client)
 		return (this->setRemoteUser(message, client));
 	return (this->setLocalUser(message, client));
 }
+
+int					Server::quitHandler(const Message &message, Client *client)
+{
+	if (client->getStatus() == UNKNOWN)
+	{
+
+	}
+	else if (client->getStatus() == USER)
+	{
+		if (message.getPrefix() != "")
+			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+		if (1 < message.getParameters().size())
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		(this->*(this->replies[RPL_QUITBROADCAST]))(message, client);
+		return ((this->*(this->replies[RPL_QUIT]))(message, client));
+	}
+	else if (client->getStatus() == SERVER)
+	{
+
+	}
+	return (CONNECT);
+}
