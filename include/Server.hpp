@@ -85,6 +85,7 @@ private:
 	int																	linksHandler(const Message &message, Client *client);
 	int																	timeHandler(const Message &message, Client *client);
 	int																	connectHandler(const Message &message, Client *client);
+	int																	privmsgHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
