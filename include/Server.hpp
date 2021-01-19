@@ -76,6 +76,8 @@ private:
 	int																	setLocalUser(const Message &message, Client *client);
 	int																	setRemoteUser(const Message &message, Client *client);
 	int																	userHandler(const Message &message, Client *client);
+	int																	localQuitHandler(const Message &message, Client *client);
+	int																	remoteQuitHandler(const Message &message, Client *client);
 	int																	quitHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
@@ -138,6 +140,7 @@ private:
 	void																renewFd(const int fd);
 
 	void																getChildServer(std::list<std::string> &serverList, std::string key);
+	std::string															getParentServer(std::string key);
 
 	void																connectClient(void);
 	void																disconnectClient(const Message &message, Client *client);
