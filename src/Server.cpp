@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
+	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
 	, port(port), mainSocket(0), maxFd(0), run(true)
 {
 	FD_ZERO(&this->readFds);
@@ -216,18 +216,14 @@ void					Server::connectServer(std::string address)
 	this->renewFd(newFd);
 	Client newClient(newFd);
 
-	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
+	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));	
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
 	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF); //토큰 추가
 	this->sendMessage(passMessage, &this->acceptClients[newFd]);
 	this->sendMessage(serverMessage, &this->acceptClients[newFd]);
+	rOtherServerHandler(Message(), &newClient);
 	std::cout << "Connect other server." << std::endl;
-
-
-	// Message versionMessage(std::string(":localhost.3000 VERSION irc.example.net")+ CR_LF);
-	// this->sendMessage(versionMessage, &newClient);
-	// std::cout << "versionnn" << std::endl;
 }
 
 void					Server::clearClient(Client *client)
