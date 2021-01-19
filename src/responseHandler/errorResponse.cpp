@@ -189,3 +189,33 @@ int		Server::eUnknownCommand(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::eNoRecipients(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	prefix = this->prefix;
+	parameters += client->getInfo(NICK);
+	parameters += std::string(" :No recipient given (privmsg)");
+	sendMessage = Message(prefix, ERR_NORECIPIENT, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::eNoTextToSend(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	prefix = this->prefix;
+	parameters += client->getInfo(NICK);
+	parameters += std::string(" :No text to send");
+	sendMessage = Message(prefix, ERR_NOTEXTTOSEND, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}

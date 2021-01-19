@@ -103,6 +103,8 @@ private:
 	int																	eCantKillServerHandler(const Message &message, Client *client);
 	int																	eNoSuchServer(const Message &message, Client *client);
 	int																	eUnknownCommand(const Message &message, Client *client);
+	int																	eNoRecipients(const Message &message, Client *client);
+	int																	eNoTextToSend(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);

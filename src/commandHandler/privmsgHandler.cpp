@@ -26,18 +26,20 @@ int     Server::privmsgHandler(const Message &message, Client *client)
     Client *targetClient;
 
     client->setCurrentCommand("PRIVMSG");
-    
-    // clientList에서 이름 찾기
-    if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+
+    if (message.getParameters().size() == 0)        // 인자가 아무것도 없을 때 privmsg
+        return ((this->*(this->replies[ERR_NORECIPIENT]))(message, client));
+    else if (message.getParameters().size() == 1)   // 인자가 한개 있을 때 privmsg seun
+        return ((this->*(this->replies[ERR_NOTEXTTOSEND]))(message, client));
+    else if (message.getParameters().size() > 2)
+        return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+    else
     {
-        targetClient = this->clientList[message.getParameter(0)];
-        std::cout << "find! nick = " << message.getParameter(0) << std::endl;
-        this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", message.getParameter(0) + " :" + message.getParameter(1)), targetClient);
-        // std::cout << "hostname = " << targetClient->getInfo(HOSTNAME) << std::endl;
-        // std::cout << "nick = " << targetClient->getInfo(NICK) << std::endl;
-        // std::cout << "address = " << targetClient->getInfo(ADDRESS) << std::endl;
-        // std::cout << "username = " << targetClient->getInfo(USERNAME) << std::endl;
-        // std::cout << "realname = " << targetClient->getInfo(REALNAME) << std::endl;
+        if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+        {
+            targetClient = this->clientList[message.getParameter(0)];
+            this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", message.getParameter(0) + " :" + message.getParameter(1)), targetClient);
+        }
     }
 
     return (CONNECT);
