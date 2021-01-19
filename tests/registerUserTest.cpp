@@ -158,7 +158,6 @@ TEST(RegisterUser, UserFirst)
 		std::string expectStr = std::string(":localhost.3000 003 dakim :This server has been started ");
 		expectStr += getTimestamp(server.startTime, false);
 		expectStr += "\r";
-		std::cout << expectStr << std::endl;
 		CHECK_EQUAL(std::string(result), expectStr);
 		free(result);
 		get_next_line(fd[0], &result);
