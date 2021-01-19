@@ -219,3 +219,19 @@ int		Server::eNoTextToSend(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::eNoSuchNick(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	prefix = this->prefix;
+	parameters += client->getInfo(NICK);
+	parameters += std::string(" ");
+	parameters += message.getParameter(0);
+	parameters += std::string(" :No such nick or channel name");
+	sendMessage = Message(prefix, ERR_NOSUCHNICK, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}

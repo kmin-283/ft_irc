@@ -105,6 +105,7 @@ private:
 	int																	eUnknownCommand(const Message &message, Client *client);
 	int																	eNoRecipients(const Message &message, Client *client);
 	int																	eNoTextToSend(const Message &message, Client *client);
+	int																	eNoSuchNick(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);

@@ -31,15 +31,24 @@ int     Server::privmsgHandler(const Message &message, Client *client)
         return ((this->*(this->replies[ERR_NORECIPIENT]))(message, client));
     else if (message.getParameters().size() == 1)   // 인자가 한개 있을 때 privmsg seun
         return ((this->*(this->replies[ERR_NOTEXTTOSEND]))(message, client));
-    else if (message.getParameters().size() > 2)
+    else if (message.getParameters().size() > 2)    // 인자가 2개 이상 일때 privmsg seun 1 2 3 4 
         return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
     else
-    {
-        if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+    {   
+        /* 클라이언트 일때
+        먼저 같은 서버에서 확인을 하고 없다면
+        다른 서버에 클라이언트를 확인
+        */
+        // clientList 비어 있을 수도 있음.
+        if ((this->clientList.size() != 0) && (this->clientList.find(message.getParameter(0)) != this->clientList.end()))
         {
             targetClient = this->clientList[message.getParameter(0)];
             this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", message.getParameter(0) + " :" + message.getParameter(1)), targetClient);
         }
+        else
+            return ((this->*(this->replies[ERR_NOSUCHNICK]))(message, client));
+        
+        // 첫번째 파라미터 맨 앞글자에 '#'이 들어오면 채널!
     }
 
     return (CONNECT);

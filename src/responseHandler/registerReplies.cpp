@@ -16,6 +16,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_UNKNOWNCOMMAND] = &Server::eUnknownCommand;
 	this->replies[ERR_NORECIPIENT] = &Server::eNoRecipients;
 	this->replies[ERR_NOTEXTTOSEND] = &Server::eNoTextToSend;
+	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
 
 
 
