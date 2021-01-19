@@ -111,10 +111,11 @@ int		Server::ePrefixHandler(const Message &message, Client *client)
 	std::string	parameters;
 	Message		sendMessage;
 
-	parameters = std::string(":Invaild prefix \"");
+	parameters = std::string(":Invalid prefix \"");
 	if (!message.getPrefix().empty())
-		parameters += message.getPrefix().length() == 2 ? message.getPrefix()
-		: message.getPrefix().substr(1, message.getPrefix().length());
+		parameters += message.getPrefix()[0] == ':'
+		? message.getPrefix().substr(1, message.getPrefix().length())
+		: message.getPrefix();
 	parameters += std::string("\"");
 	sendMessage = Message(std::string(""), ERROR_STR, parameters);
 	this->sendMessage(sendMessage, client);

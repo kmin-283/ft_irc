@@ -69,7 +69,10 @@ TEST(RegisterUser, NickFirst)
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 002 dakim :Your host is localhost.3000, running version ircserv.1.0\r"));
 		free(result);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started ") + getTimestamp(server.startTime) + std::string("\r"));
+		std::string expectStr = std::string(":localhost.3000 003 dakim :This server has been started ");
+		expectStr += getTimestamp(server.startTime, false);
+		expectStr += "\r";
+		CHECK_EQUAL(std::string(result), expectStr);
 		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 004 dakim localhost.3000 ircserv.1.0 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz\r"));
@@ -152,7 +155,10 @@ TEST(RegisterUser, UserFirst)
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 002 dakim :Your host is localhost.3000, running version ircserv.1.0\r"));
 		free(result);
 		get_next_line(fd[0], &result);
-		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 003 dakim :This server has been started ") + getTimestamp(server.startTime) + std::string("\r"));
+		std::string expectStr = std::string(":localhost.3000 003 dakim :This server has been started ");
+		expectStr += getTimestamp(server.startTime, false);
+		expectStr += "\r";
+		CHECK_EQUAL(std::string(result), expectStr);
 		free(result);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 004 dakim localhost.3000 ircserv.1.0 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz\r"));
