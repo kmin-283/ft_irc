@@ -106,8 +106,6 @@ std::string	Client::prefixCheck(const Message &message)
 	{
 		if (!message.getPrefix().empty())
 			return (ERR_UNKNOWNCOMMAND);
-		if (message.getParameters().size() > 1)
-			return (ERR_NEEDMOREPARAMS);
 	}
 	else if (this->status == SERVER)
 	{
