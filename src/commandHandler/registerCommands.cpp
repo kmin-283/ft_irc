@@ -10,7 +10,7 @@ void	Server::registerCommands(void)
 	this->commands["WALLOPS"] = &Server::wallopsHandler;
 
 	this->commands["VERSION"] = &Server::versionHandler;
-	this->commands[RPL_VERSION] = &Server::versionHandler; // RPL로 어떻게 옮길까
+	this->commands[RPL_VERSION] = &Server::versionHandler;
 	
 	this->commands["STATS"] = &Server::statsHandler;
 	this->commands[RPL_STATSLINKINFO] = &Server::statsHandler;

@@ -113,10 +113,10 @@ std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
 	}
 	else
 	{
-		uptime.tm_year = 1970;
-		uptime.tm_mon = 1;
-		uptime.tm_mday = 1;
-		uptime.tm_hour = 9;
+		uptime.tm_year = 0;
+		uptime.tm_mon = 0;
+		uptime.tm_mday = 0;
+		uptime.tm_hour = 0;
 	}
 	parsedTime = localtime(&startTime);
 	returnString = std::to_string(1900 + parsedTime->tm_year - uptime.tm_year);

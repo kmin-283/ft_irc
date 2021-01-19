@@ -21,11 +21,10 @@ OBJS_RE = $(SRCS_RE:%.cpp=%.o)
 
 TEST = AllTests.cpp nickHandlerTest.cpp userHandlerTest.cpp registerUserTest.cpp serverHandlerTest.cpp disconnectClientTest.cpp squitHandlerTest.cpp messageConstructTest.cpp messageParsingTest.cpp quitHandlerTest.cpp
 OBJS_T = $(TEST:%.cpp=%.o)
-TEST_H = -I /opt/homebrew/Cellar/cpputest/4.0/include
+TEST_H = -I /usr/local/Cellar/cpputest/4.0/include
 # TEST_H = -I ~/.brew/include
 # TEST_LIB = -L ~/.brew/lib -lCppUTest -lCppUTestExt
-TEST_LIB = -L /opt/homebrew/Cellar/cpputest/4.0/lib -lCppUTest -lCppUTestExt
-
+TEST_LIB = -L /usr/local/Cellar/cpputest/4.0/lib -lCppUTest -lCppUTestExt
 
 all : $(NAME)
 

@@ -152,7 +152,7 @@ int					Server::remoteNickHandler(const Message &message, Client *client)
 	if (this->sendClients.count(prefix) && !this->clientList.count(prefix)
 	&& !this->serverList.count(prefix))
 		return (this->resetRemoteNick(message, client));
-	//return ((this->*(this->replies[ERR_PREFIX]))(message, client)); // 이 부분에서 에러가 발생하는 중
+	// return ((this->*(this->replies[ERR_PREFIX]))(message, client)); // 이 부분에서 에러가 발생하는 중
 	return (CONNECT);
 }
 
@@ -280,24 +280,46 @@ int					Server::userHandler(const Message &message, Client *client)
 	return (this->setLocalUser(message, client));
 }
 
-int					Server::quitHandler(const Message &message, Client *client)
+int					Server::localQuitHandler(const Message &message, Client *client)
 {
 	if (client->getStatus() == UNKNOWN)
 	{
-
+		if (1 < message.getParameters().size())
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		return ((this->*(this->replies[RPL_QUIT]))(message, client));
 	}
 	else if (client->getStatus() == USER)
 	{
 		if (message.getPrefix() != "")
-			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+			return ((this->*(replies[ERR_PREFIX]))(message, client));
 		if (1 < message.getParameters().size())
-			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+			return ((this->*(replies[ERR_NEEDMOREPARAMS]))(message, client));
 		(this->*(this->replies[RPL_QUITBROADCAST]))(message, client);
 		return ((this->*(this->replies[RPL_QUIT]))(message, client));
 	}
-	else if (client->getStatus() == SERVER)
-	{
-
-	}
 	return (CONNECT);
+}
+
+int					Server::remoteQuitHandler(const Message &message, Client *client)
+{
+	std::string prefix;
+
+	if (message.getPrefix() == "" || 1 < message.getParameters().size())
+		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+	prefix = message.getPrefix()[0] == ':'
+	? message.getPrefix().substr(1, message.getPrefix().length())
+	: message.getPrefix();
+	if (!this->sendClients.count(prefix)
+	|| this->sendClients[prefix].getStatus() != USER
+	|| this->getParentServer(prefix) != client->getInfo(SERVERNAME))
+		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+	this->sendClients.erase(prefix);
+	return ((this->*(this->replies[RPL_QUITBROADCAST]))(message, client));
+}
+
+int					Server::quitHandler(const Message &message, Client *client)
+{
+	if (client->getStatus() == SERVER)
+		return (this->remoteQuitHandler(message, client));
+	return (this->localQuitHandler(message, client));
 }

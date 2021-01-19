@@ -100,16 +100,16 @@ int Server::versionHandler(const Message &message, Client *client)
 	if (client->getStatus() == USER)
 	{
 		// user에게선 prefix가 없는 경우만 옴
-		if (!list || *(--list->end()) == this->serverName)
+		if (!list)
+			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+		else if (*(--list->end()) == this->serverName)
 		{
 			sendMessage(Message(this->prefix, RPL_VERSION, client->getInfo(NICK) + " " + this->version + ". " + this->serverName), client);
 			if (list && !list->empty())
 				list->pop_back();
 		}
-		else if (list->empty())
-			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
 		// remote server에 대한 version 요청
-		else if (list)
+		else
 		{
 			for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
 				sendMessage(Message(":" + client->getInfo(NICK), "VERSION", *it)
@@ -384,11 +384,14 @@ int				Server::connectHandler(const Message &message, Client *client)
 	{
 		//if (client->getMode() != OPER)
 			//return noprivileges
+		broadcastMessage(Message(this->prefix
+								, "WALLOPS"
+								, ":Received CONNECT "
+								+ message.getParameter(0)
+								+ " from " + client->getInfo(NICK))
+								, client);
 		if (message.getParameters().size() == 1)
-		{
 			this->connectServer(message.getParameter(0));
-			// wallops message
-		}
 		else
 		{
 			sendMessage(Message(":" + client->getInfo(NICK)
@@ -402,10 +405,7 @@ int				Server::connectHandler(const Message &message, Client *client)
 	else if (client->getStatus() == SERVER)
 	{
 		if (message.getParameter(2) == this->serverName)
-		{
 			this->connectServer(message.getParameter(0));
-			// wallops message
-		}
 		else
 			sendMessage(message, &this->sendClients[message.getParameter(2)]);
 	}
