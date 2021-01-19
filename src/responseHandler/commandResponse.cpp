@@ -22,6 +22,18 @@ int		Server::rWelcomeMessageHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+static std::string getUserPrefix(Client *client)
+{
+	std::string returnString;
+
+	returnString += client->getInfo(NICK);
+	returnString += std::string("!~");
+	returnString += client->getInfo(USERNAME);
+	returnString += std::string("@");
+	returnString += client->getInfo(HOSTNAME);
+	return (returnString);
+}
+
 int		Server::rWelcomeHandler(const Message &message, Client *client)
 {
 	std::string		parameters;
@@ -30,11 +42,7 @@ int		Server::rWelcomeHandler(const Message &message, Client *client)
 	(void)message;
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" :Welcome to the Internet Relay Network ");
-	parameters += client->getInfo(NICK);
-	parameters += std::string("!~");
-	parameters += client->getInfo(USERNAME);
-	parameters += std::string("@");
-	parameters += client->getInfo(HOSTNAME);
+	parameters += getUserPrefix(client);
 	sendMessage = Message(this->prefix, RPL_WELCOME, parameters);
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
