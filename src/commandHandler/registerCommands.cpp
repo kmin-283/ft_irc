@@ -10,13 +10,13 @@ void	Server::registerCommands(void)
 	this->commands["WALLOPS"] = &Server::wallopsHandler;
 
 	this->commands["VERSION"] = &Server::versionHandler;
-	this->commands[RPL_VERSION] = &Server::versionHandler;
+	this->commands[RPL_VERSION] = &Server::rVersion;
 	
 	this->commands["STATS"] = &Server::statsHandler;
-	this->commands[RPL_STATSLINKINFO] = &Server::statsHandler;
-	this->commands[RPL_STATSCOMMANDS] = &Server::statsHandler;
-	this->commands[RPL_STATSUPTIME] = &Server::statsHandler;
-	this->commands[RPL_ENDOFSTATS] = &Server::statsHandler;
+	this->commands[RPL_STATSLINKINFO] = &Server::rStats;
+	this->commands[RPL_STATSCOMMANDS] = &Server::rStats;
+	this->commands[RPL_STATSUPTIME] = &Server::rStats;
+	this->commands[RPL_ENDOFSTATS] = &Server::rStats;
 
 	this->commands["LINKS"] = &Server::linksHandler;
 	this->commands[RPL_LINKS] = &Server::linksHandler;

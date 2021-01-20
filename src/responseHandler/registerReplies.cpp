@@ -14,6 +14,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_CANTKILLSERVER] = &Server::eCantKillServerHandler;
 	this->replies[ERR_NOSUCHSERVER] = &Server::eNoSuchServer;
 	this->replies[ERR_UNKNOWNCOMMAND] = &Server::eUnknownCommand;
+	this->replies[ERR_NOTREGISTERED] = &Server::eNotRegistered;
 
 
 
@@ -46,11 +47,10 @@ void			Server::registerReplies(void)
 	this->replies[RPL_QUIT] = &Server::rQuitHandler;
 
 
-	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 	this->replies[STATS_L] = &Server::rStatsL;
 	this->replies[STATS_M] = &Server::rStatsM;
 	this->replies[STATS_U] = &Server::rStatsU;
+	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 
-//	this->replies[STATS_O] = &Server::rStatsO;
 	this->replies[RPL_ENDOFLINKS] = &Server::rEndOfLinks;
 }

@@ -8,9 +8,10 @@ int					Server::passHandler(const Message &message, Client *client)
 	else if (client->getIsAuthorized())
 		this->sendMessage(Message(this->prefix, ERR_ALREADYREGISTRED, " :You already reregistered"), client);
 	else if (this->pass == message.getParameter(0))
-	{
-		//this->sendMessage(Message("", "Password accepted", ""), client);
 		client->setIsAuthorized(true);
-	}
+	if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else if (client->getStatus() == SERVER)
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 	return (CONNECT);
 }

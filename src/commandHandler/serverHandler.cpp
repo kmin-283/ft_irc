@@ -38,6 +38,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	client->setCurrentCommand("SERVER");
 	if (client->getStatus() == UNKNOWN)
 	{
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
 		if (!client->getIsAuthorized() || (message.getParameters().size() < 2) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 			|| (message.getParameter(0).find('.') == std::string::npos) || client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
@@ -54,6 +55,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	}
 	else if (client->getStatus() == SERVER)
 	{
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 		if (message.getPrefix() == "" || !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length()))) // 서버연결시에 새로운 연결일 수도 있음
 			return (CONNECT);
 		if (message.getParameters().size() <= 3) // 첫 연결시에 :localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server. ==> parameter가 4가 아님

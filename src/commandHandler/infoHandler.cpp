@@ -29,16 +29,14 @@ Client		*Server::hasTarget(const std::string &target, strClientPtrIter start, st
 	return (NULL);
 }
 
-void		Server::incrementLcountAndByte(const std::string &command, const Message &message)
+void		Server::incrementLocalByte(Client *client, const Message &message)
 {
-	this->infos[command].incrementLocalCount(1);
-	this->infos[command].incrementBytes(message.getTotalMessage().length());
+	this->infos[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
 }
 
-void		Server::incrementRcountAndByte(const std::string &command, const Message &message)
+void		Server::incrementRemoteByte(Client *client, const Message &message)
 {
-	this->infos[command].incrementRemoteCount(1);
-	this->infos[command].incrementBytes(message.getTotalMessage().length());
+	this->infos[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
 }
 
 static bool match(char *first, char *second)
@@ -89,68 +87,53 @@ int Server::versionHandler(const Message &message, Client *client)
 {
 	std::vector<std::string>	*list;
 	std::string					check;
+	std::string					toClient;
+	size_t						parameterSize;
 
 	client->setCurrentCommand("VERSION");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
-	if (!message.getParameters().empty())
+
+	parameterSize = message.getParameters().size();
+	if (parameterSize > 1)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	else if (parameterSize == 1)
 		list = getInfoFromWildcard(message.getParameter(0));
 	else
-		list = getInfoFromWildcard(this->serverName);
-	if (client->getStatus() == USER)
+		list = getInfoFromWildcard(this->serverName);	
+	if (!list)
 	{
-		// user에게선 prefix가 없는 경우만 옴
-		if (!list)
-			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-		else if (*(--list->end()) == this->serverName)
-		{
-			sendMessage(Message(this->prefix, RPL_VERSION, client->getInfo(NICK) + " " + this->version + ". " + this->serverName), client);
-			if (list && !list->empty())
-				list->pop_back();
-		}
-		// remote server에 대한 version 요청
-		else
-		{
-			for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
-				sendMessage(Message(":" + client->getInfo(NICK), "VERSION", *it)
-							, &this->sendClients[*it]);
-		// 다른 서버에 version 요청
-		}
+		delete list;
+		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
 	}
-	else if (client->getStatus() == SERVER)
+	
+	if (message.getPrefix().empty())
+		toClient = client->getInfo(NICK);
+	else
+		toClient = message.getPrefix().substr(1, message.getPrefix().length());
+	if (*(--list->end()) == this->serverName)
 	{
-		// server에게선 prefix가 있는 경우만 처리하면 됨
-		if (message.getCommand() == RPL_VERSION)
-		{
-			Client *ret;
-
-			if (message.getParameter(0) != this->serverName)
-			{
-				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-				if (ret == NULL)
-					ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-				if (ret != NULL)
-					sendMessage(message, ret);
-				else
-					sendMessage(message, &this->sendClients[message.getParameter(0)]);
-			}
-			delete list;
-			return (CONNECT);
-		}
-		if (list->empty())
-			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-		else if (!list || *(--list->end()) == this->serverName)
-		{
-			sendMessage(Message(this->prefix
-						, RPL_VERSION
-						, message.getPrefix().substr(1, message.getPrefix().length()) + " " + this->version + ". " + this->serverName)
-						, client);
-			if (list && !list->empty())
-				list->pop_back();
-		}
-		for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
-			sendMessage(Message(message.getPrefix(), "VERSION", *it)
-						, &this->sendClients[*it]);
+		sendMessage(Message(this->prefix
+							, RPL_VERSION
+							, toClient
+							+ " " + this->version
+							+ ". " + this->serverName)
+							, client);
+		list->pop_back();
+	}
+	else
+	{
+		sendMessage(Message(":" + toClient
+							, "VERSION"
+							, *(--list->end()))
+							, &this->sendClients[*(--list->end())]);
 	}
 	delete list;
 	return (CONNECT);
@@ -171,69 +154,57 @@ int			Server::statsHandler(const Message &message, Client *client)
 {
 	std::vector<std::string>	*list;
 	std::string					check;
+	std::string					from;
+	size_t						parameterSize;
+	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator	query;
 
 	client->setCurrentCommand("STATS");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
-	if (message.getParameters().size() == 2)
+
+
+	parameterSize = message.getParameters().size();
+	if (parameterSize == 0)
+		return (this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+	else if ((query = this->replies.find(std::string("STATS_") + message.getParameter(0)[0])) == this->replies.end())
+		return (this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+	else if (parameterSize > 2)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	else if (parameterSize == 2)
 		list = getInfoFromWildcard(message.getParameter(1));
 	else
-		list = NULL;
-	if (client->getStatus() == USER)
-	{
-		if (message.getParameters().size() == 0)
-			(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-		else if (!list || *(--list->end()) == this->serverName)
-		{
-			(this->*(this->replies[std::string("STATS_") + message.getParameter(0)[0]]))(message, client);
-			(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-			if (list)
-				list->clear();
-		}
-		else if (list->empty())
-			(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-		else if (!list->empty())
-			sendMessage(Message(":" + client->getInfo(NICK), "VERSION", *(--list->end()))
-						, &this->sendClients[*(--list->end())]);
-		// 다른 서버에 version 요청
-	}
-	else if (client->getStatus() == SERVER)
-	{
-		if (message.getCommand() == "STATS")
-		{
-			if (message.getParameters().empty())
-				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-			else if (!this->replies.count(std::string("STATS_") + message.getParameter(0)[0]))
-				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-			else if (!list || *(--list->end()) == this->serverName)
-			{
-				(this->*(this->replies[std::string("STATS_") + message.getParameter(0)[0]]))(message, client);
-				(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
-			}
-			else if (list->empty())
-				return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-			else
-				sendMessage(Message(message.getPrefix()
-									, message.getCommand()
-									, message.getParameter(0)[0]
-									+ std::string(" ") + *(--list->end()))
-									, &this->sendClients[*(--list->end())]);
-		}
-		else
-		{
-			Client *ret;
+		list = getInfoFromWildcard(this->serverName);
 
-			if (message.getParameter(0) != this->serverName)
-			{
-				ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-				if (ret == NULL)
-					ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-				if (ret != NULL)
-					sendMessage(message, ret);
-				else
-					sendMessage(message, &this->sendClients[message.getParameter(0)]);
-			}
-		}
+	if (!list)
+	{
+		delete list;
+		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+	}
+
+	if (*(--list->end()) == this->serverName)
+	{
+		(this->*(query->second))(message, client);
+		//(this->*(this->replies[std::string("STATS_") + message.getParameter(0)[0]]))(message, client);
+		(this->*(this->replies[RPL_ENDOFSTATS]))(message, client);
+	}
+	else
+	{
+		if (message.getPrefix().empty())
+			from = ":" + client->getInfo(NICK);
+		else
+			from = message.getPrefix();
+		sendMessage(Message(from
+							, "STATS"
+							, message.getParameter(0)
+							+ " " + *(--list->end()))
+							, &this->sendClients[*(--list->end())]);
 	}
 	delete list;
 	return (CONNECT);
@@ -242,12 +213,26 @@ int			Server::statsHandler(const Message &message, Client *client)
 int			Server::linksHandler(const Message &message, Client *client)
 {
 	std::string					check;
+	std::string					parameter;
 	std::vector<std::string>	*list;
+	size_t						parameterSize;
 
 	client->setCurrentCommand("LINKS");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
-	if (!message.getParameters().empty())
+
+	parameterSize = message.getParameters().size();
+	if (parameterSize > 2)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	else if (parameterSize == 2)
+		list = getInfoFromWildcard(message.getParameter(1));
+	else if (parameterSize == 1)
 		list = getInfoFromWildcard(message.getParameter(0));
 	else
 		list = getInfoFromWildcard("*");
@@ -256,7 +241,6 @@ int			Server::linksHandler(const Message &message, Client *client)
 		delete list;
 		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
 	}
-	std::string parameter;
 
 	for (std::vector<std::string>::iterator it = list->begin(); it != list->end(); ++it)
 	{
@@ -294,67 +278,53 @@ int			Server::linksHandler(const Message &message, Client *client)
 int			Server::timeHandler(const Message &message, Client *client)
 {
 	std::string					check;
+	std::string					toClient;
 	std::vector<std::string>	*list;
 	time_t						now;
+	size_t						parameterSize;
 
 	client->setCurrentCommand("TIME");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
+
 	now = time(NULL);
-	if (message.getParameters().size() == 1)
+	parameterSize = message.getParameters().size();
+	if (parameterSize > 1)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	else if (parameterSize == 1)
 		list = getInfoFromWildcard(message.getParameter(0));
-	else if (message.getParameters().size() > 1)
-		list = new std::vector<std::string>;
 	else
 		list = getInfoFromWildcard(this->serverName);
 	if (!list)
+	{
+		delete list;
 		(this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-	else if (client->getStatus() == USER)
-	{
-		if (message.getParameters().empty() || *(--list->end()) == this->serverName)
-		{
-			sendMessage(Message(this->prefix
-								, RPL_TIME
-								, this->serverName
-								+ " :" + getTimestamp(now, false))
-								, client);
-		}
-		else
-		{
-			sendMessage(Message(":" + client->getInfo(NICK)
-								, "TIME"
-								, message.getParameter(0))
-								, &this->sendClients[message.getParameter(0)]);
-		}
 	}
-	else if (client->getStatus() == SERVER)
-	{
-		if (message.getCommand() == "TIME")
-		{
-			if (message.getParameters().empty() || message.getParameter(0) == this->serverName)
-			{
-				sendMessage(Message(this->prefix
-									, RPL_TIME
-									, message.getPrefix().substr(1, message.getPrefix().length())
-									+ " " + this->serverName
-									+ " :" + getTimestamp(now, false))
-									, client);
-			}
-			else
-				broadcastMessage(message, &this->sendClients[message.getParameter(0)]);
-		}
-		else
-		{
-			Client *ret;
 
-			ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-			if (ret == NULL)
-				ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-			if (ret != NULL)
-				sendMessage(message, ret);
-			else
-				broadcastMessage(message, &this->sendClients[message.getParameter(0)]);
-		}
+	if (message.getPrefix().empty())
+		toClient = client->getInfo(NICK);
+	else
+		toClient = message.getPrefix().substr(1, message.getPrefix().length());
+	if (*(--list->end()) == this->serverName)
+	{
+		sendMessage(Message(this->prefix
+							, RPL_TIME
+							, toClient
+							+ " :" + getTimestamp(now, false))
+							, client);
+	}
+	else
+	{
+		sendMessage(Message(":" + toClient
+							, "TIME"
+							, *(--list->end()))
+							, &this->sendClients[*(--list->end())]);
 	}
 	delete list;
 	return (CONNECT);
@@ -372,42 +342,53 @@ int			Server::timeHandler(const Message &message, Client *client)
 int				Server::connectHandler(const Message &message, Client *client)
 {
 	std::string check;
+	std::string from;
+	size_t		parameterSize;
 
 	client->setCurrentCommand("CONNECT");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
-	if (message.getParameters().empty() || message.getParameters().size() == 2)
+
+	parameterSize = message.getParameters().size();
+	if (parameterSize == 0 || parameterSize == 2)
 		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
 	if (!isValidAddress(message.getParameter(0)))
 		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
-	if (client->getStatus() == USER)
+
+	if (message.getPrefix().empty())
+		from = client->getInfo(NICK);
+	else
+		from = message.getPrefix().substr(1, message.getPrefix().length());
+	if (parameterSize == 1 || message.getParameter(2) == this->serverName)
 	{
-		//if (client->getMode() != OPER)
-			//return noprivileges
 		broadcastMessage(Message(this->prefix
 								, "WALLOPS"
 								, ":Received CONNECT "
 								+ message.getParameter(0)
-								+ " from " + client->getInfo(NICK))
+								+ " from " + from)
 								, client);
 		if (message.getParameters().size() == 1)
 			this->connectServer(message.getParameter(0));
-		else
-		{
-			sendMessage(Message(":" + client->getInfo(NICK)
-								, "CONNECT"
-								, message.getParameter(0)
-								+ " " + message.getParameter(1)
-								+ " " + message.getParameter(2))
-								, &this->sendClients[message.getParameter(2)]);
-		}
 	}
-	else if (client->getStatus() == SERVER)
+	else
 	{
-		if (message.getParameter(2) == this->serverName)
-			this->connectServer(message.getParameter(0));
-		else
-			sendMessage(message, &this->sendClients[message.getParameter(2)]);
+		sendMessage(Message(":" + from
+							, "CONNECT"
+							, message.getParameter(0)
+							+ " " + message.getParameter(1)
+							+ " " + message.getParameter(2))
+							, &this->sendClients[message.getParameter(2)]);
 	}
 	return (CONNECT);
 }
+
+//int				Server::traceHandler(const Message &message, Client *client)
+//{
+	//return (CONNECT);
+//}

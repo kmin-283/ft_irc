@@ -189,3 +189,13 @@ int		Server::eUnknownCommand(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int		Server::eNotRegistered(const Message &message, Client *client)
+{
+	(void)message;
+	sendMessage(Message(this->prefix
+						, ERR_NOTREGISTERED
+						, "* :Connection not registered")
+						, client);
+	return (CONNECT);
+}

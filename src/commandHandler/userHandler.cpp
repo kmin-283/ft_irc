@@ -4,9 +4,9 @@ static bool			isValidNickName(const Message &message)
 {
 	for (size_t i = 0; i < message.getParameter(0).length(); i++)
 	{
-		if (i == 0 && !isValidFormat(std::string(LETTER) + std::string(SPECIAL), message.getParameter(0)[i]))
+		if (i == 0 && !isInTheMask(std::string(LETTER) + std::string(SPECIAL), message.getParameter(0)[i]))
 			return false;
-		else if (!isValidFormat(std::string(LETTER) + std::string(SPECIAL) + std::string(DIGIT), message.getParameter(0)[i]))
+		else if (!isInTheMask(std::string(LETTER) + std::string(SPECIAL) + std::string(DIGIT), message.getParameter(0)[i]))
 			return false;
 	}
 	return true;
@@ -160,7 +160,11 @@ int					Server::nickHandler(const Message &message, Client *client)
 {
 	client->setCurrentCommand("NICK");
 	if (client->getStatus() == SERVER)
+	{
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 		return (this->remoteNickHandler(message, client));
+	}
+	this->infos[client->getCurrentCommand()].incrementLocalCount(1);
 	return (this->localNickHandler(message, client));
 }
 
@@ -168,7 +172,7 @@ static bool			isVaildUserName(const Message &message)
 {
 	for (size_t i = 0; i < message.getParameter(0).length(); i++)
 	{
-		if (isValidFormat(std::string(USER_FORMAT), message.getParameter(0)[i]))
+		if (isInTheMask(std::string(USER_FORMAT), message.getParameter(0)[i]))
 			return false;
 	}
 	return true;
@@ -229,20 +233,6 @@ int					Server::setLocalUser(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-static bool			isVaildIpAddress(const Message &message)
-{
-	for(size_t i = 0; i < message.getParameter(1).length(); i++)
-	{
-		if (i == 0 && !isValidFormat(std::string(DIGIT), message.getParameter(1)[i]))
-			return (false);
-		if (i == message.getParameter(1).length() - 1 && isValidFormat(std::string(".:"), message.getParameter(1)[i]))
-			return (false);
-		else if (!isValidFormat(std::string(DIGIT) + std::string(".:"), message.getParameter(1)[i]))
-			return (false);
-	}
-	return (true);
-}
-
 int					Server::setRemoteUser(const Message &message, Client *client)
 {
 	std::string							prefix;
@@ -261,7 +251,7 @@ int					Server::setRemoteUser(const Message &message, Client *client)
 		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 	if (message.getParameters().size() != 4)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-	if (!isVaildIpAddress(message))
+	if (!isValidIpv4(message.getParameter(1)))
 		return (CONNECT);
 	this->getChildServer(serverList, client->getInfo(SERVERNAME));
 	serverList.push_back(client->getInfo(SERVERNAME));
@@ -275,8 +265,13 @@ int					Server::setRemoteUser(const Message &message, Client *client)
 int					Server::userHandler(const Message &message, Client *client)
 {
 	client->setCurrentCommand("USER");
+
 	if (client->getStatus() == SERVER)
+	{
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
 		return (this->setRemoteUser(message, client));
+	}
+	this->infos[client->getCurrentCommand()].incrementLocalCount(1);
 	return (this->setLocalUser(message, client));
 }
 

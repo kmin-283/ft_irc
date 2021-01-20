@@ -34,47 +34,52 @@ int					ft_atoi(const char *str)
 	return (ft_check_range(number_value, sign_value));
 }
 
-bool			isInTheMask(const char &target, const char *mask)
+bool			isInTheMask(const std::string &mask, const char &target)
 {
-	int i;
-
-	i = 0;
-	while (mask[i])
-	{
-		if (target == mask[i])
-			return (true);
-		++i;
-	}
-	return (false);
+	return (mask.find(target) != std::string::npos);
 }
 
-bool            stringCheck(const char *str, const char *mask, const char &notRepeatChar)
+bool            isValidPort(const std::string &port)
 {
-	int i;
+	size_t portLength;
 
-	i = 0;
-	while (str[i])
+	portLength = port.length();
+	if (!portLength)
+		return (false);
+	for (size_t i = 0; i < portLength; ++i)
 	{
-		if (!isInTheMask(str[i], mask))
+		if (!isInTheMask(std::string(DIGIT), port[i]))
 			return (false);
-		if (str[i + 1] && str[i] == notRepeatChar && str[i + 1] == notRepeatChar)
-			return (false);
-		++i;
 	}
 	return (true);
 }
 
-bool				ft_isdigit(const char *str)
+bool			isValidIpv4(const std::string &ipAddress)
 {
-	int			i;
+	int		cnt;
+	size_t	ipAddressLength;
+	int		hasPoint;
 
-	i = -1;
-	while (str[++i])
+	cnt = 0;
+	ipAddressLength = ipAddress.length();
+	hasPoint = 0;
+	if (!ipAddressLength)
+		return (false);
+	for (size_t i = 0; i < ipAddressLength; ++i)
 	{
-		if (!('0' <= str[i] && str[i] <= '9'))
+		if (isInTheMask(std::string(DIGIT), ipAddress[i]))
+			cnt += 1;
+		if (cnt > 3)
 			return (false);
+		if (ipAddress[i] == '.')
+		{
+			if (i == 0 || ipAddress[i + 1] == '.' || ipAddress[i + 1] == 0)
+				return (false);
+			hasPoint += 1;
+			cnt = 0;
+		}
 	}
-	return (true);
+	return (hasPoint == 3 ? true : false);
 }
 
 void				*ft_memset(void *s, int c, size_t n)
@@ -88,13 +93,6 @@ void				*ft_memset(void *s, int c, size_t n)
 			*(str + i) = c;
 		s = str;
 		return (s);
-}
-
-bool				isValidFormat(const std::string &key, const char &value)
-{
-	if (std::string::npos == key.find(value))
-		return (false);
-	return (true);
 }
 
 std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
@@ -151,9 +149,9 @@ bool			isValidAddress(const std::string &address)
 
 	passIdx = address.rfind(':');
 	portIdx = address.rfind(':', passIdx - 1);
-	if (!stringCheck(address.substr(portIdx + 1, passIdx - portIdx - 1).c_str(), "0123456789", '.')) // 반복되지 말아야 할 문자가 없으므로 상관없는 문자를 넣어둠
+	if (!isValidPort(address.substr(portIdx + 1, passIdx - portIdx - 1)))
 		return (false);
-	if (!stringCheck(address.substr(0, portIdx - 1).c_str(), ".0123456789", '.'))
+	if (!isValidIpv4(address.substr(0, portIdx)))
 		return (false);
 	return (passIdx != std::string::npos && portIdx != std::string::npos);
 }

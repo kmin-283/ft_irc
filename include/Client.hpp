@@ -83,8 +83,6 @@ private:
 	int fd;
 	bool isAuthorized;
 
-	// 추가
-
 	ClientStatus status;
 	std::string	receivedMessageStr;
 	std::vector<std::string> info;
@@ -92,6 +90,7 @@ private:
 	std::time_t			startTime;
 
 	std::string			currentCommand;
+	std::string			prevCommand;
 public:
 	Client(void);
 	Client(const int fd, const bool isAuthorized = false);
@@ -118,7 +117,8 @@ public:
 	std::string prefixCheck(const Message &message);
 
 	void				setCurrentCommand(const std::string &command);	
-	const std::string	getCurrentCommand(void) const;
+	const std::string	&getCurrentCommand(void) const;
+	const std::string	&getPrevCommand(void) const;
 };
 
 #endif
