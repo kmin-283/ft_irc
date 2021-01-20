@@ -26,4 +26,6 @@ void	Server::registerCommands(void)
 	this->commands[RPL_TIME] = &Server::timeHandler;
 
 	this->commands["CONNECT"] = &Server::connectHandler;
+
+	this->commands["PRIVMSG"] = &Server::privmsgHandler;
 }

@@ -14,6 +14,9 @@ void			Server::registerReplies(void)
 	this->replies[ERR_CANTKILLSERVER] = &Server::eCantKillServerHandler;
 	this->replies[ERR_NOSUCHSERVER] = &Server::eNoSuchServer;
 	this->replies[ERR_UNKNOWNCOMMAND] = &Server::eUnknownCommand;
+	this->replies[ERR_NORECIPIENT] = &Server::eNoRecipients;
+	this->replies[ERR_NOTEXTTOSEND] = &Server::eNoTextToSend;
+	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
 
 
 

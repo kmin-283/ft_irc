@@ -87,6 +87,7 @@ private:
 	int																	linksHandler(const Message &message, Client *client);
 	int																	timeHandler(const Message &message, Client *client);
 	int																	connectHandler(const Message &message, Client *client);
+	int																	privmsgHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -102,6 +103,9 @@ private:
 	int																	eCantKillServerHandler(const Message &message, Client *client);
 	int																	eNoSuchServer(const Message &message, Client *client);
 	int																	eUnknownCommand(const Message &message, Client *client);
+	int																	eNoRecipients(const Message &message, Client *client);
+	int																	eNoTextToSend(const Message &message, Client *client);
+	int																	eNoSuchNick(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);
