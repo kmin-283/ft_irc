@@ -388,7 +388,60 @@ int				Server::connectHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-//int				Server::traceHandler(const Message &message, Client *client)
-//{
-	//return (CONNECT);
-//}
+int				Server::traceHandler(const Message &message, Client *client)
+{
+	std::string					check;
+	std::string					from;
+	std::vector<std::string>	*list;
+	size_t						parameterSize;
+	strClientPtrIter			foundUser;
+
+	client->setCurrentCommand("TRACE");
+	if (client->getStatus() == UNKNOWN)
+		return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+	else if (client->getStatus() == USER)
+		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	else
+		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+	if ((check = client->prefixCheck(message)) != "ok")
+		return (this->*(this->replies[check]))(message, client);
+
+	parameterSize = message.getParameters().size();
+	if (parameterSize > 1)
+		return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+	else if (parameterSize == 1)
+		list = getInfoFromWildcard(message.getParameter(0));
+	else
+		list = getInfoFromWildcard(this->serverName);
+	if (!list)
+	{
+		delete list;
+		return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+	}
+
+	if (message.getPrefix().empty())
+		from = client->getInfo(NICK);
+	else
+		from = message.getPrefix().substr(1, message.getPrefix().length());
+	foundUser = this->clientList.find(*(--list->end()));
+	if (*(--list->end()) == this->serverName || foundUser != this->clientList.end())
+	{
+		//if (client->getInfo(MODE) == OPERATOR)
+		//{
+			//RPL_TRACEOPER
+			//RPL_TRACEUSER
+			//처리하기
+		//}
+		for (strClientPtrIter it = this->serverList.begin(); it != this->serverList.end(); ++it)
+		{
+			sendMessage(Message(this->prefix
+								, RPL_TRACESERVER
+								, from + " Serv 1 0S 0C "
+								+ it->second->getInfo(SERVERNAME)
+								+ " *|*@" + this->serverName
+								+ ":V")
+								, &this->sendClients[from]);
+		}
+	}
+	return (CONNECT);
+}

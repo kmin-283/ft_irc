@@ -19,11 +19,10 @@ void	Server::registerCommands(void)
 	this->commands[RPL_ENDOFSTATS] = &Server::rStats;
 
 	this->commands["LINKS"] = &Server::linksHandler;
-	this->commands[RPL_LINKS] = &Server::linksHandler;
-	this->commands[RPL_ENDOFLINKS] = &Server::linksHandler;
 
 	this->commands["TIME"] = &Server::timeHandler;
-	this->commands[RPL_TIME] = &Server::timeHandler;
+	this->commands[RPL_TIME] = &Server::rTime;
 
 	this->commands["CONNECT"] = &Server::connectHandler;
+	this->commands["TRACE"] = &Server::traceHandler;
 }
