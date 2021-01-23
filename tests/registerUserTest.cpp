@@ -20,12 +20,20 @@ TEST_GROUP(RegisterUser)
 			CHECK_EQUAL(client->getInfo(USERNAME), userName);
 			CHECK_EQUAL(client->getInfo(ADDRESS), address);
 			CHECK_EQUAL(client->getInfo(REALNAME), realName);
-			CHECK_EQUAL(client->getInfo(HOSTNAME), hostName);
+			CHECK_EQUAL(client->getInfo(UPLINKSERVER), hostName);
+			CHECK_EQUAL(server->sendClients["dakim"].getStatus(), status);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(NICK), nick);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(USERNAME), userName);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(ADDRESS), address);
 			CHECK_EQUAL(server->sendClients["dakim"].getInfo(REALNAME), realName);
-			CHECK_EQUAL(server->sendClients["dakim"].getInfo(HOSTNAME), hostName);
+			CHECK_EQUAL(server->sendClients["dakim"].getInfo(UPLINKSERVER), hostName);
+			CHECK_EQUAL(server->clientList.count("dakim"), 1);
+			CHECK_EQUAL(server->clientList["dakim"]->getStatus(), status);
+			CHECK_EQUAL(server->clientList["dakim"]->getInfo(NICK), nick);
+			CHECK_EQUAL(server->clientList["dakim"]->getInfo(USERNAME), userName);
+			CHECK_EQUAL(server->clientList["dakim"]->getInfo(ADDRESS), address);
+			CHECK_EQUAL(server->clientList["dakim"]->getInfo(REALNAME), realName);
+			CHECK_EQUAL(server->clientList["dakim"]->getInfo(UPLINKSERVER), hostName);
 		}
 	}
 };
@@ -62,6 +70,7 @@ TEST(RegisterUser, NickFirst)
 			CHECK_EQUAL(1, 0);
 		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
 		std::string("127.0.0.1"), std::string("localhost.3000"), USER);
+		CHECK_EQUAL(server.sendClients.count(userMessage.getParameter(0)), 0);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
 		free(result);
@@ -148,6 +157,7 @@ TEST(RegisterUser, UserFirst)
 			CHECK_EQUAL(1, 0);
 		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
 		std::string("127.0.0.1"), std::string("localhost.3000"), USER);
+		CHECK_EQUAL(server.sendClients.count(userMessage.getParameter(0)), 0);
 		get_next_line(fd[0], &result);
 		CHECK_EQUAL(std::string(result), std::string(":localhost.3000 001 dakim :Welcome to the Internet Relay Network dakim!~da@localhost.3000\r"));
 		free(result);
@@ -244,6 +254,7 @@ TEST(RegisterUser, BroadCastUserFirst)
 			CHECK_EQUAL(1, 0);
 		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
 		std::string("127.0.0.1"), std::string("localhost.3000"), USER);
+		CHECK_EQUAL(server.sendClients.count(userMessage.getParameter(0)), 0);
 		get_next_line(fd[2], &result);
 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
 		free(result);
@@ -307,6 +318,7 @@ TEST(RegisterUser, BroadCastNickFirst)
 			CHECK_EQUAL(1, 0);
 		given(std::string("dakim"), std::string("da"), std::string("kkiii kkii"),
 		std::string("127.0.0.1"), std::string("localhost.3000"), USER);
+		CHECK_EQUAL(server.sendClients.count(userMessage.getParameter(0)), 0);
 		get_next_line(fd[2], &result);
 		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
 		free(result);

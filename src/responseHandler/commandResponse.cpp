@@ -5,7 +5,7 @@ int		Server::rRegisterUserHandler(const Message &message, Client *client)
 	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
 	(this->*(this->replies[RPL_USERBROADCAST]))(message, client);
 	client->setStatus(USER);
-	this->sendClients[message.getParameter(0)].setStatus(USER);
+	this->sendClients[client->getInfo(NICK)].setStatus(USER);
 	return (CONNECT);
 }
 
