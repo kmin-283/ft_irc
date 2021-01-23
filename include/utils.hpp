@@ -65,7 +65,7 @@ class			Message;
 int				ft_atoi(const char *str);
 bool			isInTheMask(const std::string &mask, const char &target);
 void			*ft_memset(void *s, int c, size_t n);
-std::string		getTimestamp(std::time_t &startTime, const bool &forUptime);
+std::string		getTimestamp(const std::time_t &startTime, const bool &forUptime);
 bool            isValidPort(const std::string &port);
 bool            isValidIpv4(const std::string &ipAddress);
 bool            isValidAddress(const std::string &address);

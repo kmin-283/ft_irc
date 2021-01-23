@@ -95,7 +95,7 @@ void				*ft_memset(void *s, int c, size_t n)
 		return (s);
 }
 
-std::string		getTimestamp(std::time_t &startTime, const bool &forUptime)
+std::string		getTimestamp(const std::time_t &startTime, const bool &forUptime)
 {
 	struct tm	*parsedTime;
 	std::string	returnString;

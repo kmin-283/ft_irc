@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: ipAddress("localhost"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
+	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
 	, port(port), mainSocket(0), maxFd(0), run(true)
 {
 	FD_ZERO(&this->readFds);

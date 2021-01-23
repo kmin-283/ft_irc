@@ -25,4 +25,7 @@ void	Server::registerCommands(void)
 
 	this->commands["CONNECT"] = &Server::connectHandler;
 	this->commands["TRACE"] = &Server::traceHandler;
+	this->commands[RPL_TRACELINK] = &Server::rTrace;
+	this->commands[RPL_TRACESERVER] = &Server::rTrace;
+	this->commands[RPL_TRACEEND] = &Server::rTrace;
 }

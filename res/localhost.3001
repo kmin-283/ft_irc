@@ -1,5 +1,0 @@
-Connect other server.
-Reveive message = PASS 123 ft-irc1.0 ada|sdasdasd
-Reveive message = :localhost.3000 SERVER localhost.3000 1 :kmin seunkim dakim made this server.
-Reveive message = :localhost.3000 SERVER localhost.3003 2 0 :kmin seunkim dakim made this server.
-Connect client. fd is 6

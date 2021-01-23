@@ -145,6 +145,8 @@ private:
 
 	int																	rTime(const Message &message, Client *client);
 
+	int																	rTrace(const Message &message, Client *client);
+
 	void																renewFd(const int fd);
 
 	void																getChildServer(std::list<std::string> &serverList, std::string key);

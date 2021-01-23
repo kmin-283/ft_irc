@@ -716,7 +716,6 @@ int				Server::rEndOfLinks(const Message &message, Client *client)
 
 int				Server::rTime(const Message &message, Client *client)
 {
-
 	Client *ret;
 
 	client->setCurrentCommand("TIME");
@@ -724,6 +723,24 @@ int				Server::rTime(const Message &message, Client *client)
 	{
 		ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
 		if (ret == NULL)
+			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
+		if (ret != NULL)
+			sendMessage(message, ret);
+		else if (this->sendClients.count(message.getParameter(0)))
+			sendMessage(message, &this->sendClients[message.getParameter(0)]);
+	}
+	return (CONNECT);
+}
+
+int				Server::rTrace(const Message &message, Client *client)
+{
+	Client *ret;
+
+	client->setCurrentCommand("TRACE");
+	if (message.getParameter(0) != this->serverName)
+	{
+		//ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
+		//if (ret == NULL)
 			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
 		if (ret != NULL)
 			sendMessage(message, ret);
