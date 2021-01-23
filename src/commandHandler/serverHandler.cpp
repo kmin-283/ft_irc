@@ -141,86 +141,67 @@ void Server::deleteSubServers(const std::string &targetServer, const std::string
 		}
 		prev = it;
 	}
-	if (this->sendClients.count(targetServer))
-		this->sendClients.erase(targetServer);
+    this->sendClients.erase(targetServer);
 }
 
 int Server::squitHandler(const Message &message, Client *client)
 {
-	std::map<std::string, Client *>::iterator it;
-	int tmpFd;
+	std::map<std::string, Client *>::iterator   it;
+	std::string                                 from;
 
 	client->setCurrentCommand("SQUIT");
+	//if (message.getPrefix().empty() && (client->getInfo(MODE) != OPERATOR
+	// || message.getParameter(0) == this->serverName))
+	  //  return NO_PRIVILIGED
 	if (message.getParameters().size() != 2)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-
-	// 유저모드가 w이면 메시지를 보내야 한다고 함 <-- 추가해야할 내용...?
-
+    // 유저모드가 w이면 메시지를 보내야 한다고 함 <-- 추가해야할 내용...?
+    if (message.getPrefix().empty())
+        from = client->getInfo(NICK);
+    else
+        from = message.getPrefix().substr(1, message.getPrefix().length());
 	if (message.getParameter(0) == this->serverName) // 현재 서버가 삭제되어야 할 서버인 경우
 	{
 		this->run = false;
-		for (it = this->serverList.begin(); it != this->serverList.end(); ++it)
-		{
-			if (it->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-				sendMessage(Message("", "SQUIT", it->second->getInfo(SERVERNAME) + " " + message.getParameter(1)), it->second);
-		}
+		broadcastMessage(message, client);
 		return (TOTALDISCONNECT);
 	}
-	if (this->serverList.count(message.getParameter(0))) // 직접적으로 연결된 서버
-	{
-		std::map<std::string, Client *>::iterator iter;
-
-		for (iter = this->serverList.begin(); iter != this->serverList.end(); ++iter)
-		{
-			if (iter->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME)) // this->prefix와 비교해도 
-			{
-				std::string parameters;
-
-				parameters = ":Received SQUIT ";
-				parameters += message.getParameter(0);
-				parameters += " from ";
-				parameters += this->serverName;
-				parameters += " ";
-				parameters += message.getParameter(1);
-				sendMessage(Message(this->prefix, "WALLOPS", parameters), iter->second);
-				parameters = message.getParameter(0);
-				parameters += " ";
-				parameters += message.getParameter(1);
-				parameters += " ";
-				parameters += "(SQUIT from ";
-				parameters += this->serverName;
-				parameters += ")";
-				sendMessage(Message(":" + message.getParameter(0), "SQUIT", parameters), iter->second);
-			}
-		}
-		tmpFd = this->sendClients[message.getParameter(0)].getFd();
-		this->acceptClients.erase(tmpFd);
-		this->serverList.erase(message.getParameter(0));
-		deleteSubServers(message.getParameter(0), message.getParameter(1));
-		FD_CLR(tmpFd, &this->readFds);
-		close(tmpFd);
-		return (DISCONNECT);
-	}
-	// 직접적으로 연결되지 않은 클라이언트 ---> operator 이거나 다른 server이거나
-	// if (client->getStatus() == SERVER)
-	// {
-		std::string tmp;
-
-		if (message.getPrefix() == "")
-		{
-			tmp = ":";
-			tmp += this->serverName;
-			tmp += " ";
-			tmp += message.getTotalMessage();
-			broadcastMessage(Message(tmp), client);
-		}
-		else
-			broadcastMessage(message, client);
-		deleteSubServers(message.getParameter(0), message.getParameter(1)); // delete sub servers
-		// }
-	// else
-	// {
-	// 	std::cout << "444" << std::endl;
-	// }
-	return (CONNECT);
+	else if (this->serverList.count(message.getParameter(0)))
+    {
+	    for (strClientPtrIter it = this->serverList.begin(); it != this->serverList.end(); ++it)
+        {
+            if (client->getInfo(SERVERNAME) != message.getParameter(0))
+            {
+                sendMessage(Message(this->prefix
+                                    , "WALLOPS"
+                                    , "Received SQUIT "
+                                    + message.getParameter(0)
+                                    + " from " + from
+                                    + " " + message.getParameter(1))
+                                    , it->second);
+            }
+            if (it->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+            {
+                sendMessage(Message(":" + from
+                                    , "SQUIT"
+                                    , message.getParameter(0)
+                                    + " " + message.getParameter(1))
+                                    , it->second);
+            }
+        }
+        return (DISCONNECT);
+    }
+    else if (this->sendClients.count(message.getParameter(0)))
+    {
+        // 재귀적으로 돌면서 연결된 모든 서버를 지워줘야 함. //
+	    deleteSubServers(message.getParameter(0), message.getParameter(1));
+	    broadcastMessage(Message(":" + from
+                                , "SQUIT"
+                                , message.getParameter(0)
+                                + " " + message.getParameter(1))
+                                , client);
+    }
+    else
+        return ((this->*(this->replies[ERR_NOSUCHSERVER]))(message, client));
+    return (CONNECT);
 }

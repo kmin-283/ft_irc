@@ -160,7 +160,7 @@ private:
 	void																connectClient(void);
 	void																disconnectClient(const Message &message, Client *client);
 	void																disconnectChild(const Message &message, Client *client);
-	void																clearClient(Client *client);
+	void																clearClient(void);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
 	void																receiveMessage(const int fd);

@@ -146,7 +146,7 @@ void					Server::receiveMessage(const int fd)
 	if (readResult == 0)
 		this->disconnectClient(sendMessage, &sender);
 	if (connectionStatus == TOTALDISCONNECT)
-		this->clearClient(&sender);
+		this->clearClient();
 }
 
 static struct addrinfo	*getAddrInfo(const std::string info)
@@ -220,11 +220,14 @@ void					Server::connectServer(std::string address)
 	std::cout << "Connect other server." << std::endl;
 }
 
-void					Server::clearClient(Client *client)
+void					Server::clearClient(void)
 {
-	close(client->getFd());
-	FD_CLR(client->getFd(), &this->readFds);
-	this->sendClients.clear();
+    for (int i = this->mainSocket; i < this->maxFd; ++i)
+    {
+        close(i);
+        FD_CLR(i, &this->readFds);
+    }
+    this->sendClients.clear();
 	this->serverList.clear();
 	this->clientList.clear();
 	this->acceptClients.clear();
@@ -233,7 +236,6 @@ void					Server::clearClient(Client *client)
 void				Server::getChildServer(std::list<std::string> &serverList, std::string key)
 {
 	std::map<std::string, Client>::iterator	iterator;
-
 	for(iterator = this->sendClients.begin(); iterator != this->sendClients.end(); ++iterator)
 	{
 		if (iterator->second.getInfo(UPLINKSERVER) == key)
@@ -273,7 +275,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 {
 	std::string stringKey;
 
-	stringKey = client->getInfo(NICK);
+	stringKey = client->getInfo(1);
 	if (this->acceptClients.count(client->getFd()))
 	{
 		if (this->clientList.count(stringKey))
@@ -305,7 +307,7 @@ void					Server::sendMessage(const Message &message, Client *client)
 	client->incrementQueryData(RECVMSG, 1);
 	client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
-		std::cerr << ERROR_SEND_FAIL << std::endl;
+	    std::cerr << ERROR_SEND_FAIL << std::endl;
 }
 
 void					Server::broadcastMessage(const Message &message, Client *client)
@@ -314,9 +316,7 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
-		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-		{
-			this->sendMessage(message, iterator->second);
-		}
+		if (client == NULL || iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+            this->sendMessage(message, iterator->second);
 	}
 }
