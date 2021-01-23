@@ -2,6 +2,7 @@
 
 Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
+	, currentCommand(""), prevCommand("")
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -9,6 +10,7 @@ Client::Client()
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
+	, currentCommand(""), prevCommand("")
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -117,9 +119,16 @@ std::string	Client::prefixCheck(const Message &message)
 
 void				Client::setCurrentCommand(const std::string &command)	
 {
+	if (this->currentCommand != "")
+		this->prevCommand = this->currentCommand;
 	this->currentCommand = command;
 }
-const std::string	Client::getCurrentCommand(void) const
+const std::string	&Client::getCurrentCommand(void) const
 {
 	return (this->currentCommand);
+}
+
+const std::string	&Client::getPrevCommand(void) const
+{
+	return (this->prevCommand);
 }

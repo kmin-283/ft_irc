@@ -29,6 +29,12 @@
 # define RPL_MYINFO "004"
 # define RPL_BOUNCE "005"
 
+# define RPL_TRACELINK "200"
+# define RPL_TRACEOPER "204"
+# define RPL_TRACEUSER "205"
+# define RPL_TRACESERVER "206"
+# define RPL_TRACEEND "262"
+
 # define RPL_STATSLINKINFO "211"
 # define RPL_STATSCOMMANDS "212"
 # define RPL_STATSCLINE "213"

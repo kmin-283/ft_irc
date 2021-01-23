@@ -10,22 +10,26 @@ void	Server::registerCommands(void)
 	this->commands["WALLOPS"] = &Server::wallopsHandler;
 
 	this->commands["VERSION"] = &Server::versionHandler;
-	this->commands[RPL_VERSION] = &Server::versionHandler;
+	this->commands[RPL_VERSION] = &Server::rVersion;
 	
 	this->commands["STATS"] = &Server::statsHandler;
-	this->commands[RPL_STATSLINKINFO] = &Server::statsHandler;
-	this->commands[RPL_STATSCOMMANDS] = &Server::statsHandler;
-	this->commands[RPL_STATSUPTIME] = &Server::statsHandler;
-	this->commands[RPL_ENDOFSTATS] = &Server::statsHandler;
+	this->commands[RPL_STATSLINKINFO] = &Server::rStats;
+	this->commands[RPL_STATSCOMMANDS] = &Server::rStats;
+	this->commands[RPL_STATSUPTIME] = &Server::rStats;
+	this->commands[RPL_ENDOFSTATS] = &Server::rStats;
 
 	this->commands["LINKS"] = &Server::linksHandler;
-	this->commands[RPL_LINKS] = &Server::linksHandler;
-	this->commands[RPL_ENDOFLINKS] = &Server::linksHandler;
 
 	this->commands["TIME"] = &Server::timeHandler;
-	this->commands[RPL_TIME] = &Server::timeHandler;
+	this->commands[RPL_TIME] = &Server::rTime;
 
 	this->commands["CONNECT"] = &Server::connectHandler;
+
+	this->commands["TRACE"] = &Server::traceHandler;
+	this->commands[RPL_TRACELINK] = &Server::rTrace;
+	this->commands[RPL_TRACESERVER] = &Server::rTrace;
+	this->commands[RPL_TRACEEND] = &Server::rTrace;
+
 
 	this->commands["PRIVMSG"] = &Server::privmsgHandler;
 }
