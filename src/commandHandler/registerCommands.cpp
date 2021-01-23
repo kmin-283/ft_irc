@@ -24,8 +24,12 @@ void	Server::registerCommands(void)
 	this->commands[RPL_TIME] = &Server::rTime;
 
 	this->commands["CONNECT"] = &Server::connectHandler;
+
 	this->commands["TRACE"] = &Server::traceHandler;
 	this->commands[RPL_TRACELINK] = &Server::rTrace;
 	this->commands[RPL_TRACESERVER] = &Server::rTrace;
 	this->commands[RPL_TRACEEND] = &Server::rTrace;
+
+
+	this->commands["PRIVMSG"] = &Server::privmsgHandler;
 }
