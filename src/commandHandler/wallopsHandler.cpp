@@ -10,7 +10,7 @@ int         Server::wallopsHandler(const Message&message, Client *client)
 	client->setCurrentCommand("WALLOPS");
 	if ((check = client->prefixCheck(message)) != "ok")
 		return (this->*(this->replies[check]))(message, client);
-	this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+	this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 	// for (strClientPtrIter it = this->clientList.begin(); it != this->clientList.end(); ++it)
 	// {
 		// if (it->second->getInfo()) client의 모드가 operator이면 wallops를 해당 operator에게 전달해줌.

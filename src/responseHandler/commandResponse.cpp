@@ -545,38 +545,11 @@ int				Server::rKillHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-int				Server::rVersion(const Message &message, Client *client)
+int				Server::rReplyHandler(const Message &message, Client *client)
 {
-	Client *ret;
-
-	client->setCurrentCommand("VERSION");
-	if (message.getParameter(0) != this->serverName)
-	{
-		ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-		if (ret == NULL)
-			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-		if (ret != NULL)
-			sendMessage(message, ret);
-		else if (this->sendClients.count(message.getParameter(0)))
-			sendMessage(message, &this->sendClients[message.getParameter(0)]);
-	}
-	return (CONNECT);
-}
-int				Server::rStats(const Message &message, Client *client)
-{
-	Client *ret;
-
-	client->setCurrentCommand("STATS");
-	if (message.getParameter(0) != this->serverName)
-	{
-		ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-		if (ret == NULL)
-			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-		if (ret != NULL)
-			sendMessage(message, ret);
-		else if (this->sendClients.count(message.getParameter(0)))
-			sendMessage(message, &this->sendClients[message.getParameter(0)]);
-	}
+    (void)client;
+    if (this->sendClients.count(message.getParameter(0)))
+        sendMessage(message, &this->sendClients[message.getParameter(0)]);
 	return (CONNECT);
 }
 
@@ -588,7 +561,7 @@ int				Server::rStatsM(const Message &message, Client *client)
 		parameter = client->getInfo(NICK);
 	else
 		parameter = message.getPrefix().substr(1, message.getPrefix().length());
-	for (std::map<std::string, Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
+	for (std::map<std::string, Info>::iterator it = this->infosPerCommand.begin(); it != this->infosPerCommand.end(); ++it)
 	{
 		if (std::isalpha(it->first[0]) && (it->second.getLocalCount() != "0" || it->second.getRemoteCount() != "0"))
 		{
@@ -719,41 +692,5 @@ int				Server::rEndOfLinks(const Message &message, Client *client)
 						, parameter + " " + option
 						+ " :End of LINKS list")
 						, client);
-	return (CONNECT);
-}
-
-int				Server::rTime(const Message &message, Client *client)
-{
-	Client *ret;
-
-	client->setCurrentCommand("TIME");
-	if (message.getParameter(0) != this->serverName)
-	{
-		ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-		if (ret == NULL)
-			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-		if (ret != NULL)
-			sendMessage(message, ret);
-		else if (this->sendClients.count(message.getParameter(0)))
-			sendMessage(message, &this->sendClients[message.getParameter(0)]);
-	}
-	return (CONNECT);
-}
-
-int				Server::rTrace(const Message &message, Client *client)
-{
-	Client *ret;
-
-	client->setCurrentCommand("TRACE");
-	if (message.getParameter(0) != this->serverName)
-	{
-		//ret = hasTarget(message.getParameter(0), this->serverList.begin(), this->serverList.end());
-		//if (ret == NULL)
-			ret = hasTarget(message.getParameter(0), this->clientList.begin(), this->clientList.end());
-		if (ret != NULL)
-			sendMessage(message, ret);
-		else if (this->sendClients.count(message.getParameter(0)))
-			sendMessage(message, &this->sendClients[message.getParameter(0)]);
-	}
 	return (CONNECT);
 }

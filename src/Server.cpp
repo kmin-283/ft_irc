@@ -2,14 +2,14 @@
 
 Server::Server(const char *pass, const char *port)
 	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
-	, port(port), mainSocket(0), maxFd(0), run(true)
+	, port(port), mainSocket(0), maxFd(0), run(true), adminLoc1("kmin"), adminLoc2("Seoul"), adminEmail("admin@admin.irc")
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 
 	this->registerCommands();
 	this->registerReplies();
-	this->initInfo();
+	this->initInfosPerCommand();
 	this->motdDir = std::string("./ft_irc.motd");
 	this->serverName = std::string("localhost.") + this->port;
 	this->startTime = std::time(NULL);
@@ -18,12 +18,12 @@ Server::Server(const char *pass, const char *port)
 Server::~Server(void)
 {}
 
-void					Server::initInfo(void)
+void					Server::initInfosPerCommand(void)
 {
 	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator it;
 
 	for (it = this->commands.begin(); it != this->commands.end(); ++it)
-		this->infos.insert(std::pair<std::string, Info>(it->first, Info()));
+		this->infosPerCommand.insert(std::pair<std::string, Info>(it->first, Info()));
 }
 
 void					Server::renewFd(const int fd)

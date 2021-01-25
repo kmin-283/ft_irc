@@ -38,7 +38,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	client->setCurrentCommand("SERVER");
 	if (client->getStatus() == UNKNOWN)
 	{
-		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
 		if (!client->getIsAuthorized() || (message.getParameters().size() < 2) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 			|| (message.getParameter(0).find('.') == std::string::npos) || client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
@@ -55,7 +55,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	}
 	else if (client->getStatus() == SERVER)
 	{
-		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 		if (message.getPrefix() == "" || !this->sendClients.count(message.getPrefix().substr(1, message.getPrefix().length()))) // 서버연결시에 새로운 연결일 수도 있음
 			return (CONNECT);
 		if (message.getParameters().size() <= 3) // 첫 연결시에 :localhost.3000 SERVER localhost.3000 1 : kmin seunkim dakim made this server. ==> parameter가 4가 아님
@@ -125,22 +125,40 @@ int Server::serverHandler(const Message &message, Client *client)
  *  3002
  */
 
-void Server::deleteSubServers(const std::string &targetServer, const std::string &info)
-{
-	std::map<std::string, Client>::iterator it;
-	std::map<std::string, Client>::iterator prev;
+void Server::deleteSubServers(const std::string &targetServer, const std::string &info) {
+    std::map<std::string, Client>::iterator it;
+    std::map<std::string, Client>::iterator prev;
+    bool                                    goToBegin;
 
-	it = this->sendClients.begin();
-	prev = this->sendClients.begin();
-	for (; it != this->sendClients.end(); ++it)
-	{
-		if (it->second.getInfo(UPLINKSERVER) == targetServer)
-		{
-			deleteSubServers(it->second.getInfo(SERVERNAME), info);
-			it = prev;
-		}
-		prev = it;
-	}
+    it = this->sendClients.begin();
+    prev = this->sendClients.begin();
+    goToBegin = false;
+    while (it != this->sendClients.end())
+    {
+        if (it->second.getStatus() == USER)
+        {
+            if (it->second.getInfo(HOSTNAME) == targetServer)
+            {
+                goToBegin = true;
+                this->sendClients.erase(it->first);
+            }
+        }
+        else
+        {
+            if (it->second.getInfo(UPLINKSERVER) == targetServer)
+            {
+                goToBegin = true;
+                deleteSubServers(it->second.getInfo(SERVERNAME), info);
+            }
+        }
+        if (goToBegin)
+        {
+            it = this->sendClients.begin();
+            goToBegin = false;
+        }
+        else
+            ++it;
+    }
     this->sendClients.erase(targetServer);
 }
 
