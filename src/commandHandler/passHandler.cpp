@@ -10,8 +10,8 @@ int					Server::passHandler(const Message &message, Client *client)
 	else if (this->pass == message.getParameter(0))
 		client->setIsAuthorized(true);
 	if (client->getStatus() == USER)
-		this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
 	else if (client->getStatus() == SERVER)
-		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 	return (CONNECT);
 }

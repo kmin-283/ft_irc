@@ -161,10 +161,10 @@ int					Server::nickHandler(const Message &message, Client *client)
 	client->setCurrentCommand("NICK");
 	if (client->getStatus() == SERVER)
 	{
-		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 		return (this->remoteNickHandler(message, client));
 	}
-	this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
 	return (this->localNickHandler(message, client));
 }
 
@@ -268,10 +268,10 @@ int					Server::userHandler(const Message &message, Client *client)
 
 	if (client->getStatus() == SERVER)
 	{
-		this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+		this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 		return (this->setRemoteUser(message, client));
 	}
-	this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+	this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
 	return (this->setLocalUser(message, client));
 }
 

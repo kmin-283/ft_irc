@@ -31,12 +31,12 @@ Client		*Server::hasTarget(const std::string &target, strClientPtrIter start, st
 
 void		Server::incrementLocalByte(Client *client, const Message &message)
 {
-    this->infos[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
+    this->infosPerCommand[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
 }
 
 void		Server::incrementRemoteByte(Client *client, const Message &message)
 {
-    this->infos[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
+    this->infosPerCommand[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
 }
 
 static bool match(char *first, char *second)
@@ -94,9 +94,9 @@ int Server::versionHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
@@ -162,9 +162,9 @@ int			Server::statsHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
 
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
@@ -221,9 +221,9 @@ int			Server::linksHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
 
@@ -287,9 +287,9 @@ int			Server::timeHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
 
@@ -349,9 +349,9 @@ int				Server::connectHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
 
@@ -401,9 +401,9 @@ int				Server::traceHandler(const Message &message, Client *client)
     if (client->getStatus() == UNKNOWN)
         return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
     else if (client->getStatus() == USER)
-        this->infos[client->getCurrentCommand()].incrementLocalCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
     else
-        this->infos[client->getCurrentCommand()].incrementRemoteCount(1);
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
     if ((check = client->prefixCheck(message)) != "ok")
         return (this->*(this->replies[check]))(message, client);
 
@@ -461,6 +461,143 @@ int				Server::traceHandler(const Message &message, Client *client)
                 , target);
         sendMessage(Message(":" + from
                 , "TRACE"
+                , *(--list->end()))
+                , &this->sendClients[*(--list->end())]);
+    }
+    return (CONNECT);
+}
+
+int     Server::adminHandler(const Message &message, Client *client)
+{
+    std::string					check;
+    std::string					from;
+    std::vector<std::string>	*list;
+    size_t						parameterSize;
+    strClientPtrIter			found;
+    Client						*target;
+
+    client->setCurrentCommand("ADMIN");
+    if (client->getStatus() == UNKNOWN)
+        return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+    else if (client->getStatus() == USER)
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
+    else
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
+    if ((check = client->prefixCheck(message)) != "ok")
+        return (this->*(this->replies[check]))(message, client);
+
+    parameterSize = message.getParameters().size();
+    if (parameterSize > 1)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+    else if (parameterSize == 1)
+        list = getInfoFromWildcard(message.getParameter(0));
+    else
+        list = getInfoFromWildcard(this->serverName);
+    if (!list)
+    {
+        delete list;
+        return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+    }
+    if (message.getPrefix().empty())
+        from = client->getInfo(NICK);
+    else
+        from = message.getPrefix().substr(1, message.getPrefix().length());
+    found = this->clientList.find(*(--list->end()));
+    target = &this->sendClients[from];
+    if (*(--list->end()) == this->serverName || found != this->clientList.end())
+    {
+
+        sendMessage(Message(this->prefix
+                , RPL_ADMINME
+                , from + " " + *(--list->end())
+                + " :Administrative info")
+                , target);
+        sendMessage(Message(this->prefix
+                    , RPL_ADMINLOC1
+                    , from + " :" + this->adminLoc1)
+                    , target);
+        sendMessage(Message(this->prefix
+                    , RPL_ADMINLOC2
+                    , from + " :" + this->adminLoc2)
+                    , target);
+        sendMessage(Message(this->prefix
+                    , RPL_ADMINEMAIL
+                    , from + " :" + this->adminEmail)
+                    , target);
+    }
+    else
+    {
+        sendMessage(Message(":" + from
+                    , "ADMIN"
+                    , *(--list->end()))
+                    , &this->sendClients[*(--list->end())]);
+    }
+    return (CONNECT);
+}
+
+int     Server::infoHandler(const Message &message, Client *client)
+{
+    std::string					check;
+    std::string					from;
+    std::vector<std::string>	*list;
+    size_t						parameterSize;
+    strClientPtrIter			found;
+    Client						*target;
+
+    client->setCurrentCommand("INFO");
+    if (client->getStatus() == UNKNOWN)
+        return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+    else if (client->getStatus() == USER)
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
+    else
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
+    if ((check = client->prefixCheck(message)) != "ok")
+        return (this->*(this->replies[check]))(message, client);
+
+    parameterSize = message.getParameters().size();
+    if (parameterSize > 1)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+    else if (parameterSize == 1)
+        list = getInfoFromWildcard(message.getParameter(0));
+    else
+        list = getInfoFromWildcard(this->serverName);
+    if (!list)
+    {
+        delete list;
+        return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+    }
+    if (message.getPrefix().empty())
+        from = client->getInfo(NICK);
+    else
+        from = message.getPrefix().substr(1, message.getPrefix().length());
+    found = this->clientList.find(*(--list->end()));
+    target = &this->sendClients[from];
+    if (*(--list->end()) == this->serverName || found != this->clientList.end())
+    {
+        sendMessage(Message(this->prefix
+                , RPL_INFO
+                , from
+                  + " :" + this->version)
+                , target);
+        sendMessage(Message(this->prefix
+                , RPL_INFO
+                , from + " :Birth Data: "
+                + getTimestamp(this->startTime, false))
+                , target);
+        sendMessage(Message(this->prefix
+                , RPL_INFO
+                , from + " :Uptime: "
+                + getTimestamp(std::time(NULL) - this->startTime, true))
+                , target);
+        sendMessage(Message(this->prefix
+                , RPL_ENDOFINFO
+                , from + " :End of INFO list")
+                , target);
+    }
+    else
+    {
+        sendMessage(Message(":" + from
+                , "INFO"
                 , *(--list->end()))
                 , &this->sendClients[*(--list->end())]);
     }
