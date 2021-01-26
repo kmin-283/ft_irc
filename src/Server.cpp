@@ -257,7 +257,9 @@ void				Server::getChildServer(std::list<std::string> &serverList, std::string k
 
 std::string				Server::getParentServer(std::string key)
 {
-	if (this->serverList.count(key) || this->serverName == key)
+	if (!this->sendClients.count(key)
+	|| this->serverList.count(key)
+	|| this->serverName == key)
 		return (key);
 	return (this->getParentServer(this->sendClients[key].getInfo(UPLINKSERVER)));
 }

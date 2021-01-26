@@ -35,6 +35,7 @@ void			Server::registerReplies(void)
 	this->replies[RPL_NICK] = &Server::rNickHandler;
 	this->replies[RPL_NICKBROADCAST] = &Server::rNickBroadcastHandler;
 	this->replies[RPL_USERBROADCAST] = &Server::rUserBroadcastHandler;
+	this->replies[RPL_USERMODEBROADCAST] = &Server::rUserModeBroadcastHandler;
 	this->replies[RPL_PASS] = &Server::rPassHandler;
 	this->replies[RPL_SERVER] = &Server::rServerHandler;
 	this->replies[RPL_HOST] = &Server::rHostHandler;
