@@ -309,45 +309,6 @@ int					Server::nickHandler(const Message &message, Client *client)
 	return (this->localNickHandler(message, client));
 }
 
-<<<<<<< HEAD
-=======
-static bool			isVaildUserName(const Message &message)
-{
-	for (size_t i = 0; i < message.getParameter(0).length(); i++)
-	{
-		if (isInTheMask(std::string(USER_FORMAT), message.getParameter(0)[i]))
-			return false;
-	}
-	return true;
-}
-
-
-static void			setUser(const Message &message, Client *client, std::string address,
-					std::map<std::string, Client> &sendClients, std::string serverName)
-{
-	std::string		realName;
-	std::string		userName;
-
-	userName = (message.getParameter(0)[0] == '~' ?
-	message.getParameter(0).substr(1, message.getParameter(0).length())
-	: message.getParameter(0));
-	realName = (message.getParameter(3)[0] == ':' ?
-	message.getParameter(3).substr(1, message.getParameter(3).length())
-	: message.getParameter(3));
-	client->setInfo(USERNAME, userName);
-	client->setInfo(UPLINKSERVER, serverName);
-	client->setInfo(ADDRESS, address);
-	client->setInfo(REALNAME, realName);
-	if (client->getInfo(NICK) != "")
-	{
-		(sendClients[client->getInfo(NICK)]).setInfo(USERNAME, userName);
-		(sendClients[client->getInfo(NICK)]).setInfo(UPLINKSERVER, serverName);
-		(sendClients[client->getInfo(NICK)]).setInfo(ADDRESS, address);
-		(sendClients[client->getInfo(NICK)]).setInfo(REALNAME, realName);
-	}
-}
-
->>>>>>> b99bf7e46ba571ad6bd48a1156e2afb9e476f92e
 int					Server::setLocalUser(const Message &message, Client *client)
 {
 	if (client->getStatus() == UNKNOWN)
@@ -395,11 +356,6 @@ int					Server::setRemoteUser(const Message &message, Client *client)
 		return ((this->*(this->replies[ERR_PREFIX]))(message, client));
 	if (message.getParameters().size() != 4)
 		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-<<<<<<< HEAD
-=======
-	if (!isValidIpv4(message.getParameter(1)))
-		return (CONNECT);
->>>>>>> b99bf7e46ba571ad6bd48a1156e2afb9e476f92e
 	this->getChildServer(serverList, client->getInfo(SERVERNAME));
 	serverList.push_back(client->getInfo(SERVERNAME));
 	iterator = std::find(serverList.begin(), serverList.end(), message.getParameter(2));
