@@ -16,33 +16,19 @@ static bool			isVaildUserName(const Message &message)
 {
 	for (size_t i = 0; i < message.getParameter(0).length(); i++)
 	{
-		if (isValidFormat(std::string(USER_FORMAT), message.getParameter(0)[i]))
+		if (isInTheMask(std::string(USER_FORMAT), message.getParameter(0)[i]))
 			return false;
 	}
 	return true;
 }
 
-// static bool			isVaildIpAddress(const Message &message)
-// {
-// 	for(size_t i = 0; i < message.getParameter(1).length(); i++)
-// 	{
-// 		if (i == 0 && !isValidFormat(std::string(DIGIT), message.getParameter(1)[i]))
-// 			return (false);
-// 		if (i == message.getParameter(1).length() - 1 && isValidFormat(std::string(".:"), message.getParameter(1)[i]))
-// 			return (false);
-// 		else if (!isValidFormat(std::string(DIGIT) + std::string(".:"), message.getParameter(1)[i]))
-// 			return (false);
-// 	}
-// 	return (true);
-// }
-
 static bool			isValidUserMode(const std::string &string)
 {
 	for (size_t i = 0; i < string.length(); i++)
 	{
-		if (i != 0 && !isValidFormat(std::string(MODEUSER), string[i]))
+		if (i != 0 && !isInTheMask(std::string(MODEUSER), string[i]))
 			return (false);
-		else if (!isValidFormat(std::string(MODEUSER) + std::string("+-"), string[i]))
+		else if (!isInTheMask(std::string(MODEUSER) + std::string("+-"), string[i]))
 			return (false);
 	}
 	return (true);
@@ -52,7 +38,7 @@ static bool			isValidHopCountToken(const std::string &string)
 {
 	for (size_t i = 0; i < string.length(); i++)
 	{
-		if (!isValidFormat(std::string(DIGIT), string[i]))
+		if (!isInTheMask(std::string(DIGIT), string[i]))
 			return (false);
 	}
 	return (true);
