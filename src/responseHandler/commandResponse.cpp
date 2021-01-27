@@ -437,6 +437,7 @@ int		Server::rPassHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
+	client->setCurrentCommand("PASS");
 	parameters = this->pass;
 	sendMessage = Message("", RPL_PASS, parameters + " " + this->version + " ada|sdasdasd");
 	this->sendMessage(sendMessage, client);
@@ -449,6 +450,7 @@ int		Server::rHostHandler(const Message &message, Client *client)
 	Message			sendMessage;
 
 	(void)message;
+	client->setCurrentCommand("SERVER");
 	parameters += this->serverName;
 	parameters += std::string(" ");
 	parameters += client->getInfo(HOPCOUNT);
@@ -483,6 +485,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 				parameters += std::to_string(ft_atoi(it->second.getInfo(HOPCOUNT).c_str()) + 1);
 				parameters += std::string(" 0 ");
 				parameters += it->second.getInfo(SERVERINFO);
+				client->setCurrentCommand("SERVER");
 				sendMessage = Message(prefix, RPL_SERVER, parameters);
 				this->sendMessage(sendMessage, client);
 			}
@@ -491,6 +494,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 				prefix = "";
 				parameters = it->second.getInfo(NICK);
 				parameters += std::string(" :1");
+				client->setCurrentCommand("NICK");
 				sendMessage = Message(prefix, RPL_NICK, parameters);
 				this->sendMessage(sendMessage, client);
 				parameters.clear();
@@ -504,6 +508,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 				parameters += it->second.getInfo(HOSTNAME);
 				parameters += " :";
 				parameters += it->second.getInfo(REALNAME);
+				client->setCurrentCommand("USER");
 				sendMessage = Message(prefix, RPL_USER, parameters);
 				this->sendMessage(sendMessage, client);
 			}
@@ -560,6 +565,14 @@ int				Server::rKillHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int				Server::rReplyHandler(const Message &message, Client *client)
+{
+    (void)client;
+    if (this->sendClients.count(message.getParameter(0)))
+        sendMessage(message, &this->sendClients[message.getParameter(0)]);
+	return (CONNECT);
+}
+
 int				Server::rStatsM(const Message &message, Client *client)
 {
 	std::string parameter;
@@ -568,7 +581,7 @@ int				Server::rStatsM(const Message &message, Client *client)
 		parameter = client->getInfo(NICK);
 	else
 		parameter = message.getPrefix().substr(1, message.getPrefix().length());
-	for (std::map<std::string, Info>::iterator it = this->infos.begin(); it != this->infos.end(); ++it)
+	for (std::map<std::string, Info>::iterator it = this->infosPerCommand.begin(); it != this->infosPerCommand.end(); ++it)
 	{
 		if (std::isalpha(it->first[0]) && (it->second.getLocalCount() != "0" || it->second.getRemoteCount() != "0"))
 		{
@@ -583,17 +596,6 @@ int				Server::rStatsM(const Message &message, Client *client)
 	}
 	return (CONNECT);
 }
-
-//  :irc.example.net 211 localhost.6670 localhost.3000 0 5 290 3 92 :25
-//  :irc.example.net 211 localhost.6670 localhost.3001 0 5 290 3 92 :23
-//  :irc.example.net 211 localhost.6670 localhost.6670 138 7 462 3 77 :21
-//  :irc.example.net 219 localhost.6670 l :End of STATS report
-
-
-//  :irc.example.net 211 localhost.6670 localhost.3000 0 5 290 3 92 :33
-//  :irc.example.net 211 localhost.6670 localhost.3001 0 5 290 3 92 :31
-//  :irc.example.net 211 localhost.6670 localhost.6670 138 11 731 4 117 :29
-//  :irc.example.net 219 localhost.6670 l :End of STATS reportt
 
 int				Server::rStatsL(const Message &message, Client *client)
 {
@@ -613,8 +615,6 @@ int				Server::rStatsL(const Message &message, Client *client)
 		parameter += it->second->getInfo(USERNAME);
 		parameter += "@";
 		parameter += it->second->getInfo(HOSTNAME);
-		it->second->incrementQueryData(RECVMSG, 1);
-		it->second->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 		sendMessage(Message(this->prefix
 							, RPL_STATSLINKINFO
 							, parameter
@@ -625,8 +625,6 @@ int				Server::rStatsL(const Message &message, Client *client)
 							+ " " + it->second->getQueryData(RECVBYTES)
 							+ " :" + std::to_string(current - it->second->getStartTime()))
 							, client);
-		it->second->incrementQueryData(RECVMSG, -1);
-		it->second->incrementQueryData(RECVBYTES, -message.getTotalMessage().length());
 	}
 
 	for (strClientPtrIter it = this->serverList.begin(); it != this->serverList.end(); ++it)
@@ -637,8 +635,6 @@ int				Server::rStatsL(const Message &message, Client *client)
 			parameter = message.getPrefix().substr(1, message.getPrefix().length());
 		parameter += " ";
 		parameter += it->second->getInfo(SERVERNAME);
-		it->second->incrementQueryData(RECVMSG, 1);
-		it->second->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 		sendMessage(Message(this->prefix
 							, RPL_STATSLINKINFO
 							, parameter
@@ -649,8 +645,6 @@ int				Server::rStatsL(const Message &message, Client *client)
 							+ " " + it->second->getQueryData(RECVBYTES)
 							+ " :" + std::to_string(current - it->second->getStartTime()))
 							, client);
-		it->second->incrementQueryData(RECVMSG, -1);
-		it->second->incrementQueryData(RECVBYTES, -message.getTotalMessage().length());
 	}
 	return (CONNECT);
 }

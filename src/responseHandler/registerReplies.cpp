@@ -15,6 +15,13 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NOSUCHSERVER] = &Server::eNoSuchServer;
 	this->replies[ERR_UNKNOWNCOMMAND] = &Server::eUnknownCommand;
 
+	this->replies[ERR_NOTREGISTERED] = &Server::eNotRegistered;
+
+	this->replies[ERR_NORECIPIENT] = &Server::eNoRecipients;
+	this->replies[ERR_NOTEXTTOSEND] = &Server::eNoTextToSend;
+	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
+
+
 
 
 
@@ -47,11 +54,10 @@ void			Server::registerReplies(void)
 	this->replies[RPL_QUIT] = &Server::rQuitHandler;
 
 
-	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 	this->replies[STATS_L] = &Server::rStatsL;
 	this->replies[STATS_M] = &Server::rStatsM;
 	this->replies[STATS_U] = &Server::rStatsU;
+	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 
-//	this->replies[STATS_O] = &Server::rStatsO;
 	this->replies[RPL_ENDOFLINKS] = &Server::rEndOfLinks;
 }

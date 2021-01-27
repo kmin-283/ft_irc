@@ -31,6 +31,12 @@
 # define RPL_MYINFO "004"
 # define RPL_BOUNCE "005"
 
+# define RPL_TRACELINK "200"
+# define RPL_TRACEOPER "204"
+# define RPL_TRACEUSER "205"
+# define RPL_TRACESERVER "206"
+# define RPL_TRACEEND "262"
+
 # define RPL_STATSLINKINFO "211"
 # define RPL_STATSCOMMANDS "212"
 # define RPL_STATSCLINE "213"
@@ -55,10 +61,18 @@
 # define RPL_LUSERCHANNELS "254"
 # define RPL_LUSERME "255"
 
+# define RPL_ADMINME "256"
+# define RPL_ADMINLOC1 "257"
+# define RPL_ADMINLOC2 "258"
+# define RPL_ADMINEMAIL "259"
+
 # define RPL_VERSION "351"
 
 # define RPL_LINKS "364"
 # define RPL_ENDOFLINKS "365"
+
+# define RPL_INFO "371"
+# define RPL_ENDOFINFO "374"
 
 # define RPL_MOTDCONTENT "372"
 # define RPL_MOTDSTART "375"

@@ -1,15 +1,15 @@
 #include "Server.hpp"
 
 Server::Server(const char *pass, const char *port)
-	: version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
-	, port(port), mainSocket(0), maxFd(0), run(true)
+	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
+	, port(port), mainSocket(0), maxFd(0), run(true), adminLoc1("kmin"), adminLoc2("Seoul"), adminEmail("admin@admin.irc")
 {
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 
 	this->registerCommands();
 	this->registerReplies();
-	this->initInfo();
+	this->initInfosPerCommand();
 	this->motdDir = std::string("./ft_irc.motd");
 	this->serverName = std::string("localhost.") + this->port;
 	this->startTime = std::time(NULL);
@@ -18,12 +18,12 @@ Server::Server(const char *pass, const char *port)
 Server::~Server(void)
 {}
 
-void					Server::initInfo(void)
+void					Server::initInfosPerCommand(void)
 {
 	std::map<std::string, int (Server::*)(const Message &, Client *)>::iterator it;
 
 	for (it = this->commands.begin(); it != this->commands.end(); ++it)
-		this->infos.insert(std::pair<std::string, Info>(it->first, Info()));
+		this->infosPerCommand.insert(std::pair<std::string, Info>(it->first, Info()));
 }
 
 void					Server::renewFd(const int fd)
@@ -134,16 +134,8 @@ void					Server::receiveMessage(const int fd)
 			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
 			if (this->commands.find(sendMessage.getCommand()) != this->commands.end())
 			{
-				if (sender.getStatus() == USER)
-				{
-					sender.incrementQueryData(SENDMSG, 1);
-					sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
-				}
-				else if (sender.getStatus() == SERVER)
-				{
-					sender.incrementQueryData(SENDMSG, 1);
-					sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
-				}
+				sender.incrementQueryData(SENDMSG, 1);
+				sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
 				connectionStatus = (this->*(this->commands[sendMessage.getCommand()]))(sendMessage, &sender);
 			}
 			sender.clearReceivedMessageStr();
@@ -154,7 +146,7 @@ void					Server::receiveMessage(const int fd)
 	if (readResult == 0)
 		this->disconnectClient(sendMessage, &sender);
 	if (connectionStatus == TOTALDISCONNECT)
-		this->clearClient(&sender);
+		this->clearClient();
 }
 
 static struct addrinfo	*getAddrInfo(const std::string info)
@@ -216,25 +208,26 @@ void					Server::connectServer(std::string address)
 	this->renewFd(newFd);
 	Client newClient(newFd);
 
-	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
+	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));	
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
 	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF); //토큰 추가
+	this->acceptClients[newFd].setCurrentCommand("PASS");
 	this->sendMessage(passMessage, &this->acceptClients[newFd]);
+	this->acceptClients[newFd].setCurrentCommand("SERVER");
 	this->sendMessage(serverMessage, &this->acceptClients[newFd]);
+	rOtherServerHandler(Message(), &newClient);
 	std::cout << "Connect other server." << std::endl;
-
-
-	// Message versionMessage(std::string(":localhost.3000 VERSION irc.example.net")+ CR_LF);
-	// this->sendMessage(versionMessage, &newClient);
-	// std::cout << "versionnn" << std::endl;
 }
 
-void					Server::clearClient(Client *client)
+void					Server::clearClient(void)
 {
-	close(client->getFd());
-	FD_CLR(client->getFd(), &this->readFds);
-	this->sendClients.clear();
+    for (int i = this->mainSocket; i < this->maxFd; ++i)
+    {
+        close(i);
+        FD_CLR(i, &this->readFds);
+    }
+    this->sendClients.clear();
 	this->serverList.clear();
 	this->clientList.clear();
 	this->acceptClients.clear();
@@ -243,7 +236,6 @@ void					Server::clearClient(Client *client)
 void				Server::getChildServer(std::list<std::string> &serverList, std::string key)
 {
 	std::map<std::string, Client>::iterator	iterator;
-
 	for(iterator = this->sendClients.begin(); iterator != this->sendClients.end(); ++iterator)
 	{
 		if (iterator->second.getInfo(UPLINKSERVER) == key)
@@ -285,7 +277,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 {
 	std::string stringKey;
 
-	stringKey = client->getInfo(NICK);
+	stringKey = client->getInfo(1);
 	if (this->acceptClients.count(client->getFd()))
 	{
 		if (this->clientList.count(stringKey))
@@ -311,19 +303,13 @@ void					Server::sendMessage(const Message &message, Client *client)
 {
 	//TODO 512자가 넘은 경우 나누어 전송해야함
 	if (client->getStatus() == USER)
-	{
-		incrementLcountAndByte(client->getCurrentCommand(), message);
-		client->incrementQueryData(RECVMSG, 1);
-		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
-	}
-	else if (client->getStatus() == SERVER)
-	{
-		incrementRcountAndByte(client->getCurrentCommand(), message);
-		client->incrementQueryData(RECVMSG, 1);
-		client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
-	}
+		incrementLocalByte(client, message);
+	else
+		incrementRemoteByte(client, message);
+	client->incrementQueryData(RECVMSG, 1);
+	client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
-		std::cerr << ERROR_SEND_FAIL << std::endl;
+	    std::cerr << ERROR_SEND_FAIL << std::endl;
 }
 
 void					Server::broadcastMessage(const Message &message, Client *client)
@@ -332,9 +318,7 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
-		if (iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-		{
-			this->sendMessage(message, iterator->second);
-		}
+		if (client == NULL || iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
+            this->sendMessage(message, iterator->second);
 	}
 }

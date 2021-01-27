@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		networkIndex = 1;
 		portIndex = argc - 2;
 		passIndex = argc - 1;
-		if (stringCheck(argv[portIndex], "0123456789", '.'))
+		if (isValidPort(std::string(argv[portIndex])))
 		{
 			server = new Server(argv[passIndex], argv[portIndex]);
 			try

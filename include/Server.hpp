@@ -59,9 +59,12 @@ private:
 
 	bool																run;
 
+	std::string                                                         adminLoc1;
+	std::string                                                         adminLoc2;
+	std::string                                                         adminEmail;
 	std::time_t															startTime;
 
-	std::map<std::string, Info>											infos;
+	std::map<std::string, Info>											infosPerCommand;
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
@@ -88,6 +91,13 @@ private:
 	int																	timeHandler(const Message &message, Client *client);
 	int																	connectHandler(const Message &message, Client *client);
 
+	int																	traceHandler(const Message &message, Client *client);
+	int																	privmsgHandler(const Message &message, Client *client);
+
+	int                                                                 adminHandler(const Message &message, Client *client);
+
+	int                                                                 infoHandler(const Message &message, Client *client);
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -102,6 +112,10 @@ private:
 	int																	eCantKillServerHandler(const Message &message, Client *client);
 	int																	eNoSuchServer(const Message &message, Client *client);
 	int																	eUnknownCommand(const Message &message, Client *client);
+	int																	eNotRegistered(const Message &message, Client *client);
+	int																	eNoRecipients(const Message &message, Client *client);
+	int																	eNoTextToSend(const Message &message, Client *client);
+	int																	eNoSuchNick(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);
@@ -131,11 +145,14 @@ private:
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitHandler(const Message &message, Client *client);
 
+	int																	rReplyHandler(const Message &message, Client *client);
+
 	int																	rStatsL(const Message &message, Client *client);
 	int																	rStatsM(const Message &message, Client *client);
 	int																	rStatsO(const Message &message, Client *client);
 	int																	rStatsU(const Message &message, Client *client);
 	int																	rEndOfStats(const Message &message, Client *client);
+
 	int																	rEndOfLinks(const Message &message, Client *client);
 
 	void																renewFd(const int fd);
@@ -146,7 +163,7 @@ private:
 	void																connectClient(void);
 	void																disconnectClient(const Message &message, Client *client);
 	void																disconnectChild(const Message &message, Client *client);
-	void																clearClient(Client *client);
+	void																clearClient(void);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
 	void																receiveMessage(const int fd);
@@ -155,9 +172,9 @@ private:
 	void																settingClient(const Message &message, Client *client);
 	std::vector<std::string>											*getInfoFromWildcard(const std::string &info);
 
-	void																initInfo(void);
-	void																incrementLcountAndByte(const std::string &command, const Message &message);
-	void																incrementRcountAndByte(const std::string &command, const Message &message);
+	void																initInfosPerCommand(void);
+	void																incrementLocalByte(Client *client, const Message &message);
+	void																incrementRemoteByte(Client *client, const Message &message);
 
 	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
 public:
