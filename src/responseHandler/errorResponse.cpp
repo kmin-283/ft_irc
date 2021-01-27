@@ -198,6 +198,8 @@ int		Server::eNotRegistered(const Message &message, Client *client)
 						, ERR_NOTREGISTERED
 						, "* :Connection not registered")
 						, client);
+	return (CONNECT);
+}
 
 int		Server::eNoRecipients(const Message &message, Client *client)
 {
