@@ -407,3 +407,23 @@ int					Server::quitHandler(const Message &message, Client *client)
 		return (this->remoteQuitHandler(message, client));
 	return (this->localQuitHandler(message, client));
 }
+
+int					Server::operHandler(const Message &message, Client *client)
+{
+	if (client->getStatus() == USER)
+	{
+		if (message.getPrefix() != "" && message.getPrefix() != client->getInfo(NICK))
+			return ((this->*(this->replies[ERR_PREFIX]))(message, client));
+		if (message.getParameters().size() != 2)
+			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+		if (this->operName != message.getParameter(0))
+			return ((this->*(this->replies[ERR_NOOPERHOST]))(message, client));
+		if (this->operPass != message.getParameter(1))
+			return ((this->*(this->replies[ERR_PASSWDMISMATCH]))(message, client));
+		setMode(std::string("+o"), client, this->sendClients);
+		(this->*(this->replies[RPL_USERMODEBROADCAST]))(message, client);
+		(this->*(this->replies[RPL_USERMODE]))(message, client);
+		return ((this->*(this->replies[RPL_YOUREOPER]))(message, client));
+	}
+	return ((this->*(this->replies[ERR_NOTREGISTERED]))(message, client));
+}

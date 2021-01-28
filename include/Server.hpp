@@ -66,6 +66,9 @@ private:
 
 	std::map<std::string, Info>											infosPerCommand;
 
+	std::string															operName;
+	std::string															operPass;
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
@@ -82,6 +85,7 @@ private:
 	int																	localQuitHandler(const Message &message, Client *client);
 	int																	remoteQuitHandler(const Message &message, Client *client);
 	int																	quitHandler(const Message &message, Client *client);
+	int																	operHandler(const Message &message, Client *client);
 	int																	serverHandler(const Message &message, Client *client);
 	int																	squitHandler(const Message &message, Client *client);
 	int																	wallopsHandler(const Message &message, Client *client);
@@ -105,6 +109,7 @@ private:
 	int																	eErroneusNickNameHandler(const Message &message, Client *client);
 	int																	eNickNameInUseHandler(const Message &message, Client *client);
 	int																	eAlreadyRegisteredHandler(const Message &message, Client *client);
+	int																	eNotRegisteredHandler(const Message &message, Client *client);
 	int																	ePassUnauthorizedHandler(const Message &message, Client *client);
 	int																	eErroneusUserNameHandler(const Message &message, Client *client);
 	int																	ePrefixHandler(const Message &message, Client *client);
@@ -116,7 +121,8 @@ private:
 	int																	eNoRecipients(const Message &message, Client *client);
 	int																	eNoTextToSend(const Message &message, Client *client);
 	int																	eNoSuchNick(const Message &message, Client *client);
-
+	int																	eNoOperHostHandler(const Message &message, Client *client);
+	int																	eNoPassMisMatchHandler(const Message &message, Client *client);
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
@@ -138,12 +144,14 @@ private:
 	int																	rPassHandler(const Message &message, Client *client);
 	int																	rServerHandler(const Message &message, Client *client);
 	int																	rHostHandler(const Message &message, Client *client);
+	int																	rUserModeHandler(const Message &message, Client *client);
 	int																	rOtherServerHandler(const Message &message, Client *client);
 	int																	rServerBroadcastHandler(const Message &message, Client *client);
 	int																	rKillHandler(const Message &message, Client *client);
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitHandler(const Message &message, Client *client);
+	int																	rYourOper(const Message &message, Client *client);
 
 	int																	rReplyHandler(const Message &message, Client *client);
 

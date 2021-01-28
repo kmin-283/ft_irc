@@ -7,11 +7,13 @@ void	Server::registerCommands(void)
 	this->commands["USER"] = &Server::userHandler;
 	this->commands["SERVER"] = &Server::serverHandler;
 	this->commands["SQUIT"] = &Server::squitHandler;
+	this->commands["QUIT"] = &Server::quitHandler;
+	this->commands["OPER"] = &Server::operHandler;
 	this->commands["WALLOPS"] = &Server::wallopsHandler;
 
 	this->commands["VERSION"] = &Server::versionHandler;
 	this->commands[RPL_VERSION] = &Server::rReplyHandler;
-	
+
 	this->commands["STATS"] = &Server::statsHandler;
 	this->commands[RPL_STATSLINKINFO] = &Server::rReplyHandler;
 	this->commands[RPL_STATSCOMMANDS] = &Server::rReplyHandler;

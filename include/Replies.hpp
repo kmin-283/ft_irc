@@ -8,6 +8,7 @@
 # define RPL_NICK "NICK"
 # define RPL_USER "USER"
 # define RPL_MODE "MODE"
+# define RPL_USERMODE "USER MODE"
 # define RPL_HOST "HOST"
 # define RPL_OTHERSERVER "OTHER SERVER"
 # define RPL_SERVER "SERVER"
@@ -18,6 +19,7 @@
 # define RPL_KILL "KILL"
 # define RPL_SQUIT "SQUIT"
 # define RPL_QUIT "QUIT"
+# define RPL_OPER "OPER"
 # define RPL_SQUITBROADCAST "SQUIT BROADCAST"
 # define RPL_QUITBROADCAST "QUIT BROADCAST"
 
@@ -78,6 +80,8 @@
 # define RPL_MOTDSTART "375"
 # define RPL_ENDOFMOTD "376"
 
+# define RPL_YOUREOPER "381"
+
 # define RPL_TIME "391"
 
 # define ERR_NOSUCHNICK "401"
@@ -113,5 +117,7 @@
 # define ERR_PASSWDMISMATCH "464"
 
 # define ERR_CANTKILLSERVER "483"
+
+# define ERR_NOOPERHOST "491"
 
 #endif

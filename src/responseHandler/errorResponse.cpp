@@ -25,6 +25,32 @@ int		Server::eNeedMoreParamsHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int		Server::eNoOperHostHandler(const Message &message, Client *client)
+{
+	std::string	parameters;
+	Message		sendMessage;
+
+	(void)message;
+	parameters = client->getInfo(NICK) == "" ? "*" : client->getInfo(NICK);
+	parameters += std::string(" :Invalid operator host");
+	sendMessage = Message(this->prefix, ERR_NOOPERHOST, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int		Server::eNoPassMisMatchHandler(const Message &message, Client *client)
+{
+	std::string	parameters;
+	Message		sendMessage;
+
+	(void)message;
+	parameters = client->getInfo(NICK) == "" ? "*" : client->getInfo(NICK);
+	parameters += std::string(" :Invalid password");
+	sendMessage = Message(this->prefix, ERR_PASSWDMISMATCH, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
 int		Server::eErroneusNickNameHandler(const Message &message, Client *client)
 {
 	std::string	parameters;
@@ -190,14 +216,16 @@ int		Server::eUnknownCommand(const Message &message, Client *client)
 	return (CONNECT);
 }
 
-
-int		Server::eNotRegistered(const Message &message, Client *client)
+int		Server::eNotRegisteredHandler(const Message &message, Client *client)
 {
+	std::string	parameters;
+	Message		sendMessage;
+
 	(void)message;
-	sendMessage(Message(this->prefix
-						, ERR_NOTREGISTERED
-						, "* :Connection not registered")
-						, client);
+	parameters = client->getInfo(NICK) == "" ? "*" : client->getInfo(NICK);
+	parameters += std::string(" :Connection not registered");
+	sendMessage = Message(this->prefix, ERR_NOTREGISTERED, parameters);
+	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
 

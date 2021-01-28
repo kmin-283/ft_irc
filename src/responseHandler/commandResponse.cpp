@@ -423,11 +423,43 @@ int				Server::rUserModeBroadcastHandler(const Message &message, Client *client)
 	prefix = std::string(":");
 	prefix += client->getInfo(NICK);
 	parameters = client->getInfo(NICK);
-	parameters += std::string(" +");
-	parameters += client->getInfo(USERMODE);
+	if (message.getCommand() == RPL_NICK)
+	{
+		parameters += std::string(" +");
+		parameters += client->getInfo(USERMODE);
+	}
+	else if (message.getCommand() == RPL_OPER)
+		parameters += std::string(" :+o");
 	sendMessage = Message(prefix, RPL_MODE, parameters);
 	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
 	? &this->acceptClients[client->getFd()] : client));
+	return (CONNECT);
+}
+
+int				Server::rUserModeHandler(const Message &message, Client *client)
+{
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	parameters = client->getInfo(NICK);
+	parameters += std::string(" :+");
+	parameters += client->getInfo(USERMODE);
+	sendMessage = Message(this->prefix, RPL_MODE, parameters);
+	this->sendMessage(sendMessage, client);
+	return (CONNECT);
+}
+
+int				Server::rYourOper(const Message &message, Client *client)
+{
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	parameters = client->getInfo(NICK) == "" ? "*" : client->getInfo(NICK);
+	parameters += std::string(" :You are now an IRC Operator");
+	sendMessage = Message(this->prefix, RPL_YOUREOPER, parameters);
+	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
 

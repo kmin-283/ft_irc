@@ -15,11 +15,13 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NOSUCHSERVER] = &Server::eNoSuchServer;
 	this->replies[ERR_UNKNOWNCOMMAND] = &Server::eUnknownCommand;
 
-	this->replies[ERR_NOTREGISTERED] = &Server::eNotRegistered;
+	this->replies[ERR_NOTREGISTERED] = &Server::eNotRegisteredHandler;
 
 	this->replies[ERR_NORECIPIENT] = &Server::eNoRecipients;
 	this->replies[ERR_NOTEXTTOSEND] = &Server::eNoTextToSend;
 	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
+	this->replies[ERR_NOOPERHOST] = &Server::eNoOperHostHandler;
+	this->replies[ERR_PASSWDMISMATCH] = &Server::eNoPassMisMatchHandler;
 
 
 
@@ -46,6 +48,8 @@ void			Server::registerReplies(void)
 	this->replies[RPL_PASS] = &Server::rPassHandler;
 	this->replies[RPL_SERVER] = &Server::rServerHandler;
 	this->replies[RPL_HOST] = &Server::rHostHandler;
+	this->replies[RPL_USERMODE] = &Server::rUserModeHandler;
+
 	this->replies[RPL_OTHERSERVER] = &Server::rOtherServerHandler;
 	this->replies[RPL_SERVERBROADCAST] = &Server::rServerBroadcastHandler;
 	this->replies[RPL_KILL] = &Server::rKillHandler;
@@ -60,4 +64,5 @@ void			Server::registerReplies(void)
 	this->replies[RPL_ENDOFSTATS] = &Server::rEndOfStats;
 
 	this->replies[RPL_ENDOFLINKS] = &Server::rEndOfLinks;
+	this->replies[RPL_YOUREOPER] = &Server::rYourOper;
 }

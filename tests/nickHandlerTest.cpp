@@ -1279,6 +1279,102 @@ TEST(ServerSendNickMessageTest, RegisterUserBroadCast)
 	}
 }
 
+TEST(ServerSendNickMessageTest, RegisterUserSevenManyMode)
+{
+	int		fd[2];
+	Client	*client;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1)
+	{
+		expect(Message(std::string(":lo2 NICK dakim 1 ~deok localhost 1 +oi :1\r\n")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		client = &server.sendClients[std::string("dakim")];
+		CHECK_EQUAL(client->getStatus(), USER);
+		CHECK_EQUAL(client->getInfo(USERNAME), std::string("deok"));
+		CHECK_EQUAL(client->getInfo(REALNAME), std::string("1"));
+		CHECK_EQUAL(client->getInfo(ADDRESS), std::string("localhost"));
+		CHECK_EQUAL(client->getInfo(UPLINKSERVER), std::string("lo2"));
+		CHECK_EQUAL(client->getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(client->getInfo(USERMODE), std::string("oi"));
+		CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+TEST(ServerSendNickMessageTest, RegisterUserBroadCastManyMode)
+{
+	int		i;
+	int		fd[6];
+	char	*result;
+	Client	*registerClient;
+	Client	*otherServer;
+	Client	*anotherServer;
+	Server	server("111", "3000");
+
+	if (pipe(fd) != -1 && pipe(fd + 2) != -1 && pipe(fd + 4) != -1)
+	{
+		otherServer = new Client(fd[3], true);
+		otherServer->setStatus(SERVER);
+		otherServer->setInfo(UPLINKSERVER, std::string("lo1"));
+		otherServer->setInfo(SERVERNAME, std::string("lo3"));
+		otherServer->setInfo(HOPCOUNT, std::string("1"));
+		otherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[otherServer->getInfo(SERVERNAME)] = *otherServer;
+		server.serverList[otherServer->getInfo(SERVERNAME)] = &server.sendClients[otherServer->getInfo(SERVERNAME)];
+
+		anotherServer = new Client(fd[5], true);
+		anotherServer->setStatus(SERVER);
+		anotherServer->setInfo(UPLINKSERVER, std::string("lo2"));
+		anotherServer->setInfo(SERVERNAME, std::string("lo4"));
+		anotherServer->setInfo(HOPCOUNT, std::string("2"));
+		anotherServer->setInfo(SERVERINFO, std::string("sexy server"));
+		server.sendClients[anotherServer->getInfo(SERVERNAME)] = *anotherServer;
+		server.serverList[anotherServer->getInfo(SERVERNAME)] = &server.sendClients[anotherServer->getInfo(SERVERNAME)];
+
+		expect(Message(std::string(":lo2 NICK dakim 1 ~deok localhost 1 +io :1\r\n")), fd[1]);
+		given(server, CONNECT, std::string("dakim"), 1);
+		registerClient = &server.sendClients[std::string("dakim")];
+		CHECK_EQUAL(registerClient->getStatus(), USER);
+		CHECK_EQUAL(registerClient->getInfo(USERNAME), std::string("deok"));
+		CHECK_EQUAL(registerClient->getInfo(REALNAME), std::string("1"));
+		CHECK_EQUAL(registerClient->getInfo(ADDRESS), std::string("localhost"));
+		CHECK_EQUAL(registerClient->getInfo(UPLINKSERVER), std::string("lo2"));
+		CHECK_EQUAL(registerClient->getInfo(NICK), std::string("dakim"));
+		CHECK_EQUAL(registerClient->getInfo(USERMODE), std::string("io"));
+		CHECK_EQUAL(server.sendClients.count(std::string("~deok")), 0);
+		CHECK_EQUAL(server.sendClients.count(std::string("deok")), 0);
+		CHECK_EQUAL(server.clientList.count(std::string("dakim")), 0);
+
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~deok localhost lo2 :1\r"));
+		free(result);
+		get_next_line(fd[2], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim MODE dakim +io\r"));
+		free(result);
+
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string("NICK dakim :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim USER ~deok localhost lo2 :1\r"));
+		free(result);
+		get_next_line(fd[4], &result);
+		CHECK_EQUAL(std::string(result), std::string(":dakim MODE dakim +io\r"));
+		free(result);
+
+		delete otherServer;
+		delete anotherServer;
+		i = -1;
+		while (++i < 6)
+			close(fd[i]);
+	}
+}
+
 TEST(ServerSendNickMessageTest, RegisterUser)
 {
 	Server	server("111", "3000");
