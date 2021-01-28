@@ -73,13 +73,11 @@ void					Server::start(void)
 	timeout.tv_usec = 0;
 	while(run)
 	{
-		it = this->acceptClients.begin();
-		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
+		FD_SET(mainSocket, &readFds);
+		for (std::map<int, Client>::iterator iterator = acceptClients.begin(); iterator != acceptClients.end(); ++iterator)
 		{
-			this->renewFd(listenFd);
-			if (it == acceptClients.end())
-				break ;
-			listenFd = it->second.getFd();
+			FD_SET(iterator->second.getFd(), &readFds);
+			std::cout << iterator->second.getFd() << std::endl;
 		}
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cout << ERROR_SELECT_FAIL << std::endl;
