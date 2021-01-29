@@ -94,6 +94,8 @@ private:
 	int																	traceHandler(const Message &message, Client *client);
 	int																	privmsgHandler(const Message &message, Client *client);
 
+	int     															joinHandler(const Message &message, Client *client);
+
 	int                                                                 adminHandler(const Message &message, Client *client);
 
 	int                                                                 infoHandler(const Message &message, Client *client);

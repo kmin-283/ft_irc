@@ -27,6 +27,7 @@ std::string     getTextMessage(const Message &message)
     std::string textMessage;
 
     textMessage += message.getParameter(0);
+    
     if (message.getParameter(1).at(0) == ':')
     {
         for (int i = 1; i < int(message.getParameters().size()); i++)
