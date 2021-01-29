@@ -5,6 +5,10 @@
 
 class		Channel
 {
+private:
+public:
+    Channel();
+    ~Channel();
 };
 
 #endif

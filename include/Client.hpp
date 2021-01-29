@@ -87,10 +87,15 @@ private:
 	std::string	receivedMessageStr;
 	std::vector<std::string> info;
 	std::vector<size_t> queryData;
-	std::time_t			startTime;
 
 	std::string			currentCommand;
 	std::string			prevCommand;
+
+    std::time_t			startTime;
+    bool                waitPong;
+    std::time_t         lastPing;
+    std::time_t         pingLimit;
+
 public:
 	Client(void);
 	Client(const int fd, const bool isAuthorized = false);
@@ -113,6 +118,14 @@ public:
 	std::string getQueryData(const int &index) const;
 
 	std::time_t	getStartTime(void) const;
+	void        setLastPing(const std::time_t current);
+	std::time_t getLastPing(void) const;
+
+	void        setWaitPong(bool state);
+	bool        getWaitPong(void) const;
+
+	void        setPingLimit(const std::time_t current);
+	std::time_t getPingLimit() const;
 
 	std::string prefixCheck(const Message &message);
 

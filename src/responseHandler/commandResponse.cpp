@@ -313,7 +313,12 @@ int				Server::rSquitBroadcastHandler(const Message &message, Client *client)
 	Message					sendMessage;
 
 	parameters = client->getInfo(SERVERNAME);
-	if (!message.getParameters().empty())
+	if (message.getCommand() == TIMEOUT)
+	{
+	    prefix = ':' + message.getParameter(0);
+        parameters += " :ERROR :Ping timeout";
+    }
+    else if (!message.getParameters().empty())
 	{
 		prefix = message.getPrefix();
 		parameters += std::string(" :ID \"");
@@ -347,7 +352,12 @@ int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
 
 	prefix = std::string(":");
 	parameters = std::string(":");
-	if (message.getCommand() == RPL_NICK)
+	if (message.getCommand() == TIMEOUT)
+	{
+	    prefix = message.getPrefix();
+        parameters += "ERROR :Ping Timeout";
+    }
+    else if (message.getCommand() == RPL_NICK)
 	{
 		prefix += message.getParameter(0);
 		parameters += std::string("Nick collision");

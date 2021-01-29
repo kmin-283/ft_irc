@@ -2,19 +2,21 @@
 
 Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand("")
+	, currentCommand(""), prevCommand(""), waitPong(true)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
 	this->startTime = std::time(NULL);
+	this->lastPing = this->startTime;
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand("")
+	, currentCommand(""), prevCommand(""), waitPong(true)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
 	this->startTime = std::time(NULL);
+	this->lastPing = this->startTime;
 }
 Client::~Client(void)
 {
@@ -100,6 +102,36 @@ std::time_t	Client::getStartTime(void) const
 	return (this->startTime);
 }
 
+void        Client::setLastPing(const std::time_t current)
+{
+    this->lastPing = current;
+}
+
+std::time_t Client::getLastPing() const
+{
+    return (std::difftime(std::time(NULL), this->lastPing));
+}
+
+void    Client::setWaitPong(bool state)
+{
+    this->waitPong = state;
+}
+
+bool    Client::getWaitPong(void) const
+{
+    return (this->waitPong);
+}
+
+void    Client::setPingLimit(const std::time_t current)
+{
+    this->pingLimit = current;
+}
+
+std::time_t Client::getPingLimit() const
+{
+    return (std::difftime(std::time(NULL), this->pingLimit));
+}
+
 std::string	Client::prefixCheck(const Message &message)
 {
 	std::string ret;
@@ -111,6 +143,8 @@ std::string	Client::prefixCheck(const Message &message)
 	}
 	else if (this->status == SERVER)
 	{
+	    if (message.getCommand() == "PING")
+	        return ("ok");
 		if (message.getPrefix().empty())
 			return (ERR_NEEDMOREPARAMS);
 	}
