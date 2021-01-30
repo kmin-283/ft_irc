@@ -10,7 +10,7 @@ class		Channel
 {
     private:
         std::string                         name;
-        std::map<std::string, Client *>     joinedClients;
+        std::map<std::string, Client *>     joinedUsers;
     
     public:
                                             Channel();
@@ -19,8 +19,12 @@ class		Channel
         void                                setName(const std::string &name);
         const std::string                   getName(void) const;
         
-        void                                joinChannel(Client *);
-        void                                leaveChannel(Client *);
+        void                                enterUser(Client *user);
+        void                                leaveUser(Client *user);
+
+        // 임시로 만듬.
+        int                                 getSize(void);
+        void                                showUsersName(void);
 };
 
 #endif

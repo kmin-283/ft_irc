@@ -100,6 +100,7 @@ private:
 
 	int                                                                 infoHandler(const Message &message, Client *client);
 
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
 	int																	eNoNickNameGivenHandler(const Message &message, Client *client);
@@ -179,6 +180,9 @@ private:
 	void																incrementRemoteByte(Client *client, const Message &message);
 
 	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
+
+	// 디버깅용!
+	int																	show(const Message &message, Client *client);
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);

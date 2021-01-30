@@ -44,4 +44,7 @@ void	Server::registerCommands(void)
     this->commands["INFO"] = &Server::infoHandler;
     this->commands[RPL_INFO] = &Server::rReplyHandler;
     this->commands[RPL_ENDOFINFO] = &Server::rReplyHandler;
+
+	// 디버깅
+	this->commands["SHOW"] = &Server::show;
 }

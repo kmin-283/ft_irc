@@ -322,3 +322,25 @@ void					Server::broadcastMessage(const Message &message, Client *client)
             this->sendMessage(message, iterator->second);
 	}
 }
+
+// 디버깅
+int		Server::show(const Message &message, Client *client)
+{
+	(void)message;
+	(void)client;
+	std::cout << "\033[0;32m== server (" << this->serverName << ") channelList ==\033[0m" << std::endl;
+	
+	// 이 서버에 있는 채널들의 유저들 출력
+	std::map<std::string, Channel>::iterator	it = this->channelList.begin();
+	for (; it != this->channelList.end(); ++it)
+	{
+		std::cout << it->first << " ";
+		it->second.showUsersName();
+	}
+
+	// 메시지를 보낸 유저의 채널 목록들 출력
+	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") subscribedChannels --\033[0m" << std::endl;
+	client->showChannel();
+	std::cout << "======================================================================================" << std::endl;
+	return (CONNECT);
+}

@@ -96,7 +96,7 @@ private:
 	std::string							currentCommand;
 	std::string							prevCommand;
 
-	std::map<std::string, Channel>		subscribedChannels;
+	std::map<std::string, Channel *>	subscribedChannels;
 public:
 										Client(void);
 										Client(const int fd, const bool isAuthorized = false);
@@ -125,6 +125,12 @@ public:
 	void								setCurrentCommand(const std::string &command);
 	const std::string					&getCurrentCommand(void) const;
 	const std::string					&getPrevCommand(void) const;
+
+	void								joinChannel(Channel *channel);
+	void								leaveChannel(Channel *channel);
+
+	// 디버깅
+	void								showChannel(void);
 };
 
 #endif

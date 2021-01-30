@@ -18,16 +18,13 @@ int     Server::joinHandler(const Message &message, Client *client)
             // 없으면 채널 새로 만들기 
             else
             {
-                targetChannel = &Channel(channelName);
+                this->channelList[channelName] = Channel(channelName);
+                targetChannel = &this->channelList[channelName];
             }
-            std::cout << "channelList size = " << channelList.size() << std::endl;
-            std::cout << "channelname = " << targetChannel->getName() << std::endl;
-            // 새로 만든 채널을 서버의 채널 리스트에 추가
-
             // 유저의 가입 채널 리스트에 채널 추가
-
+            client->joinChannel(targetChannel);
             // 채널의 유저 리스트에도 유저 추가 
-
+            targetChannel->enterUser(client);
             // 같은 채널 안에 있는 유저들에게 메시지 전송
 
             // 353
