@@ -128,6 +128,7 @@ public:
 
 	void								joinChannel(Channel *channel);
 	void								leaveChannel(Channel *channel);
+	Channel*							findChannel(std::string channelName);
 
 	// 디버깅
 	void								showChannel(void);

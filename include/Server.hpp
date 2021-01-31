@@ -181,6 +181,9 @@ private:
 
 	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
 
+	// privmsgHandler에 있음 join도 사용
+	std::string     													getClientPrefix(Client *client);
+
 	// 디버깅용!
 	int																	show(const Message &message, Client *client);
 public:

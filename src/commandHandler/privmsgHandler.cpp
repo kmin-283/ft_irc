@@ -8,19 +8,6 @@
  * 
  */
 
-std::string     getClientPrefix(Client *client)
-{
-    std::string prefix;
-
-    prefix += client->getInfo(NICK);
-    prefix += std::string("!~");
-    prefix += client->getInfo(USERNAME);
-    prefix += std::string("@");
-    prefix += client->getInfo(HOSTNAME);
-
-    return (prefix);
-}
-
 // PRIVMSG 이후에 보낼 메시지 리턴
 std::string     getTextMessage(const Message &message)
 {
@@ -36,6 +23,19 @@ std::string     getTextMessage(const Message &message)
     else
         textMessage += (" :" + message.getParameter(1));
     return (textMessage);
+}
+
+// getUserPrefix랑 같은 함수
+std::string     Server::getClientPrefix(Client *client)
+{
+	std::string returnString;
+
+	returnString += client->getInfo(NICK);
+	returnString += std::string("!~");
+	returnString += client->getInfo(USERNAME);
+	returnString += std::string("@");
+	returnString += client->getInfo(HOSTNAME);
+	return (returnString);
 }
 
 int     Server::privmsgHandler(const Message &message, Client *client)
