@@ -95,6 +95,7 @@ private:
 	int																	privmsgHandler(const Message &message, Client *client);
 
 	int     															joinHandler(const Message &message, Client *client);
+	int     															partHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 

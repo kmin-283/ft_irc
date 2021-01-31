@@ -9,7 +9,7 @@ SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
-SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp privmsgHandler.cpp joinHandler.cpp
+SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp privmsgHandler.cpp channelHandler.cpp
 
 SRC_COM_DIR = ./src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))

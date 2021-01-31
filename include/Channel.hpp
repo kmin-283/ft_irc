@@ -10,8 +10,10 @@ class		Channel
 {
     private:
         std::string                         name;
+        std::map<std::string, Client *>     operators;      // 채널 관리자, 여러명 가능, 앞에 @ 붙음.
         std::map<std::string, Client *>     joinedUsers;
         std::string                         key;
+        std::string                         topic;
     
     public:
                                             Channel();
@@ -28,7 +30,7 @@ class		Channel
         std::string                         getUserNameList(void);
 
         // 임시로 만듬.
-        int                                 getSize(void);
+        int                                 getNumbersOfUsers(void);
         void                                showUsersName(void);
 };
 

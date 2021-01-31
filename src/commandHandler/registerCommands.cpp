@@ -34,6 +34,7 @@ void	Server::registerCommands(void)
 	this->commands["PRIVMSG"] = &Server::privmsgHandler;
 
 	this->commands["JOIN"] = &Server::joinHandler;
+	this->commands["PART"] = &Server::partHandler;
 
 	this->commands["ADMIN"] = &Server::adminHandler;
 	this->commands[RPL_ADMINME] = &Server::rReplyHandler;

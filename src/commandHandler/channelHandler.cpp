@@ -18,6 +18,8 @@ int     Server::joinHandler(const Message &message, Client *client)
     std::vector<Client *>       joinedUsers;
     Channel                     *targetChannel;
 
+    // 인자 애러 처리 해야함.
+
     if (client->getStatus() == USER)
     {   
         channelNames = getChannelNames(message.getParameter(0));
@@ -59,9 +61,63 @@ int     Server::joinHandler(const Message &message, Client *client)
             }
             // 403 No such channel (채널 이름 오류)
             else
-                this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " No such channel"), client);
+                this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " No such channel"), client);
         }
+        // UNKNOWN 일때 451 애러
     }
     
     return (CONNECT);
 }
+
+int     Server::partHandler(const Message &message, Client *client)
+{
+    std::string                 channelName;
+    std::vector<std::string>    channelNames;
+    std::vector<Client *>       joinedUsers;
+    Channel                     *targetChannel;
+
+    // ngircd는 이상하게 2개까지 받음 -> 2812가 2개까지 받음
+    if (message.getParameters().size() != 1)
+        return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+
+    if (client->getStatus() == USER)
+    {
+        channelNames = getChannelNames(message.getParameter(0));
+        for (int i = 0; i < (int)channelNames.size(); i++)
+        {
+            channelName = channelNames[i];
+
+            if (client->findChannel(channelName))
+            {
+                targetChannel = &this->channelList[channelName];
+                
+                client->leaveChannel(targetChannel);
+
+                targetChannel->leaveUser(client);
+                // 채널에 아무도 없으면 서버에서 채널 삭제
+                if (targetChannel->getNumbersOfUsers() == 0)
+                {
+                    this->channelList.erase(channelName);
+                    this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), client);
+                    // 채널에 혼자 남았을 때 자기 자신에게 part 메시지를 보내고 끝남.
+                    continue;
+                }
+                
+                joinedUsers = targetChannel->getUsersList();
+                for (int i = 0; i < (int)joinedUsers.size(); i++)
+                    this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), joinedUsers[i]);
+                
+            }
+            // 442
+            else if (this->channelList.find(channelName) != this->channelList.end())
+                this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + channelName + " :You are not on that channel"), client);
+            // 403
+            else
+                this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " No such channel"), client);
+        }
+    }
+    // UNKNOWN 일때 451 애러
+    // SERVER 일때 461???
+    return (CONNECT);
+}
+
