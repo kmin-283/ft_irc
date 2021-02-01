@@ -66,10 +66,14 @@
 # define RPL_ADMINLOC2 "258"
 # define RPL_ADMINEMAIL "259"
 
+# define RPL_NOTOPIC "331"
+
 # define RPL_VERSION "351"
+# define RPL_NAMREPLY "353"
 
 # define RPL_LINKS "364"
 # define RPL_ENDOFLINKS "365"
+# define RPL_ENDOFNAMES "366"
 
 # define RPL_INFO "371"
 # define RPL_ENDOFINFO "374"

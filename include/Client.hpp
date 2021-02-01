@@ -3,6 +3,9 @@
 
 #include "utils.hpp"
 #include "Replies.hpp"
+#include "Channel.hpp"
+
+class Channel;
 
 enum ClientStatus
 {
@@ -81,13 +84,13 @@ enum QueryData
 class Client
 {
 private:
-	int fd;
-	bool isAuthorized;
+	int 								fd;
+	bool								isAuthorized;
 
-	ClientStatus status;
-	std::string	receivedMessageStr;
-	std::vector<std::string> info;
-	std::vector<size_t> queryData;
+	ClientStatus 						status;
+	std::string							receivedMessageStr;
+	std::vector<std::string> 			info;
+	std::vector<size_t> 				queryData;
 
 	std::string			currentCommand;
 	std::string			prevCommand;
@@ -96,6 +99,8 @@ private:
     bool                waitPong;
     std::time_t         lastPing;
     std::time_t         pingLimit;
+  
+  std::map<std::string, Channel *>	subscribedChannels;
 
 public:
 	Client(void);
@@ -133,6 +138,14 @@ public:
 	void				setCurrentCommand(const std::string &command);
 	const std::string	&getCurrentCommand(void) const;
 	const std::string	&getPrevCommand(void) const;
+  
+  void								joinChannel(Channel *channel);
+	void								leaveChannel(Channel *channel);
+	Channel*							findChannel(std::string channelName);
+
+	// 디버깅
+	void								showChannel(void);
+
 };
 
 #endif

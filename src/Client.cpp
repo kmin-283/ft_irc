@@ -166,3 +166,30 @@ const std::string	&Client::getPrevCommand(void) const
 {
 	return (this->prevCommand);
 }
+
+void	Client::joinChannel(Channel *channel)
+{
+	this->subscribedChannels[channel->getName()] = channel;
+}
+
+void	Client::leaveChannel(Channel *channel)
+{
+	this->subscribedChannels.erase(channel->getName());
+}
+
+Channel*	Client::findChannel(std::string channelName)
+{
+	if (this->subscribedChannels.find(channelName) != this->subscribedChannels.end())
+		return (this->subscribedChannels[channelName]);
+	else
+		return (nullptr);	
+}
+
+void	Client::showChannel(void)
+{
+	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();
+	std::cout << "[ ";
+	for (; it != this->subscribedChannels.end(); it++)
+		std::cout << it->first << " ";
+	std::cout << "] " << std::endl;
+}

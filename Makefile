@@ -3,13 +3,14 @@ CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra
 NAME = ircserv
 INCLUDE = -I ./include/
 
-SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp
+SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp Channel.cpp
 SRC_DIR = ./src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
 SRC_LIB = libirc.a
 
-SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp privmsgHandler.cpp Channel.cpp
+SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp privmsgHandler.cpp channelHandler.cpp
+
 
 SRC_COM_DIR = ./src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))
