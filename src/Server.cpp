@@ -91,7 +91,7 @@ void					Server::start(void)
             }
 	        if (!it->second.getWaitPong() && it->second.getPingLimit() > PING_LIMIT)
             {
-	            this->disconnectClient(Message(this->prefix
+	            this->disconnectClient(Message(":" + it->second.getInfo(1)
                         , TIMEOUT // timeout
                         , it->second.getInfo(1)
                           + " :ERROR: ping timeout"), &it->second);
