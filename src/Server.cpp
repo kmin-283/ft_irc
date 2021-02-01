@@ -231,7 +231,7 @@ void					Server::connectServer(std::string address)
 	this->renewFd(newFd);
 	Client newClient(newFd);
 
-	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));	
+	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
 	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF); //토큰 추가
@@ -272,7 +272,9 @@ void				Server::getChildServer(std::list<std::string> &serverList, std::string k
 
 std::string				Server::getParentServer(std::string key)
 {
-	if (this->serverList.count(key) || this->serverName == key)
+	if (!this->sendClients.count(key)
+	|| this->serverList.count(key)
+	|| this->serverName == key)
 		return (key);
 	return (this->getParentServer(this->sendClients[key].getInfo(UPLINKSERVER)));
 }

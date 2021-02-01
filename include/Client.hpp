@@ -19,6 +19,7 @@ enum UserIndex
 	ADDRESS,
 	USERNAME,
 	REALNAME,
+	USERMODE
 };
 
 enum ServerIndex
@@ -129,7 +130,7 @@ public:
 
 	std::string prefixCheck(const Message &message);
 
-	void				setCurrentCommand(const std::string &command);	
+	void				setCurrentCommand(const std::string &command);
 	const std::string	&getCurrentCommand(void) const;
 	const std::string	&getPrevCommand(void) const;
 };

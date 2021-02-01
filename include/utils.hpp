@@ -34,6 +34,8 @@
 # define DIGIT "0123456789"
 # define SPECIAL "-[]\\`^{|}"
 # define USER_FORMAT "\r\n @"
+# define MODEUSER "aiwroOs"
+# define MODECHANNEL "oOvaimnqpsrtklber"
 
 # define SSL_PORT "6669"
 # define ERROR -1
@@ -47,6 +49,7 @@
 
 # define DEFAULT_SIZE 10
 # define NUM_OF_COMMANDS 30
+
 
 # define TIMEOUT "T"
 # define PING_LIMIT 10

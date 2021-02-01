@@ -144,6 +144,7 @@ private:
 	int																	rNickHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
 	int																	rUserBroadcastHandler(const Message &message, Client *client);
+	int																	rUserModeBroadcastHandler(const Message &message, Client *client);
 	int																	rPassHandler(const Message &message, Client *client);
 	int																	rServerHandler(const Message &message, Client *client);
 	int																	rHostHandler(const Message &message, Client *client);
