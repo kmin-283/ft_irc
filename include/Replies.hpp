@@ -66,6 +66,8 @@
 # define RPL_ADMINLOC2 "258"
 # define RPL_ADMINEMAIL "259"
 
+# define RPL_NOTOPIC "331"
+
 # define RPL_VERSION "351"
 # define RPL_NAMREPLY "353"
 

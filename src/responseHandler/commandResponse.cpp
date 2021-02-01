@@ -157,7 +157,7 @@ int		Server::rLUserChannelHandler(const Message &message, Client *client)
 	(void)message;
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" ");
-	stream << this->channelList.size();
+	stream << (this->localChannelList.size() + this->remoteChannelList.size());
 	parameters += stream.str();
 	parameters += std::string(" :channels formed");
 	sendMessage = Message(this->prefix, RPL_LUSERCHANNELS, parameters);

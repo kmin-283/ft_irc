@@ -20,7 +20,9 @@ class		Channel
                                             Channel(const std::string &name);
                                             ~Channel();
         void                                setName(const std::string &name);
-        const std::string                   getName(void) const;
+        const std::string                   &getName(void) const;
+        void                                setTopic(const std::string &topic);
+        const std::string                   &getTopic(void) const;
         
         std::vector<Client *>               getUsersList(void);
 

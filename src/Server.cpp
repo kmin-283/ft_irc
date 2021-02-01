@@ -331,13 +331,19 @@ int		Server::show(const Message &message, Client *client)
 	std::cout << "\033[0;32m== server (" << this->serverName << ") channelList ==\033[0m" << std::endl;
 	
 	// 이 서버에 있는 채널들의 유저들 출력
-	std::map<std::string, Channel>::iterator	it = this->channelList.begin();
-	for (; it != this->channelList.end(); ++it)
+	std::map<std::string, Channel>::iterator	it = this->localChannelList.begin();
+	for (; it != this->localChannelList.end(); ++it)
 	{
-		std::cout << it->first << " ";
+		std::cout << "L " << it->first << " ";
 		it->second.showUsersName();
 	}
 
+	it = this->remoteChannelList.begin();
+	for (; it != this->remoteChannelList.end(); it++)
+	{
+		std::cout << "R " << it->first << " ";
+		it->second.showUsersName();
+ 	}
 	// 메시지를 보낸 유저의 채널 목록들 출력
 	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") subscribedChannels --\033[0m" << std::endl;
 	client->showChannel();

@@ -55,7 +55,8 @@ private:
 	std::map<std::string, Client *>										serverList;
 	std::map<std::string, Client *>										clientList;
 	std::map<std::string, Client *>										serviceList;
-	std::map<std::string, Channel>										channelList;
+	std::map<std::string, Channel>										localChannelList;
+	std::map<std::string, Channel>										remoteChannelList;
 
 	bool																run;
 
@@ -96,6 +97,7 @@ private:
 
 	int     															joinHandler(const Message &message, Client *client);
 	int     															partHandler(const Message &message, Client *client);
+	int     															topicHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 

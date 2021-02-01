@@ -3,7 +3,7 @@
 Channel::Channel() {}
 
 Channel::Channel(const std::string& name)
-    : name(name) {}
+    : name(name), topic("") {}
 
 Channel::~Channel() {}
 
@@ -12,10 +12,21 @@ void    Channel::setName(const std::string& name)
     this->name = name;
 }
 
-const std::string   Channel::getName(void) const
+const std::string   &Channel::getName(void) const
 {
     return (this->name);
 }
+
+void    Channel::setTopic(const std::string& topic)
+{
+    this->topic = topic;
+}
+
+const std::string   &Channel::getTopic(void) const
+{
+    return (this->topic);
+}
+
 
 std::vector<Client *> Channel::getUsersList(void)
 {
