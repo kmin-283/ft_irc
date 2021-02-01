@@ -99,8 +99,8 @@ private:
     bool                waitPong;
     std::time_t         lastPing;
     std::time_t         pingLimit;
-  
-  std::map<std::string, Channel *>	subscribedChannels;
+	
+	std::map<std::string, Channel *>	subscribedChannels;
 
 public:
 	Client(void);
@@ -138,8 +138,7 @@ public:
 	void				setCurrentCommand(const std::string &command);
 	const std::string	&getCurrentCommand(void) const;
 	const std::string	&getPrevCommand(void) const;
-  
-  void								joinChannel(Channel *channel);
+	void								joinChannel(Channel *channel);
 	void								leaveChannel(Channel *channel);
 	Channel*							findChannel(std::string channelName);
 

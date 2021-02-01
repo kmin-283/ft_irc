@@ -52,8 +52,8 @@
 
 
 # define TIMEOUT "T"
-# define PING_LIMIT 10
-# define PING_CYCLE 5
+# define PING_LIMIT 40
+# define PING_CYCLE 40
 
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
