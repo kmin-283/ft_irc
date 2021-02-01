@@ -231,7 +231,7 @@ void					Server::connectServer(std::string address)
 	this->renewFd(newFd);
 	Client newClient(newFd);
 
-	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));	
+	this->acceptClients.insert(std::pair<int, Client>(newFd, newClient));
 	std::string password = address.substr(address.rfind(":") + 1, address.length() - 1);
 	Message passMessage("PASS " + password + CR_LF);
 	Message serverMessage("SERVER " + this->serverName + " 1 " + this->info + CR_LF); //토큰 추가
@@ -272,7 +272,9 @@ void				Server::getChildServer(std::list<std::string> &serverList, std::string k
 
 std::string				Server::getParentServer(std::string key)
 {
-	if (this->serverList.count(key) || this->serverName == key)
+	if (!this->sendClients.count(key)
+	|| this->serverList.count(key)
+	|| this->serverName == key)
 		return (key);
 	return (this->getParentServer(this->sendClients[key].getInfo(UPLINKSERVER)));
 }
@@ -342,4 +344,32 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 		if (client == NULL || iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
             this->sendMessage(message, iterator->second);
 	}
+}
+
+// 디버깅
+int		Server::show(const Message &message, Client *client)
+{
+	(void)message;
+	(void)client;
+	std::cout << "\033[0;32m== server (" << this->serverName << ") channelList ==\033[0m" << std::endl;
+	
+	// 이 서버에 있는 채널들의 유저들 출력
+	std::map<std::string, Channel>::iterator	it = this->localChannelList.begin();
+	for (; it != this->localChannelList.end(); ++it)
+	{
+		std::cout << "L " << it->first << " ";
+		it->second.showUsersName();
+	}
+
+	it = this->remoteChannelList.begin();
+	for (; it != this->remoteChannelList.end(); it++)
+	{
+		std::cout << "R " << it->first << " ";
+		it->second.showUsersName();
+ 	}
+	// 메시지를 보낸 유저의 채널 목록들 출력
+	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") subscribedChannels --\033[0m" << std::endl;
+	client->showChannel();
+	std::cout << "======================================================================================" << std::endl;
+	return (CONNECT);
 }

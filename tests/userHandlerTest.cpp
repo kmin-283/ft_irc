@@ -550,20 +550,20 @@ TEST(ServerSendUserMessageNotUserTest, ParameterSizeError)
 	}
 }
 
-TEST(ServerSendUserMessageNotUserTest, AddressError)
-{
-	int		fd[2];
-	Server	server("111", "3000");
+// TEST(ServerSendUserMessageNotUserTest, AddressError)
+// {
+// 	int		fd[2];
+// 	Server	server("111", "3000");
 
-	if (pipe(fd) != -1)
-	{
-		expect(Message(std::string(":dakim"), std::string("USER"), std::string("~deok sdfsfsdfs lo2 :sdf")), fd[1]);
-		given(server, CONNECT, std::string("dakim"), 1);
-		CHECK_EQUAL(server.sendClients[std::string("dakim")].getStatus(), UNKNOWN);
-		close(fd[0]);
-		close(fd[1]);
-	}
-}
+// 	if (pipe(fd) != -1)
+// 	{
+// 		expect(Message(std::string(":dakim"), std::string("USER"), std::string("~deok sdfsfsdfs lo2 :sdf")), fd[1]);
+// 		given(server, CONNECT, std::string("dakim"), 1);
+// 		CHECK_EQUAL(server.sendClients[std::string("dakim")].getStatus(), UNKNOWN);
+// 		close(fd[0]);
+// 		close(fd[1]);
+// 	}
+// }
 
 TEST(ServerSendUserMessageNotUserTest, ServerNameError)
 {

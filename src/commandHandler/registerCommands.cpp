@@ -33,6 +33,10 @@ void	Server::registerCommands(void)
 
 	this->commands["PRIVMSG"] = &Server::privmsgHandler;
 
+	this->commands["JOIN"] = &Server::joinHandler;
+	this->commands["PART"] = &Server::partHandler;
+	this->commands["TOPIC"] = &Server::topicHandler;
+
 	this->commands["ADMIN"] = &Server::adminHandler;
 	this->commands[RPL_ADMINME] = &Server::rReplyHandler;
     this->commands[RPL_ADMINLOC1] = &Server::rReplyHandler;
@@ -43,6 +47,8 @@ void	Server::registerCommands(void)
     this->commands[RPL_INFO] = &Server::rReplyHandler;
     this->commands[RPL_ENDOFINFO] = &Server::rReplyHandler;
 
-    this->commands["PING"] = &Server::pingHandler;
-    this->commands["PONG"] = &Server::pongHandler;
+	// 디버깅
+	this->commands["SHOW"] = &Server::show;
+  this->commands["PING"] = &Server::pingHandler;
+  this->commands["PONG"] = &Server::pongHandler;
 }

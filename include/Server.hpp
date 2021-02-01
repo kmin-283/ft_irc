@@ -58,7 +58,8 @@ private:
 	std::map<std::string, Client *>										serverList;
 	std::map<std::string, Client *>										clientList;
 	std::map<std::string, Client *>										serviceList;
-	std::map<std::string, Channel>										channelList;
+	std::map<std::string, Channel>										localChannelList;
+	std::map<std::string, Channel>										remoteChannelList;
 
 	bool																run;
 
@@ -100,12 +101,16 @@ private:
 	int																	traceHandler(const Message &message, Client *client);
 	int																	privmsgHandler(const Message &message, Client *client);
 
+	int     															joinHandler(const Message &message, Client *client);
+	int     															partHandler(const Message &message, Client *client);
+	int     															topicHandler(const Message &message, Client *client);
+
 	int                                                                 adminHandler(const Message &message, Client *client);
 
 	int                                                                 infoHandler(const Message &message, Client *client);
 
 	int                                                                 pingHandler(const Message &message, Client *client);
-    int                                                                 pongHandler(const Message &message, Client *client);
+  int                                                                 pongHandler(const Message &message, Client *client);
 
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
@@ -144,6 +149,7 @@ private:
 	int																	rNickHandler(const Message &message, Client *client);
 	int																	rNickBroadcastHandler(const Message &message, Client *client);
 	int																	rUserBroadcastHandler(const Message &message, Client *client);
+	int																	rUserModeBroadcastHandler(const Message &message, Client *client);
 	int																	rPassHandler(const Message &message, Client *client);
 	int																	rServerHandler(const Message &message, Client *client);
 	int																	rHostHandler(const Message &message, Client *client);
@@ -186,6 +192,12 @@ private:
 	void																incrementRemoteByte(Client *client, const Message &message);
 
 	Client																*hasTarget(const std::string &target, strClientPtrIter start, strClientPtrIter end);
+
+	// privmsgHandler에 있음 join도 사용
+	std::string     													getClientPrefix(Client *client);
+
+	// 디버깅용!
+	int																	show(const Message &message, Client *client);
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);

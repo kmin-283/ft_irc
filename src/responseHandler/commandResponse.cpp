@@ -4,6 +4,8 @@ int		Server::rRegisterUserHandler(const Message &message, Client *client)
 {
 	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
 	(this->*(this->replies[RPL_USERBROADCAST]))(message, client);
+	if (client->getInfo(USERMODE) != "")
+		(this->*(this->replies[RPL_USERMODEBROADCAST]))(message, client);
 	client->setStatus(USER);
 	this->sendClients[client->getInfo(NICK)].setStatus(USER);
 	return (CONNECT);
@@ -155,7 +157,7 @@ int		Server::rLUserChannelHandler(const Message &message, Client *client)
 	(void)message;
 	parameters = client->getInfo(NICK);
 	parameters += std::string(" ");
-	stream << this->channelList.size();
+	stream << (this->localChannelList.size() + this->remoteChannelList.size());
 	parameters += stream.str();
 	parameters += std::string(" :channels formed");
 	sendMessage = Message(this->prefix, RPL_LUSERCHANNELS, parameters);
@@ -375,6 +377,7 @@ int				Server::rQuitBroadcastHandler(const Message &message, Client *client)
 	this->broadcastMessage(sendMessage, client);
 	return (CONNECT);
 }
+
 int				Server::rQuitHandler(const Message &message, Client *client)
 {
 	std::string			parameters;
@@ -420,6 +423,23 @@ int				Server::rUserBroadcastHandler(const Message &message, Client *client)
 	return (CONNECT);
 }
 
+int				Server::rUserModeBroadcastHandler(const Message &message, Client *client)
+{
+	std::string		prefix;
+	std::string		parameters;
+	Message			sendMessage;
+
+	(void)message;
+	prefix = std::string(":");
+	prefix += client->getInfo(NICK);
+	parameters = client->getInfo(NICK);
+	parameters += std::string(" +");
+	parameters += client->getInfo(USERMODE);
+	sendMessage = Message(prefix, RPL_MODE, parameters);
+	this->broadcastMessage(sendMessage, (!this->clientList.count(client->getInfo(NICK))
+	? &this->acceptClients[client->getFd()] : client));
+	return (CONNECT);
+}
 
 int		Server::rPassHandler(const Message &message, Client *client)
 {
