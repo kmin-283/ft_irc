@@ -34,6 +34,7 @@ class		Channel
         // 임시로 만듬.
         int                                 getNumbersOfUsers(void);
         void                                showUsersName(void);
+
 };
 
 #endif

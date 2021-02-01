@@ -11,6 +11,7 @@ SRC_LIB = libirc.a
 
 SRC_COM = registerCommands.cpp passHandler.cpp userHandler.cpp serverHandler.cpp wallopsHandler.cpp infoHandler.cpp privmsgHandler.cpp channelHandler.cpp
 
+
 SRC_COM_DIR = ./src/commandHandler/
 SRCS_COM = $(addprefix $(SRC_COM_DIR), $(SRC_COM))
 OBJS_COM = $(SRCS_COM:%.cpp=%.o)

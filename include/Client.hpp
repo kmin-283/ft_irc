@@ -91,47 +91,60 @@ private:
 	std::string							receivedMessageStr;
 	std::vector<std::string> 			info;
 	std::vector<size_t> 				queryData;
-	std::time_t							startTime;
 
-	std::string							currentCommand;
-	std::string							prevCommand;
+	std::string			currentCommand;
+	std::string			prevCommand;
 
+    std::time_t			startTime;
+    bool                waitPong;
+    std::time_t         lastPing;
+    std::time_t         pingLimit;
+	
 	std::map<std::string, Channel *>	subscribedChannels;
+
 public:
-										Client(void);
-										Client(const int fd, const bool isAuthorized = false);
-										~Client(void);
-	Client 								&operator=(const Client &client);
-	const int 							&getFd(void) const;
-	const ClientStatus 					&getStatus(void) const;
-	void 								setStatus(const ClientStatus &status);
-	const bool 							&getIsAuthorized(void) const;
-	void 								setIsAuthorized(bool isAuthorized);
-	void 								setInfo(const int &index, const std::string &myPrefix);
-	std::string							getReceivedMessageStr() const;
-	void								addReceivedMessageStr(char buffer);
-	void								clearReceivedMessageStr(void);
+	Client(void);
+	Client(const int fd, const bool isAuthorized = false);
+	~Client(void);
+	Client &operator=(const Client &client);
+	const int &getFd(void) const;
+	const ClientStatus &getStatus(void) const;
+	void setStatus(const ClientStatus &status);
+	const bool &getIsAuthorized(void) const;
+	void setIsAuthorized(bool isAuthorized);
+	void setInfo(const int &index, const std::string &myPrefix);
+	std::string		getReceivedMessageStr() const;
+	void			addReceivedMessageStr(char buffer);
+	void			clearReceivedMessageStr(void);
 
-	const std::string 					&getInfo(const int &index) const;
-	const std::vector<std::string> 		&getInfo(void) const;
+	const std::string &getInfo(const int &index) const;
+	const std::vector<std::string> &getInfo(void) const;
 
-	void 								incrementQueryData(const int &index, const int &val);
-	std::string 						getQueryData(const int &index) const;
+	void incrementQueryData(const int &index, const int &val);
+	std::string getQueryData(const int &index) const;
 
-	std::time_t							getStartTime(void) const;
+	std::time_t	getStartTime(void) const;
+	void        setLastPing(const std::time_t current);
+	std::time_t getLastPing(void) const;
 
-	std::string 						prefixCheck(const Message &message);
+	void        setWaitPong(bool state);
+	bool        getWaitPong(void) const;
 
-	void								setCurrentCommand(const std::string &command);
-	const std::string					&getCurrentCommand(void) const;
-	const std::string					&getPrevCommand(void) const;
+	void        setPingLimit(const std::time_t current);
+	std::time_t getPingLimit() const;
 
+	std::string prefixCheck(const Message &message);
+
+	void				setCurrentCommand(const std::string &command);
+	const std::string	&getCurrentCommand(void) const;
+	const std::string	&getPrevCommand(void) const;
 	void								joinChannel(Channel *channel);
 	void								leaveChannel(Channel *channel);
 	Channel*							findChannel(std::string channelName);
 
 	// 디버깅
 	void								showChannel(void);
+
 };
 
 #endif

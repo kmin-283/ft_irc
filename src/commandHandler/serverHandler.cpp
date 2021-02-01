@@ -19,9 +19,12 @@
 
 void Server::settingClient(const Message &message, Client *client)
 {
+    size_t parameterSize;
+
+    parameterSize = message.getParameters().size();
 	client->setStatus(SERVER);
 	client->setInfo(SERVERNAME, message.getParameter(0));
-	if (message.getParameters().size() == 4)
+	if (parameterSize == 4)
 	{
 		client->setInfo(TOKEN, message.getParameter(2));
 		client->setInfo(SERVERINFO, message.getParameter(3));
@@ -39,7 +42,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	if (client->getStatus() == UNKNOWN)
 	{
 		this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
-		if (!client->getIsAuthorized() || (message.getParameters().size() < 2) // nc로 입력할 때 토큰 없이 입력하는 경우 3
+		if (!client->getIsAuthorized() || (message.getParameters().size() < 3) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 			|| (message.getParameter(0).find('.') == std::string::npos) || client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
@@ -221,5 +224,118 @@ int Server::squitHandler(const Message &message, Client *client)
     }
     else
         return ((this->*(this->replies[ERR_NOSUCHSERVER]))(message, client));
+    return (CONNECT);
+}
+
+int     Server::pingHandler(const Message &message, Client *client)
+{
+    std::string					check;
+    std::string					from;
+    std::string                 target;
+    std::vector<std::string>	*list;
+    size_t						parameterSize;
+
+    client->setCurrentCommand("PING");
+    if (client->getStatus() == UNKNOWN)
+        return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+    else if (client->getStatus() == USER)
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
+    else
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
+    if ((check = client->prefixCheck(message)) != "ok")
+        return (this->*(this->replies[check]))(message, client);
+
+    parameterSize = message.getParameters().size();
+    if (parameterSize > 2)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+    else if (parameterSize == 0)
+        return (this->*(this->replies[ERR_NOORIGIN]))(message, client);
+    else if (parameterSize == 1)
+    {
+        if (message.getParameter(0)[0] == ':')
+        {
+            target = message.getParameter(0).substr(1, message.getParameter(0).length());
+            list = getInfoFromWildcard(target);
+        }
+        else
+        {
+            sendMessage(Message(this->prefix
+                                , "PONG"
+                                , this->serverName
+                                + " :" + message.getParameter(0))
+                                , client);
+            return (CONNECT);
+        }
+    }
+    else
+    {
+        if (message.getParameter(1)[0] == ':')
+        {
+            target = message.getParameter(1).substr(1, message.getParameter(1).length());
+            list = getInfoFromWildcard(target);
+        }
+        else
+        {
+            target = message.getParameter(1);
+            list = getInfoFromWildcard(target);
+        }
+    }
+    if (!list)
+    {
+        delete list;
+        return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+    }
+    if (message.getPrefix().empty())
+        from = client->getInfo(NICK);
+    else
+        from = message.getPrefix().substr(1, message.getPrefix().length());
+    if (parameterSize == 1 || *(--list->end()) == this->serverName)
+    {
+        sendMessage(Message(this->prefix
+                            , "PONG"
+                            , this->serverName + " " + from)
+                            , &this->sendClients[from]);
+    }
+    else
+    {
+        sendMessage(Message(':' + from
+                            , "PING"
+                            , message.getParameter(0) +
+                            " :" + target)
+                            , &this->sendClients[target]);
+    }
+    return (CONNECT);
+}
+
+/*
+ * Sa(ngircd) --- Sb(3000) --- Sc(3002)
+ *                |
+ *                Ua(asd)
+ * 인 경우 user는 갱신안되는 문제 해결하기
+ */
+
+
+int     Server::pongHandler(const Message &message, Client *client)
+{
+    std::string     target;
+    size_t          parameterSize;
+
+    client->setCurrentCommand("PONG");
+    parameterSize = message.getParameters().size();
+    if (parameterSize != 1)
+    {
+        if (message.getParameter(1)[0] == ':')
+            target = message.getParameter(1).substr(1, message.getParameter(1).length());
+        else
+            target = message.getParameter(1);
+    }
+    if (message.getParameters().size() == 1 || target == this->serverName)
+    {
+        client->setWaitPong(true);
+        client->setLastPing(std::time(NULL));
+        client->setPingLimit(std::time(NULL));
+    }
+    else if (this->sendClients.count(target))
+        sendMessage(message, &this->sendClients[target]);
     return (CONNECT);
 }
