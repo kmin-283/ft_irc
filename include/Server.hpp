@@ -31,6 +31,9 @@ private:
 		void															incrementLocalCount(const int &size);
 		std::string													getLocalCount() const;
 	};
+
+//	std::map<std::string, Channel>                                      localChannel;
+//    std::map<std::string, Channel>                                      remoteChannel;
 	std::vector<std::string>											cmd;
 
 	std::string															prefix;
@@ -67,6 +70,9 @@ private:
 
 	std::map<std::string, Info>											infosPerCommand;
 
+	time_t                                                              pingTime;
+	bool                                                                isDeletedClient;
+
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
 	int																	passHandler(const Message &message, Client *client);
@@ -102,6 +108,9 @@ private:
 	int                                                                 adminHandler(const Message &message, Client *client);
 
 	int                                                                 infoHandler(const Message &message, Client *client);
+
+	int                                                                 pingHandler(const Message &message, Client *client);
+  int                                                                 pongHandler(const Message &message, Client *client);
 
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;

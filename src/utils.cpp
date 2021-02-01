@@ -107,7 +107,6 @@ std::string		getTimestamp(const std::time_t &startTime, const bool &forUptime)
 		uptime.tm_mon = 1;
 		uptime.tm_mday = 1;
 		uptime.tm_hour = 9;
-
 	}
 	else
 	{

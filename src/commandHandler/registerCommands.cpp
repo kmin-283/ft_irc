@@ -49,4 +49,6 @@ void	Server::registerCommands(void)
 
 	// 디버깅
 	this->commands["SHOW"] = &Server::show;
+  this->commands["PING"] = &Server::pingHandler;
+  this->commands["PONG"] = &Server::pongHandler;
 }
