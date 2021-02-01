@@ -19,9 +19,12 @@
 
 void Server::settingClient(const Message &message, Client *client)
 {
+    size_t parameterSize;
+
+    parameterSize = message.getParameters().size();
 	client->setStatus(SERVER);
 	client->setInfo(SERVERNAME, message.getParameter(0));
-	if (message.getParameters().size() == 4)
+	if (parameterSize == 4)
 	{
 		client->setInfo(TOKEN, message.getParameter(2));
 		client->setInfo(SERVERINFO, message.getParameter(3));
@@ -39,7 +42,7 @@ int Server::serverHandler(const Message &message, Client *client)
 	if (client->getStatus() == UNKNOWN)
 	{
 		this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
-		if (!client->getIsAuthorized() || (message.getParameters().size() < 2) // nc로 입력할 때 토큰 없이 입력하는 경우 3
+		if (!client->getIsAuthorized() || (message.getParameters().size() < 3) // nc로 입력할 때 토큰 없이 입력하는 경우 3
 			|| (message.getParameter(0).find('.') == std::string::npos) || client->getInfo(NICK) != "" || client->getInfo(USERNAME) != "")
 		{
 			return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));

@@ -89,45 +89,45 @@ int     Server::joinHandler(const Message &message, Client *client)
     }
     else if (client->getStatus() == SERVER)
     {
-        std::string clientName;
+        // std::string clientName;
 
-        // :kmin!2~@loa JOIN :#1
-        if (message.getPrefix().find("!"))
-        {
+        // // :kmin!2~@loa JOIN :#1
+        // if (message.getPrefix().find("!"))
+        // {
             
-        }
-        else
-        {
-            clientName = message.getPrefix().substr(1, message.getPrefix().length());
-            Client      *targetClient = &this->sendClients[clientName];
-        // broadcast 메시지를 받음
-        // local channel user를 봐서 있으면 메시지전송
+        // }
+        // else
+        // {
+        //     clientName = message.getPrefix().substr(1, message.getPrefix().length());
+        //     Client      *targetClient = &this->sendClients[clientName];
+        // // broadcast 메시지를 받음
+        // // local channel user를 봐서 있으면 메시지전송
 
-            channelName = message.getParameter(0).substr(1, message.getParameter(0).length());
-        }        
-        // 현재 서버에 같은 채널의 유저가 있는 경우
+        //     channelName = message.getParameter(0).substr(1, message.getParameter(0).length());
+        // }        
+        // // 현재 서버에 같은 채널의 유저가 있는 경우
 
-        if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
-            targetChannel = &it->second;
-        else if((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
-            targetChannel = &it->second;
-        else
-        {
-            this->remoteChannelList[channelName] = Channel(channelName);
-            targetChannel = &this->remoteChannelList[channelName];
-        }
-        // if (this->remoteChannelList.find(channelName) == this->remoteChannelList.end())
+        // if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
+        //     targetChannel = &it->second;
+        // else if((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
+        //     targetChannel = &it->second;
+        // else
+        // {
         //     this->remoteChannelList[channelName] = Channel(channelName);
-        // targetChannel = &this->remoteChannelList[channelName];
-        // 유저에 채널 리스트에도 채널 추가 
-        // :asdasfasfas COMMAND
-        targetClient->joinChannel(targetChannel);
+        //     targetChannel = &this->remoteChannelList[channelName];
+        // }
+        // // if (this->remoteChannelList.find(channelName) == this->remoteChannelList.end())
+        // //     this->remoteChannelList[channelName] = Channel(channelName);
+        // // targetChannel = &this->remoteChannelList[channelName];
+        // // 유저에 채널 리스트에도 채널 추가 
+        // // :asdasfasfas COMMAND
+        // targetClient->joinChannel(targetChannel);
 
-        targetChannel.toAllUser(message);
-        targetChannel->enterUser(targetClient);
-        // 채널의 유저 리스트에 채널 추가
+        // targetChannel.toAllUser(message);
+        // targetChannel->enterUser(targetClient);
+        // // 채널의 유저 리스트에 채널 추가
 
-        this->broadcastMessage(message, client);
+        // this->broadcastMessage(message, client);
     }
     
     return (CONNECT);

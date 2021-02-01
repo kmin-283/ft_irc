@@ -67,7 +67,7 @@ void					Server::init(void)
 void					Server::start(void)
 {
 	struct timeval timeout;
-	std::map<int, Client>::iterator prev;
+	std::map<int, Client>::iterator next;
 	clientIter it;
 
 	timeout.tv_sec = 2;
@@ -75,8 +75,10 @@ void					Server::start(void)
 	while(run)
 	{
 	    FD_SET(mainSocket, &readFds);
-	    prev = this->acceptClients.begin();
 	    it = this->acceptClients.begin();
+		next = this->acceptClients.begin();
+		if (!this->acceptClients.empty())
+			++next;
 	    while (it != this->acceptClients.end())
 	    {
 	        isDeletedClient = false;
@@ -91,18 +93,23 @@ void					Server::start(void)
             }
 	        if (!it->second.getWaitPong() && it->second.getPingLimit() > PING_LIMIT)
             {
-	            this->disconnectClient(Message(this->prefix
+	            this->disconnectClient(Message(":" + it->second.getInfo(1)
                         , TIMEOUT // timeout
                         , it->second.getInfo(1)
-                          + " :ERROR: ping timeout"), &it->second);
-	            isDeletedClient = true;
-	            it = prev;
+                        + " :ERROR: ping timeout"), &it->second);
+				if (this->acceptClients.empty())
+					break;
+				isDeletedClient = true;
+				it = next;
 	            // user를 삭제하는 경우에 다른 서버로 quit이 전송 안됨.
-            }
-	        if (!isDeletedClient)
-	            FD_SET(it->second.getFd(), &readFds);
-	        prev = it;
-	        ++it;
+			}
+			if (!isDeletedClient)
+	        {
+				FD_SET(it->second.getFd(), &readFds);
+				if (next != this->acceptClients.end())
+					++next;
+				++it;
+			}
         }
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cout << ERROR_SELECT_FAIL << std::endl;
