@@ -42,4 +42,7 @@ void	Server::registerCommands(void)
     this->commands["INFO"] = &Server::infoHandler;
     this->commands[RPL_INFO] = &Server::rReplyHandler;
     this->commands[RPL_ENDOFINFO] = &Server::rReplyHandler;
+
+    this->commands["PING"] = &Server::pingHandler;
+    this->commands["PONG"] = &Server::pongHandler;
 }
