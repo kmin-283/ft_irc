@@ -246,3 +246,14 @@ int		Server::eNoSuchNick(const Message &message, Client *client)
 	this->sendMessage(sendMessage, client);
 	return (CONNECT);
 }
+
+int     Server::eNoOrigin(const Message &message, Client *client)
+{
+    (void)message;
+    sendMessage(Message(this->prefix
+                        , ERR_NOORIGIN
+                        , client->getInfo(NICK)
+                        + " :No Origin Specified")
+                        , client);
+    return (CONNECT);
+}
