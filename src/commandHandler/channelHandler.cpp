@@ -63,7 +63,7 @@ int     Server::joinHandler(const Message &message, Client *client)
                 // 같은 채널 안에 있는 유저들에게 메시지 전송
                 // 1. local channel user에게 메시지 전송
                 // 2. broadcast 전송
-                joinedUsers = targetChannel->getUsersList();
+                joinedUsers = targetChannel->getUsersList("all");
                 for (int i = 0; i < (int)joinedUsers.size(); i++)
                     this->sendMessage(Message(":" + getClientPrefix(client), "JOIN", ":" + channelName), joinedUsers[i]);
                 // 다른 서버에도 보냄.
@@ -87,49 +87,41 @@ int     Server::joinHandler(const Message &message, Client *client)
         }
         // UNKNOWN 일때 451 애러
     }
-    // else if (client->getStatus() == SERVER)
-    // {
-    //     std::string clientName;
+    else if (client->getStatus() == SERVER)
+    {
+         std::string    clientName;
+         Client         *targetClient;
+         size_t         idx;
+         // :kmin!2~@loa JOIN :#1
+         if ((idx = message.getPrefix().find("!", 0)) != std::string::npos)
+             clientName = message.getPrefix().substr(1, idx-1);
+         else
+             clientName = message.getPrefix().substr(1, message.getPrefix().length());
+         targetClient = &this->sendClients[clientName];
+         // broadcast 메시지를 받음
+         // local channel user를 봐서 있으면 메시지전송
+         channelName = message.getParameter(0).substr(1, message.getParameter(0).length());
+         // 현재 서버에 같은 채널의 유저가 있는 경우
 
-    //     // :kmin!2~@loa JOIN :#1
-    //     if (message.getPrefix().find("!"))
-    //     {
-            
-    //     }
-    //     else
-    //     {
-    //         clientName = message.getPrefix().substr(1, message.getPrefix().length());
-    //         Client      *targetClient = &this->sendClients[clientName];
-    //     // broadcast 메시지를 받음
-    //     // local channel user를 봐서 있으면 메시지전송
-
-    //         channelName = message.getParameter(0).substr(1, message.getParameter(0).length());
-    //     }        
-    //     // 현재 서버에 같은 채널의 유저가 있는 경우
-
-    //     if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
-    //         targetChannel = &it->second;
-    //     else if((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
-    //         targetChannel = &it->second;
-    //     else
-    //     {
-    //         this->remoteChannelList[channelName] = Channel(channelName);
-    //         targetChannel = &this->remoteChannelList[channelName];
-    //     }
-    //     if (this->remoteChannelList.find(channelName) == this->remoteChannelList.end())
-    //         this->remoteChannelList[channelName] = Channel(channelName);
-    //     targetChannel = &this->remoteChannelList[channelName];
-    //     유저에 채널 리스트에도 채널 추가 
-    //     :asdasfasfas COMMAND
-    //     targetClient->joinChannel(targetChannel);
-
-    //     targetChannel.toAllUser(message);
-    //     targetChannel->enterUser(targetClient);
-    //     채널의 유저 리스트에 채널 추가
-
-    //     this->broadcastMessage(message, client);
-    // }
-    
+         if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
+             targetChannel = &it->second;
+         else if((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
+             targetChannel = &it->second;
+         else
+         {
+             this->remoteChannelList[channelName] = Channel(channelName);
+             targetChannel = &this->remoteChannelList[channelName];
+         }
+         targetClient->joinChannel(targetChannel);
+         if (idx != std::string::npos)
+         {
+             joinedUsers = targetChannel->getUsersList(this->serverName);
+             for (int i = 0; i < (int)joinedUsers.size(); i++)
+                 this->sendMessage(message, joinedUsers[i]);
+         }
+         this->broadcastMessage(message, client);
+         targetChannel->enterUser(targetClient);
+    }
     return (CONNECT);
 }
 
@@ -169,7 +161,7 @@ int     Server::partHandler(const Message &message, Client *client)
                 // 자신 한테도 part 메시지를 날려야 함.
                 this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), client);
 
-                joinedUsers = targetChannel->getUsersList();
+                joinedUsers = targetChannel->getUsersList("all");
                 for (int i = 0; i < (int)joinedUsers.size(); i++)
                     this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), joinedUsers[i]);
                 

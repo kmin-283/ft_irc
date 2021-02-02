@@ -28,17 +28,22 @@ const std::string   &Channel::getTopic(void) const
 }
 
 
-std::vector<Client *> Channel::getUsersList(void)
+std::vector<Client *> Channel::getUsersList(const std::string &mask)
 {
     std::vector<Client *> users;
     
     std::map<std::string, Client *>::iterator it = this->operators.begin();
     for (; it != this->operators.end(); it++)
-        users.push_back(it->second);
-    
+    {
+        if (mask == "all" || it->second->getInfo(HOSTNAME) == mask)
+            users.push_back(it->second);
+    }
     it = this->joinedUsers.begin();
     for (; it != this->joinedUsers.end(); it++)
-        users.push_back(it->second);
+    {
+        if (mask == "all" || it->second->getInfo(HOSTNAME) == mask)
+            users.push_back(it->second);
+    }
     return (users);
 }
 
