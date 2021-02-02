@@ -322,6 +322,8 @@ int     Server::pongHandler(const Message &message, Client *client)
 
     client->setCurrentCommand("PONG");
     parameterSize = message.getParameters().size();
+    if (parameterSize == 0)
+        return (this->*(this->replies[ERR_NOORIGIN]))(message, client);
     if (parameterSize != 1)
     {
         if (message.getParameter(1)[0] == ':')
