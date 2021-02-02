@@ -185,6 +185,11 @@ Channel*	Client::findChannel(std::string channelName)
 		return (nullptr);	
 }
 
+int			Client::getNumbersOfJoinedChannels(void)
+{
+	return (this->subscribedChannels.size());
+}
+
 void	Client::showChannel(void)
 {
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();

@@ -324,11 +324,65 @@ int     Server::topicHandler(const Message &message, Client *client)
     return (CONNECT);
 }
 
+int     Server::namesHandler(const Message &message, Client *client)
+{
+    std::string                                 noChannelUserList;
+    std::map<std::string, Channel>::iterator    it;
+    std::vector<std::string>                    channelNames;
+
+    client->setCurrentCommand("NAMES");
+    if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
+        return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+    
+    if (message.getParameters().size() == 0)
+    {
+        it = this->localChannelList.begin();
+        for (; it != this->localChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->second.getName() + " :" + it->second.getUserNameList()), client);
+        it = this->remoteChannelList.begin();
+        for (; it != this->remoteChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->second.getName() + " :" + it->second.getUserNameList()), client);
+        // 아무 채널에도 속해 있지 않는 유저들 찾기
+        strClientPtrIter pit = this->clientList.begin();
+        for (; pit != this->clientList.end(); pit++)
+        {   
+            // TODO: clientList랑 client랑 채널 정보가 다름
+            // if (pit->second->getNumbersOfJoinedChannels() == 0) 
+
+            it = this->localChannelList.begin();
+            for(; it != this->localChannelList.end(); it++)
+            {
+                
+            }
+            noChannelUserList += (pit->first + " ");
+        }
+        if (!noChannelUserList.empty())
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " * * :" + noChannelUserList), client);
+        // 366
+        this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " * :End of NAMES list"), client);
+    }
+    else if (message.getParameters().size() == 1)
+    {
+        channelNames = getChannelNames(message.getParameter(0));
+        for (int i = 0; i < (int)channelNames.size(); i++)
+        {
+            if ((it = this->localChannelList.find(channelNames[i])) != this->localChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->second.getName() + " :" + it->second.getUserNameList()), client);
+            else if ((it = this->remoteChannelList.find(channelNames[i])) != this->remoteChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->second.getName() + " :" + it->second.getUserNameList()), client);
+            this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " " + channelNames[i] + " :End of NAMES list"), client);            
+        }
+        
+    }    
+    return (CONNECT);
+}
+
 int     Server::listHandler(const Message &message, Client *client)
 {
     std::map<std::string, Channel>::iterator it;
     std::vector<std::string> channelNames;
 
+    client->setCurrentCommand("LIST");
     if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
         return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
     

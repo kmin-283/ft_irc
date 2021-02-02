@@ -104,6 +104,7 @@ private:
 	int     															joinHandler(const Message &message, Client *client);
 	int     															partHandler(const Message &message, Client *client);
 	int     															topicHandler(const Message &message, Client *client);
+	int     															namesHandler(const Message &message, Client *client);
 	int     															listHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
