@@ -20,7 +20,7 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NORECIPIENT] = &Server::eNoRecipients;
 	this->replies[ERR_NOTEXTTOSEND] = &Server::eNoTextToSend;
 	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
-
+    this->replies[ERR_NOORIGIN] = &Server::eNoOrigin;
 
 
 

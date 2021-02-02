@@ -256,7 +256,7 @@ int     Server::topicHandler(const Message &message, Client *client)
             topic = getTopic(message);
             targetChannel->setTopic(topic);
             // 같은 채넣에 있는 사람들에게 topic 메시지를 보냄(topic이 바뀌었다고 알림).
-            joinedUsers = targetChannel->getUsersList();
+            joinedUsers = targetChannel->getUsersList("all");
             for (int i = 0; i < (int)joinedUsers.size(); i++)
                 this->sendMessage(Message(getClientPrefix(client), "TOPIC", channelName + " :" + topic), joinedUsers[i]);
             //TODO: 다른 서버 같은 채널에 있는 사람들에게도 topic이 변경 된 메시지를 받아야 함.
