@@ -67,6 +67,8 @@
 # define RPL_ADMINEMAIL "259"
 
 # define RPL_NOTOPIC "331"
+# define RPL_TOPIC "332"
+# define RPL_TOPICWHOTIME "333"
 
 # define RPL_VERSION "351"
 # define RPL_NAMREPLY "353"

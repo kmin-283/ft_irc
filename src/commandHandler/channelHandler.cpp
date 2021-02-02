@@ -112,11 +112,6 @@ int     Server::joinHandler(const Message &message, Client *client)
              this->remoteChannelList[channelName] = Channel(channelName);
              targetChannel = &this->remoteChannelList[channelName];
          }
-         // if (this->remoteChannelList.find(channelName) == this->remoteChannelList.end())
-         //     this->remoteChannelList[channelName] = Channel(channelName);
-         // targetChannel = &this->remoteChannelList[channelName];
-         // 유저에 채널 리스트에도 채널 추가
-         // :asdasfasfas COMMAND
          targetClient->joinChannel(targetChannel);
          if (idx != std::string::npos)
          {
@@ -179,16 +174,39 @@ int     Server::partHandler(const Message &message, Client *client)
                 this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " :No such channel"), client);
         }
     }
-    // UNKNOWN 일때 451 애러
+    //TODO:UNKNOWN 일때 451 애러
     // SERVER 일때 461???
     return (CONNECT);
 }
 
+std::string     getTopic(const Message &message)
+{
+    std::string returnTopic;
+
+    // 콜론(:) 만 있고 뒤에 아무것도 없으면 다시 빈 topic 으로 됨.
+    if (message.getParameter(1) == ":" && message.getParameters().size() == 2)
+    {
+        returnTopic = "";
+        return (returnTopic);
+    }
+    if (message.getParameter(1).at(0) == ':')
+    {
+        returnTopic = message.getParameter(1).substr(1);
+        for (int i = 2; i < (int)message.getParameters().size(); i++)
+            returnTopic += (" " + message.getParameter(i));
+    }
+    else
+        returnTopic = message.getParameter(1);
+    return (returnTopic);
+}
+
 int     Server::topicHandler(const Message &message, Client *client)
 {   
-    std::string topic;
-    std::string channelName;
-    Channel     *targetChannel;
+    std::string             topic;
+    std::string             channelName;
+    Channel                 *targetChannel;
+    std::vector<Client *>   joinedUsers;
+    std::time_t             time;
 
     if (!((message.getParameters().size() >= 1 && message.getParameters().size() <= 2) 
         || (message.getParameters().size() > 2 && message.getParameter(0).at(0) == ':')))
@@ -197,13 +215,26 @@ int     Server::topicHandler(const Message &message, Client *client)
     if (client->getStatus() == USER)
     {   
         channelName = message.getParameter(0);
+        // 서버리스트에 채널이 없을 떄
+        if (this->localChannelList.find(channelName) == this->localChannelList.end() 
+            && this->remoteChannelList.find(channelName) == this->remoteChannelList.end())
+        {   // 403
+            this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " :No such channel"), client);
+            return (CONNECT);
+        }
+
+        targetChannel = client->findChannel(channelName);
+        // 유저가 채널에 들어가 있지 않을 때
+        if (targetChannel == nullptr)
+        {
+            this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + channelName + " :You are not on that channel"), client);
+            return(CONNECT);
+        }
+
+        // topic 조회 하기
         if (message.getParameters().size() == 1)
         {
-            targetChannel = client->findChannel(channelName);
-            // 유저가 채널에 들어가 있지 않을 때
-            if (targetChannel == nullptr)
-                this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + channelName + " :You are not on that channel"), client);
-            else
+            if (targetChannel)
             {
                 // topic이 없으면
                 if (targetChannel->getTopic() == "")    // 331
@@ -212,10 +243,25 @@ int     Server::topicHandler(const Message &message, Client *client)
                 else 
                 {
                     // 332
-                    // 333
-                }
+                    this->sendMessage(Message(this->prefix, RPL_TOPIC, client->getInfo(NICK) + " " + channelName + " :" + targetChannel->getTopic()), client);
 
+                    time = std::time(0);
+                    // 333
+                    this->sendMessage(Message(this->prefix, RPL_TOPICWHOTIME, client->getInfo(NICK) + " " + channelName + " " + client->getInfo(NICK) + " " + std::to_string(time)), client);
+                }
             }
+        }
+        else if (message.getParameters().size() >= 2)
+        {
+            topic = getTopic(message);
+            targetChannel->setTopic(topic);
+            // 같은 채넣에 있는 사람들에게 topic 메시지를 보냄(topic이 바뀌었다고 알림).
+            joinedUsers = targetChannel->getUsersList();
+            for (int i = 0; i < (int)joinedUsers.size(); i++)
+                this->sendMessage(Message(getClientPrefix(client), "TOPIC", channelName + " :" + topic), joinedUsers[i]);
+            //TODO: 다른 서버 같은 채널에 있는 사람들에게도 topic이 변경 된 메시지를 받아야 함.
+                    
+            //TODO: 다른 서버에 있는 채널들에 topic도 변경 되어야 함.
         }
     }
     return (CONNECT);
