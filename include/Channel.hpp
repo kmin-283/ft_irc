@@ -24,7 +24,7 @@ class		Channel
         void                                setTopic(const std::string &topic);
         const std::string                   &getTopic(void) const;
         
-        std::vector<Client *>               getUsersList(void);
+        std::vector<Client *>               getUsersList(const std::string &mask);
 
         void                                enterUser(Client *user);
         void                                leaveUser(Client *user);
