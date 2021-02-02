@@ -36,6 +36,7 @@ void	Server::registerCommands(void)
 	this->commands["JOIN"] = &Server::joinHandler;
 	this->commands["PART"] = &Server::partHandler;
 	this->commands["TOPIC"] = &Server::topicHandler;
+	this->commands["LIST"] = &Server::listHandler;
 
 	this->commands["ADMIN"] = &Server::adminHandler;
 	this->commands[RPL_ADMINME] = &Server::rReplyHandler;
