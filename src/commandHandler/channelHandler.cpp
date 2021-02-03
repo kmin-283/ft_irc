@@ -15,6 +15,7 @@ int     Server::joinHandler(const Message &message, Client *client)
 {
     std::string                 check;
     std::string                 channelName;
+    std::string                 fullChannelName;
     std::vector<std::string>    channelNames;
     std::vector<Client *>       joinedUsers;
     Channel                     *targetChannel;
@@ -33,19 +34,18 @@ int     Server::joinHandler(const Message &message, Client *client)
         return (this->*(this->replies[check]))(message, client);
     
     if (client->getStatus() == USER)
-    {   
+    {
         //join #my,#my2,123
         channelNames = getChannelNames(message.getParameter(0));
         for (int i = 0; i < (int)channelNames.size(); i++)
         {
-            channelName = channelNames[i];
-
+            fullChannelName = channelNames[i];
             // 이미 유저가 채널에 가입이 되어 있으면 아무일도 일어나지 않음
-            if(client->findChannel(channelName))
+            if(client->findChannel(fullChannelName))
                 continue;
-            if(channelName.at(0) == '#' || channelName.at(0) == '&')
+            if(fullChannelName.at(0) == '#' || fullChannelName.at(0) == '&')
             {
-                strClientPtrIter p;
+                channelName = fullChannelName.substr(1);
                 // 채널이 없으면 생성
                 if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
                     targetChannel = &it->second;
@@ -53,7 +53,7 @@ int     Server::joinHandler(const Message &message, Client *client)
                     targetChannel = &it->second;
                 else
                 {
-                    this->localChannelList[channelName] = Channel(channelName);
+                    this->localChannelList[channelName] = Channel(fullChannelName);
                     targetChannel = &this->localChannelList[channelName];
                 }
                 // 유저에 채널 리스트에도 채널 추가
@@ -69,28 +69,28 @@ int     Server::joinHandler(const Message &message, Client *client)
                 for (int i = 0; i < (int)joinedUsers.size(); i++)
                 {
                     if (joinedUsers[i]->getInfo(HOSTNAME) == this->serverName)
-                        this->sendMessage(Message(":" + getClientPrefix(client), "JOIN", ":" + channelName), joinedUsers[i]);
+                        this->sendMessage(Message(":" + getClientPrefix(client), "JOIN", ":" + fullChannelName), joinedUsers[i]);
                 }
                 // 353
                 this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) 
                                                                         + " = "
-                                                                        + targetChannel->getName()
+                                                                        + fullChannelName
                                                                         + " :" 
                                                                         + targetChannel->getUserNameList()), client);
                 // replis
                 // 366
                 this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK)
                                                                         + " "
-                                                                        + targetChannel->getName()
+                                                                        + fullChannelName
                                                                         + " :End of NAMES list"), client);
                 // 다른 서버에 있는 유저들에게 join 는 알리는 메시지
-                this->broadcastMessage(Message(":" + getClientPrefix(client), "JOIN", ":" + channelName), client);
+                //this->broadcastMessage(Message(":" + getClientPrefix(client), "JOIN", ":" + fullChannelName), client);
                 // 다른 서버에 있는 채널에 유저를 추가하는 메시지
-                this->broadcastMessage(Message(":" + client->getInfo(NICK), "JOIN", ":" + channelName), client);
+                this->broadcastMessage(Message(":" + client->getInfo(NICK), "JOIN", fullChannelName), client);
             }
             // 403 No such channel (채널 이름 오류)
             else
-                this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " No such channel"), client);
+                this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + fullChannelName + " No such channel"), client);
         }
         // UNKNOWN 일때 451 애러
     }
@@ -98,44 +98,30 @@ int     Server::joinHandler(const Message &message, Client *client)
     {
         std::string     clientName;
         Client          *targetClient;
-        size_t          idx;
-        bool            alreadyEnter = false;
         // :kmin!2~@loa JOIN :#1
-        if ((idx = message.getPrefix().find("!", 0)) != std::string::npos)
-            clientName = message.getPrefix().substr(1, idx-1);
-        else
-            clientName = message.getPrefix().substr(1, message.getPrefix().length());
+        clientName = message.getPrefix().substr(1);
         targetClient = &this->sendClients[clientName];
         // broadcast 메시지를 받음
         // local channel user를 봐서 있으면 메시지전송
-        channelName = message.getParameter(0).substr(1, message.getParameter(0).length());
+        channelName = message.getParameter(0).substr(1);
         // 현재 서버에 같은 채널의 유저가 있는 경우
-
         if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
-        {
             targetChannel = &it->second;
-            alreadyEnter = true;
-        }
         else if((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
-        {
             targetChannel = &it->second;
-            alreadyEnter = true;
-        }
         else
         {
             this->remoteChannelList[channelName] = Channel(channelName);
             targetChannel = &this->remoteChannelList[channelName];
-            targetChannel->enterUser(targetClient);
         }
-        if (idx != std::string::npos)
-        {
-            targetClient->joinChannel(targetChannel);
-            joinedUsers = targetChannel->getUsersList(this->serverName);
-            for (int i = 0; i < (int)joinedUsers.size(); i++)
-                this->sendMessage(message, joinedUsers[i]);
-            if (!alreadyEnter)
-                targetChannel->enterUser(targetClient);
-        }
+        targetClient->joinChannel(targetChannel);
+        joinedUsers = targetChannel->getUsersList(this->serverName);
+        for (int i = 0; i < (int)joinedUsers.size(); i++)
+            this->sendMessage(Message(getClientPrefix(joinedUsers[i])
+                                    , "JOIN"
+                                    , ":" + message.getParameter(0))
+                                    , joinedUsers[i]);
+        targetChannel->enterUser(targetClient);
         this->broadcastMessage(message, client);
     }
     return (CONNECT);
@@ -323,6 +309,39 @@ int     Server::topicHandler(const Message &message, Client *client)
     }
     return (CONNECT);
 }
+// mode + channel + mode + modeparameter
+// 만약 mode만 주어지고 mode parameter가 주어지지않는 경우에는 해당 모드를 가진 list를 출력함
+int         Server::modeHandler(const Message &message, Client *client)
+{
+    std::string					check;
+    std::string					from;
+    std::vector<std::string>	*list;
+    size_t						parameterSize;
+    strClientPtrIter			found;
+    //Client						*target;
+
+    client->setCurrentCommand("MODE");
+    if (client->getStatus() == UNKNOWN)
+        return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+    else if (client->getStatus() == USER)
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
+    else
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
+    if ((check = client->prefixCheck(message)) != "ok")
+        return (this->*(this->replies[check]))(message, client);
+
+    parameterSize = message.getParameters().size();
+    if (parameterSize > 3 || parameterSize < 2)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+    else if (parameterSize == 3)
+        list = getInfoFromWildcard(message.getParameter(2));
+    else
+        list = getInfoFromWildcard(this->serverName);
+    if (!list)
+    {
+        delete list;
+        return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+    }
 
 int     Server::namesHandler(const Message &message, Client *client)
 {
@@ -413,6 +432,5 @@ int     Server::listHandler(const Message &message, Client *client)
 
     // 323
     this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
-
     return (CONNECT);
 }

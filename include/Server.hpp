@@ -104,15 +104,19 @@ private:
 	int     															joinHandler(const Message &message, Client *client);
 	int     															partHandler(const Message &message, Client *client);
 	int     															topicHandler(const Message &message, Client *client);
+<<<<<<< HEAD
+	int                                                                 modeHandler(const Message &message, Client *client);
+=======
 	int     															namesHandler(const Message &message, Client *client);
 	int     															listHandler(const Message &message, Client *client);
+>>>>>>> aff0d4bd35dff200cd548a56a49a338b50b2e9a3
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 
 	int                                                                 infoHandler(const Message &message, Client *client);
 
 	int                                                                 pingHandler(const Message &message, Client *client);
-  int                                                                 pongHandler(const Message &message, Client *client);
+  int                                                                   pongHandler(const Message &message, Client *client);
 
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
