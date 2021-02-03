@@ -309,7 +309,6 @@ int     Server::topicHandler(const Message &message, Client *client)
     }
     return (CONNECT);
 }
-<<<<<<< HEAD
 // mode + channel + mode + modeparameter
 // 만약 mode만 주어지고 mode parameter가 주어지지않는 경우에는 해당 모드를 가진 list를 출력함
 int         Server::modeHandler(const Message &message, Client *client)
@@ -343,7 +342,6 @@ int         Server::modeHandler(const Message &message, Client *client)
         delete list;
         return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
     }
-=======
 
 int     Server::namesHandler(const Message &message, Client *client)
 {
@@ -434,7 +432,5 @@ int     Server::listHandler(const Message &message, Client *client)
 
     // 323
     this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
->>>>>>> aff0d4bd35dff200cd548a56a49a338b50b2e9a3
-
     return (CONNECT);
 }
