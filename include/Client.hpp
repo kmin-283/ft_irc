@@ -140,7 +140,12 @@ public:
 	const std::string	&getPrevCommand(void) const;
 	void								joinChannel(Channel *channel);
 	void								leaveChannel(Channel *channel);
+<<<<<<< HEAD
 	Channel*							findChannel(const std::string &channelName);
+=======
+	Channel*							findChannel(std::string channelName);
+	int									getNumbersOfJoinedChannels(void);
+>>>>>>> aff0d4bd35dff200cd548a56a49a338b50b2e9a3
 
 	// 디버깅
 	void								showChannel(void);
