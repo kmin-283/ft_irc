@@ -141,6 +141,7 @@ public:
 	void								joinChannel(Channel *channel);
 	void								leaveChannel(Channel *channel);
 	Channel*							findChannel(std::string channelName);
+	int									getNumbersOfJoinedChannels(void);
 
 	// 디버깅
 	void								showChannel(void);

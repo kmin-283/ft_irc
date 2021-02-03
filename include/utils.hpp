@@ -52,7 +52,7 @@
 
 
 # define TIMEOUT "T"
-# define PING_LIMIT 10
+# define PING_LIMIT 100
 # define PING_CYCLE 10
 
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
