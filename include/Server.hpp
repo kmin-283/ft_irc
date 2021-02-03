@@ -104,13 +104,14 @@ private:
 	int     															joinHandler(const Message &message, Client *client);
 	int     															partHandler(const Message &message, Client *client);
 	int     															topicHandler(const Message &message, Client *client);
+	int                                                                 modeHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 
 	int                                                                 infoHandler(const Message &message, Client *client);
 
 	int                                                                 pingHandler(const Message &message, Client *client);
-  int                                                                 pongHandler(const Message &message, Client *client);
+  int                                                                   pongHandler(const Message &message, Client *client);
 
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;

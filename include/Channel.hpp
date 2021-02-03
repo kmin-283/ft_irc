@@ -4,6 +4,25 @@
 # include "Client.hpp"
 # include "utils.hpp"
 
+# define MODE_UO 1
+# define MODE_LO 2
+# define MODE_V 4
+# define MODE_A 8
+# define MODE_LI 16
+# define MODE_M 32
+# define MODE_N 64
+# define MODE_Q 128
+# define MODE_P 256
+# define MODE_S 512
+# define MODE_R 1024
+# define MODE_T 2048
+# define MODE_K 4096
+# define MODE_L 8192
+# define MODE_B 16384
+# define MODE_E 32768
+# define MODE_UI 65536
+
+
 class       Client;
 
 class		Channel
@@ -14,7 +33,7 @@ class		Channel
         std::map<std::string, Client *>     joinedUsers;
         std::string                         key;
         std::string                         topic;
-    
+        int                                 mode;
     public:
                                             Channel();
                                             Channel(const std::string &name);
@@ -34,7 +53,6 @@ class		Channel
         // 임시로 만듬.
         int                                 getNumbersOfUsers(void);
         void                                showUsersName(void);
-
 };
 
 #endif

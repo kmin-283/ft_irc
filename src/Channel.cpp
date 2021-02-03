@@ -3,8 +3,10 @@
 Channel::Channel() {}
 
 Channel::Channel(const std::string& name)
-    : name(name), topic("") {}
-
+    : name(name), topic(""), mode(0)
+{
+    (void)mode;
+}
 Channel::~Channel() {}
 
 void    Channel::setName(const std::string& name)

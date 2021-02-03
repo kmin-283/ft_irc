@@ -266,3 +266,39 @@ int     Server::topicHandler(const Message &message, Client *client)
     }
     return (CONNECT);
 }
+// mode + channel + mode + modeparameter
+// 만약 mode만 주어지고 mode parameter가 주어지지않는 경우에는 해당 모드를 가진 list를 출력함
+int         Server::modeHandler(const Message &message, Client *client)
+{
+    std::string					check;
+    std::string					from;
+    std::vector<std::string>	*list;
+    size_t						parameterSize;
+    strClientPtrIter			found;
+    //Client						*target;
+
+    client->setCurrentCommand("MODE");
+    if (client->getStatus() == UNKNOWN)
+        return (this->*(this->replies[ERR_NOTREGISTERED]))(message, client);
+    else if (client->getStatus() == USER)
+        this->infosPerCommand[client->getCurrentCommand()].incrementLocalCount(1);
+    else
+        this->infosPerCommand[client->getCurrentCommand()].incrementRemoteCount(1);
+    if ((check = client->prefixCheck(message)) != "ok")
+        return (this->*(this->replies[check]))(message, client);
+
+    parameterSize = message.getParameters().size();
+    if (parameterSize > 3 || parameterSize < 2)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+    else if (parameterSize == 3)
+        list = getInfoFromWildcard(message.getParameter(2));
+    else
+        list = getInfoFromWildcard(this->serverName);
+    if (!list)
+    {
+        delete list;
+        return (this->*(this->replies[ERR_NOSUCHSERVER]))(message, client);
+    }
+
+    return (CONNECT);
+}
