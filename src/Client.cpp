@@ -177,12 +177,19 @@ void	Client::leaveChannel(Channel *channel)
 	this->subscribedChannels.erase(channel->getName());
 }
 
-Channel*	Client::findChannel(std::string channelName)
+Channel*	Client::findChannel(const std::string &fullChannelName)
 {
-	if (this->subscribedChannels.find(channelName) != this->subscribedChannels.end())
-		return (this->subscribedChannels[channelName]);
-	else
-		return (nullptr);	
+    std::string channelName;
+
+    channelName = fullChannelName.substr(1);
+    if (fullChannelName[0] == '&' || fullChannelName[0] == '#')
+    {
+        if (this->subscribedChannels.find(channelName) != this->subscribedChannels.end())
+            return (this->subscribedChannels[channelName]);
+        else
+            return (nullptr);
+    }
+    return (NULL);
 }
 
 void	Client::showChannel(void)

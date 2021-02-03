@@ -3,8 +3,12 @@
 Channel::Channel() {}
 
 Channel::Channel(const std::string& name)
-    : name(name), topic(""), mode(0)
+    : name(name.substr(1, name.length())), topic(""), mode(0)
 {
+    if (name[0] == '&')
+        this->prefix = ONLY_LOCAL;
+    else
+        this->prefix = LOCAL_AND_REMOTE;
     (void)mode;
 }
 Channel::~Channel() {}

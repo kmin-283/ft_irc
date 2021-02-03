@@ -23,6 +23,12 @@
 # define MODE_UI 65536
 
 
+typedef enum
+{
+    ONLY_LOCAL = 0,
+    LOCAL_AND_REMOTE,
+}       channelPrefix;
+
 class       Client;
 
 class		Channel
@@ -34,6 +40,7 @@ class		Channel
         std::string                         key;
         std::string                         topic;
         int                                 mode;
+        channelPrefix                       prefix;
     public:
                                             Channel();
                                             Channel(const std::string &name);
