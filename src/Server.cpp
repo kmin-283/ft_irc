@@ -358,6 +358,12 @@ int		Server::show(const Message &message, Client *client)
 {
 	(void)message;
 	(void)client;
+	std::cout << "----- clientList ----" << std::endl;
+	strClientPtrIter iter = this->clientList.begin();
+	std::cout << "( ";
+	for (; iter != this->clientList.end(); ++iter)
+		std::cout << iter->first << " ";
+	std::cout << ")" << std::endl;
 	std::cout << "\033[0;32m== server (" << this->serverName << ") channelList ==\033[0m" << std::endl;
 	
 	// 이 서버에 있는 채널들의 유저들 출력
