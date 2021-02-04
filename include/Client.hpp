@@ -139,7 +139,7 @@ public:
 	const std::string	&getCurrentCommand(void) const;
 	const std::string	&getPrevCommand(void) const;
 	void								joinChannel(Channel *channel, const std::string &channelName);
-	void								leaveChannel(Channel *channel);
+	void								leaveChannel(const std::string &channelName);
 
 	Channel*							findChannel(const std::string &channelName);
 

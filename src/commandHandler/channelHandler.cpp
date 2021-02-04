@@ -131,16 +131,41 @@ int     Server::joinHandler(const Message &message, Client *client)
     return (CONNECT);
 }
 
+std::string getPartMessage(const Message& message)
+{
+    std::string returnMessage;
+
+    if (message.getParameters().size() == 1)
+        returnMessage = "";
+    else if (message.getParameters().size() == 2)
+    {
+        if (message.getParameter(1).at(0) == ':')
+            returnMessage = message.getParameter(1).substr(1);
+        else
+            returnMessage = message.getParameter(1);
+    }
+    else 
+    {   
+        returnMessage = message.getParameter(1).substr(1);
+        for (int i = 2; i < (int)message.getParameters().size(); i++)
+            returnMessage += message.getParameter(i);
+    }
+    return (returnMessage);
+}
+
 int     Server::partHandler(const Message &message, Client *client)
 {
     std::string                 channelName;
     std::vector<std::string>    channelNames;
     std::vector<Client *>       joinedUsers;
-    Channel                     *targetChannel;
+    Channel                     *targetChannel = NULL;
+    std::map<std::string, Channel>::iterator it;
 
     client->setCurrentCommand("PART");
     // ngircd는 이상하게 2개까지 받음 -> 2812가 2개까지 받음
-    if (message.getParameters().size() != 1)
+    if (!(message.getParameters().size() == 1 || 
+        (message.getParameters().size() == 2) ||
+        (message.getParameters().size() > 2 && message.getParameter(1).at(0) == ':')))
         return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
 
     if (client->getStatus() == USER)
@@ -152,26 +177,39 @@ int     Server::partHandler(const Message &message, Client *client)
 
             if (client->findChannel(channelName))
             {
-                targetChannel = &this->localChannelList[channelName];
+                if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
+                    targetChannel = &it->second;
+                else if ((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
+                    targetChannel = &it->second;
                 
-                client->leaveChannel(targetChannel);
+                client->leaveChannel(channelName);
+                this->sendClients[client->getInfo(NICK)].leaveChannel(channelName);
 
                 targetChannel->leaveUser(client);
                 // 채널에 아무도 없으면 서버에서 채널 삭제
                 if (targetChannel->getNumbersOfUsers() == 0)
                 {
-                    this->localChannelList.erase(channelName);
-                    this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), client);
+                    if (this->localChannelList.find(channelName) != this->localChannelList.end())
+                        this->localChannelList.erase(channelName);
+                    else if (this->remoteChannelList.find(channelName) != this->remoteChannelList.end())
+                        this->remoteChannelList.erase(channelName);
+                    this->sendMessage(Message(":" + getClientPrefix(client), "PART", channelName + " :" + getPartMessage(message)), client);
+
+                    if (channelName.at(0) == '#')
+                        this->broadcastMessage(Message(":" + client->getInfo(NICK), "PART", channelName + " :" + getPartMessage(message)), client);
                     // 채널에 혼자 남았을 때 자기 자신에게 part 메시지를 보내고 끝남.
                     continue;
                 }
                 // 자신 한테도 part 메시지를 날려야 함.
-                this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), client);
+                this->sendMessage(Message(":" + getClientPrefix(client), "PART", channelName + " :" + getPartMessage(message)), client);
 
-                joinedUsers = targetChannel->getUsersList("all");
+                joinedUsers = targetChannel->getUsersList(this->serverName);
                 for (int i = 0; i < (int)joinedUsers.size(); i++)
-                    this->sendMessage(Message(getClientPrefix(client), "PART", ":" + channelName), joinedUsers[i]);
+                    this->sendMessage(Message(":" + getClientPrefix(client), "PART", channelName + " :" + getPartMessage(message)), joinedUsers[i]);
                 
+                //:seunkim PART #m1 : 1 2 3 4 5
+                if (channelName.at(0) == '#')
+                    this->broadcastMessage(Message(":" + client->getInfo(NICK), "PART", channelName + " :" + getPartMessage(message)), client);
             }
             // 442
             else if (this->localChannelList.find(channelName) != this->localChannelList.end())
@@ -180,6 +218,39 @@ int     Server::partHandler(const Message &message, Client *client)
             else
                 this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + channelName + " :No such channel"), client);
         }
+    }
+    // :seunkim PART #1 :123
+    else if (client->getStatus() == SERVER)
+    {
+        std::string clientName;
+        Client      *targetClient;
+
+        clientName = message.getPrefix().substr(1);
+        targetClient = &this->sendClients[clientName];
+
+        channelName = message.getParameter(0);
+
+        if ((it = this->localChannelList.find(channelName)) != this->localChannelList.end())
+            targetChannel = &it->second;
+        else if ((it = this->remoteChannelList.find(channelName)) != this->remoteChannelList.end())
+            targetChannel = &it->second;
+
+        targetClient->leaveChannel(channelName);
+        targetChannel->leaveUser(targetClient);
+
+        joinedUsers = targetChannel->getUsersList(this->serverName);
+        for (int i = 0; i < (int)joinedUsers.size(); i++)
+            this->sendMessage(Message(":" + getClientPrefix(targetClient), "PART", channelName + " :" + getPartMessage(message)), joinedUsers[i]);
+
+        if (targetChannel->getNumbersOfUsers() == 0)
+        {
+            if (this->localChannelList.find(channelName) != this->localChannelList.end())
+                this->localChannelList.erase(channelName);
+            else if (this->remoteChannelList.find(channelName) != this->remoteChannelList.end())
+                this->remoteChannelList.erase(channelName);
+        }
+
+        this->broadcastMessage(message, client);
     }
     //TODO:UNKNOWN 일때 451 애러
     // SERVER 일때 461???

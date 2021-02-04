@@ -41,7 +41,6 @@ std::vector<Client *> Channel::getUsersList(const std::string &mask)
     std::map<std::string, Client *>::iterator it = this->operators.begin();
     for (; it != this->operators.end(); it++)
     {
-        std::cout << "getUserslist = " << it->first << std::endl;
         if (mask == "all" || it->second->getInfo(HOSTNAME) == mask)
             users.push_back(it->second);
     }

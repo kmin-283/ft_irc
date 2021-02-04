@@ -172,9 +172,9 @@ void	Client::joinChannel(Channel *channel, const std::string &channelName)
 	this->subscribedChannels[channelName] = channel;
 }
 
-void	Client::leaveChannel(Channel *channel)
+void	Client::leaveChannel(const std::string &channelName)
 {
-	this->subscribedChannels.erase(channel->getName());
+	this->subscribedChannels.erase(channelName);
 }
 
 Channel*	Client::findChannel(const std::string &fullChannelName)
