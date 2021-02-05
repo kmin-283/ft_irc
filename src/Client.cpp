@@ -167,29 +167,22 @@ const std::string	&Client::getPrevCommand(void) const
 	return (this->prevCommand);
 }
 
-void	Client::joinChannel(Channel *channel)
+void	Client::joinChannel(Channel *channel, const std::string &channelName)
 {
-	this->subscribedChannels[channel->getName()] = channel;
+	this->subscribedChannels[channelName] = channel;
 }
 
-void	Client::leaveChannel(Channel *channel)
+void	Client::leaveChannel(const std::string &channelName)
 {
-	this->subscribedChannels.erase(channel->getName());
+	this->subscribedChannels.erase(channelName);
 }
 
 Channel*	Client::findChannel(const std::string &fullChannelName)
 {
-    std::string channelName;
-
-    channelName = fullChannelName.substr(1);
-    if (fullChannelName[0] == '&' || fullChannelName[0] == '#')
-    {
-        if (this->subscribedChannels.find(channelName) != this->subscribedChannels.end())
-            return (this->subscribedChannels[channelName]);
-        else
-            return (nullptr);
-    }
-    return (NULL);
+	if (this->subscribedChannels.find(fullChannelName) != this->subscribedChannels.end())
+		return (this->subscribedChannels[fullChannelName]);
+	else
+		return (nullptr);
 }
 
 int			Client::getNumbersOfJoinedChannels(void)
@@ -202,6 +195,6 @@ void	Client::showChannel(void)
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();
 	std::cout << "[ ";
 	for (; it != this->subscribedChannels.end(); it++)
-		std::cout << it->first << " ";
+		std::cout << it->second->getName() << " ";
 	std::cout << "] " << std::endl;
 }

@@ -40,7 +40,7 @@ class		Channel
         std::string                         key;
         std::string                         topic;
         int                                 mode;
-        channelPrefix                       prefix;
+        channelPrefix                       chPrefix;
     public:
                                             Channel();
                                             Channel(const std::string &name);
@@ -49,6 +49,7 @@ class		Channel
         const std::string                   &getName(void) const;
         void                                setTopic(const std::string &topic);
         const std::string                   &getTopic(void) const;
+        // channelPrefix                       &getChannelPrefix(void) const;
         
         std::vector<Client *>               getUsersList(const std::string &mask);
 
