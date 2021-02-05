@@ -33,7 +33,6 @@ const std::string   &Channel::getTopic(void) const
     return (this->topic);
 }
 
-
 std::vector<Client *> Channel::getUsersList(const std::string &mask)
 {
     std::vector<Client *> users;

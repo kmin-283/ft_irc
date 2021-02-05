@@ -41,6 +41,8 @@ class		Channel
         std::string                         topic;
         int                                 mode;
         channelPrefix                       prefix;
+        //banList;
+        //inviteList;
     public:
                                             Channel();
                                             Channel(const std::string &name);
@@ -49,6 +51,7 @@ class		Channel
         const std::string                   &getName(void) const;
         void                                setTopic(const std::string &topic);
         const std::string                   &getTopic(void) const;
+        void                                setMode();
         
         std::vector<Client *>               getUsersList(const std::string &mask);
 

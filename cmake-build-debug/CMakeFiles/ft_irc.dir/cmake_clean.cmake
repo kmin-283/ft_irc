@@ -1,0 +1,40 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/ft_irc.dir/src/Channel.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/Client.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/Info.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/Message.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/Server.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/ServerException.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/main.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o"
+  "CMakeFiles/ft_irc.dir/src/utils.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o"
+  "CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o"
+  "CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o"
+  "CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o"
+  "ft_irc"
+  "ft_irc.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang C CXX)
+  include(CMakeFiles/ft_irc.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

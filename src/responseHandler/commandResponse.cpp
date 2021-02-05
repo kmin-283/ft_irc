@@ -524,6 +524,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			}
 		}
 	}
+	// join, mode보내기.....
 	return (CONNECT);
 }
 
