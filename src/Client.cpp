@@ -2,7 +2,7 @@
 
 Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true)
+	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -11,7 +11,7 @@ Client::Client()
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true)
+	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -167,29 +167,22 @@ const std::string	&Client::getPrevCommand(void) const
 	return (this->prevCommand);
 }
 
-void	Client::joinChannel(Channel *channel)
+void	Client::joinChannel(Channel *channel, const std::string &channelName)
 {
-	this->subscribedChannels[channel->getName()] = channel;
+	this->subscribedChannels[channelName] = channel;
 }
 
-void	Client::leaveChannel(Channel *channel)
+void	Client::leaveChannel(const std::string &channelName)
 {
-	this->subscribedChannels.erase(channel->getName());
+	this->subscribedChannels.erase(channelName);
 }
 
 Channel*	Client::findChannel(const std::string &fullChannelName)
 {
-    std::string channelName;
-
-    channelName = fullChannelName.substr(1);
-    if (fullChannelName[0] == '&' || fullChannelName[0] == '#')
-    {
-        if (this->subscribedChannels.find(channelName) != this->subscribedChannels.end())
-            return (this->subscribedChannels[channelName]);
-        else
-            return (nullptr);
-    }
-    return (NULL);
+	if (this->subscribedChannels.find(fullChannelName) != this->subscribedChannels.end())
+		return (this->subscribedChannels[fullChannelName]);
+	else
+		return (nullptr);
 }
 
 int			Client::getNumbersOfJoinedChannels(void)
@@ -197,11 +190,24 @@ int			Client::getNumbersOfJoinedChannels(void)
 	return (this->subscribedChannels.size());
 }
 
+void 	Client::setChannelMode(const int &mode, const bool &isAdd)
+{
+	if (isAdd)
+		this->channelMode |= mode;
+	else
+		this->channelMode ^= mode;
+}
+
+int 	Client::getChannelMode() const
+{
+	return (this->channelMode);
+}
+
 void	Client::showChannel(void)
 {
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();
 	std::cout << "[ ";
 	for (; it != this->subscribedChannels.end(); it++)
-		std::cout << it->first << " ";
+		std::cout << it->second->getName() << " ";
 	std::cout << "] " << std::endl;
 }

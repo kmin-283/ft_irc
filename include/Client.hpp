@@ -95,12 +95,13 @@ private:
 	std::string			currentCommand;
 	std::string			prevCommand;
 
-    std::time_t			startTime;
-    bool                waitPong;
-    std::time_t         lastPing;
-    std::time_t         pingLimit;
-	
+	std::time_t			startTime;
+	bool                waitPong;
+	std::time_t         lastPing;
+	std::time_t         pingLimit;
+
 	std::map<std::string, Channel *>	subscribedChannels;
+	int 								channelMode;
 
 public:
 	Client(void);
@@ -138,10 +139,14 @@ public:
 	void				setCurrentCommand(const std::string &command);
 	const std::string	&getCurrentCommand(void) const;
 	const std::string	&getPrevCommand(void) const;
-	void								joinChannel(Channel *channel);
-	void								leaveChannel(Channel *channel);
+	void								joinChannel(Channel *channel, const std::string &channelName);
+	void								leaveChannel(const std::string &channelName);
+
 	Channel*							findChannel(const std::string &channelName);
+
 	int									getNumbersOfJoinedChannels(void);
+	void 								setChannelMode(const int &mode, const bool &isAdd);
+	int 								getChannelMode(void) const;
 
 	// 디버깅
 	void								showChannel(void);

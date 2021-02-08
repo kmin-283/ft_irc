@@ -257,3 +257,13 @@ int     Server::eNoOrigin(const Message &message, Client *client)
                         , client);
     return (CONNECT);
 }
+
+int		Server::eUnknownMode(const Message &message, Client *client)
+{
+	sendMessage(Message(this->prefix
+						, ERR_UNKNOWNMODE
+						, client->getInfo(NICK)
+						+ " " + message.getParameter(1)[0]
+						+ " :is unknown mode char"), client);
+	return (CONNECT);
+}

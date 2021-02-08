@@ -22,6 +22,8 @@ void			Server::registerReplies(void)
 	this->replies[ERR_NOSUCHNICK] = &Server::eNoSuchNick;
     this->replies[ERR_NOORIGIN] = &Server::eNoOrigin;
 
+    this->replies[ERR_UNKNOWNMODE] = &Server::eUnknownMode;
+
 
 
 

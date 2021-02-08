@@ -50,7 +50,9 @@ void	Server::registerCommands(void)
     this->commands[RPL_ENDOFINFO] = &Server::rReplyHandler;
 
 	// 디버깅
-	this->commands["SHOW"] = &Server::show;
-  this->commands["PING"] = &Server::pingHandler;
-  this->commands["PONG"] = &Server::pongHandler;
+    this->commands["SHOW"] = &Server::show;
+    this->commands["PING"] = &Server::pingHandler;
+    this->commands["PONG"] = &Server::pongHandler;
+
+    this->commands["MODE"] = &Server::modeHandler;
 }
