@@ -105,6 +105,11 @@ private:
 	int     															partHandler(const Message &message, Client *client);
 	int     															topicHandler(const Message &message, Client *client);
 	int                                                                 modeHandler(const Message &message, Client *client);
+	int 																modeHelper(std::string &error, size_t &modeIndex, const Message &message, Client *client);
+	void																showBanList(Channel &channel, Client *client);
+	void																showExceptionList(Channel &channel, Client *client);
+	void 																showInvitationList(Channel &channel, Client *client);
+
 	int     															namesHandler(const Message &message, Client *client);
 	int     															listHandler(const Message &message, Client *client);
 
@@ -113,8 +118,7 @@ private:
 	int                                                                 infoHandler(const Message &message, Client *client);
 
 	int                                                                 pingHandler(const Message &message, Client *client);
-  int                                                                   pongHandler(const Message &message, Client *client);
-
+  	int                                                                 pongHandler(const Message &message, Client *client);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	replies;
 	void																registerReplies(void);
@@ -135,6 +139,7 @@ private:
 	int																	eNoTextToSend(const Message &message, Client *client);
 	int																	eNoSuchNick(const Message &message, Client *client);
 	int                                                                 eNoOrigin(const Message &message, Client *client);
+	int 																eUnknownMode(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);

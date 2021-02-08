@@ -2,7 +2,7 @@
 
 Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true)
+	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -11,7 +11,7 @@ Client::Client()
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true)
+	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -188,6 +188,19 @@ Channel*	Client::findChannel(const std::string &fullChannelName)
 int			Client::getNumbersOfJoinedChannels(void)
 {
 	return (this->subscribedChannels.size());
+}
+
+void 	Client::setChannelMode(const int &mode, const bool &isAdd)
+{
+	if (isAdd)
+		this->channelMode |= mode;
+	else
+		this->channelMode ^= mode;
+}
+
+int 	Client::getChannelMode() const
+{
+	return (this->channelMode);
 }
 
 void	Client::showChannel(void)

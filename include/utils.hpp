@@ -8,6 +8,7 @@
 # include <queue>
 # include <stack>
 # include <map>
+# include <set>
 # include <algorithm>
 # include <cctype>
 # include <ctime>
@@ -52,9 +53,11 @@
 
 
 # define TIMEOUT "T"
-
 # define PING_LIMIT 140
 # define PING_CYCLE 140
+
+# define ON true
+# define OFF false
 
 # define ERROR_ARG_NUM "Error: Too few or too few arguments."
 # define ERROR_PORT "Error: Port must be numeric."
