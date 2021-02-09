@@ -140,6 +140,7 @@ private:
 	int																	eNoSuchNick(const Message &message, Client *client);
 	int                                                                 eNoOrigin(const Message &message, Client *client);
 	int 																eUnknownMode(const Message &message, Client *client);
+	int																	eUserNotInChannel(const Message &message, Client *client);
 
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);

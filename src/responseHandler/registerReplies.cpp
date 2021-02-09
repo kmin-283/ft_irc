@@ -23,6 +23,7 @@ void			Server::registerReplies(void)
     this->replies[ERR_NOORIGIN] = &Server::eNoOrigin;
 
     this->replies[ERR_UNKNOWNMODE] = &Server::eUnknownMode;
+    this->replies[ERR_USERNOTINCHANNEL] = &Server::eUserNotInChannel;
 
 
 
