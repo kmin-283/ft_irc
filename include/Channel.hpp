@@ -68,9 +68,10 @@ public:
 
 		std::set<std::string> 				&getInvitationList(void);
 
-	void 								setMode(const int &mode, const bool &setConfig);
+		void 								setMode(const int &mode, const bool &setConfig);
         const int 							&getMode(void) const;
         int 								toggleMode(std::string &successState, std::string &error, size_t &modeIndex, const Message &message);
+        std::map<std::string, Client *>		&getOperators(void);
         Client                              *findOperator(const std::string &userName);
 
         std::vector<Client *>               getUsersList(const std::string &mask);
