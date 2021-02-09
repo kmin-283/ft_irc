@@ -118,7 +118,6 @@ int     Server::joinHandler(const Message &message, Client *client)
             targetChannel = &this->remoteChannelList[fullChannelName];
         }
         targetClient->joinChannel(targetChannel, message.getParameter(0));
-        this->sendClients[targetClient->getInfo(NICK)].joinChannel(targetChannel, fullChannelName);
         joinedUsers = targetChannel->getUsersList(this->serverName);
         for (int i = 0; i < (int)joinedUsers.size(); i++)
             this->sendMessage(Message(getClientPrefix(joinedUsers[i])
@@ -513,7 +512,6 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 					chanIter->second.makeUserToOper(message.getParameter(modeParamIndex));
 				else
 					chanIter->second.makeOperToUser(message.getParameter(modeParamIndex));
-				clientIter->second.setChannelMode(MODE_LO, isAdd);
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
@@ -552,7 +550,6 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 					error = ERR_USERNOTINCHANNEL;
 					return (-1);
 				}
-				clientIter->second.setChannelMode(MODE_V, isAdd);
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{

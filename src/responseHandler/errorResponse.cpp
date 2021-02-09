@@ -270,7 +270,12 @@ int		Server::eUnknownMode(const Message &message, Client *client)
 
 int		Server::eUserNotInChannel(const Message &message, Client *client)
 {
-	(void)message;
-	(void)client;
+	sendMessage(Message(this->prefix
+				, ERR_USERNOTINCHANNEL
+				, client->getInfo(NICK)
+				+ " " + message.getParameter(1)
+				+ " " + message.getParameter(0)
+				+ " :They aren't on that channnel")
+				, client);
 	return (CONNECT);
 }
