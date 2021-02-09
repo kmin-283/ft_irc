@@ -10,3 +10,5 @@ ircserv
 test
 .idea
 .gradle
+CMakeLists.txt
+cmake-build-debug

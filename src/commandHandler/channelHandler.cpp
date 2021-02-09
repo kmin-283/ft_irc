@@ -387,12 +387,11 @@ int     Server::topicHandler(const Message &message, Client *client)
 
 void 		Server::showExceptionList(Channel &channel, Client *client)
 {
-	std::vector<std::string>::iterator it;
-	std::vector<std::string> *exceptList;
+	std::set<std::string>::iterator it;
+	std::set<std::string> 	&exceptList = channel.getExceptionList();
 
-	exceptList = channel.getExceptionList();
-	it = exceptList->begin();
-	for (; it != exceptList->end(); ++it)
+	it = exceptList.begin();
+	for (; it != exceptList.end(); ++it)
 	{
 		this->sendMessage(Message(this->prefix
 			, RPL_EXCEPTLIST
@@ -409,16 +408,14 @@ void 		Server::showExceptionList(Channel &channel, Client *client)
 		  + " " + channel.getName()
 		  + " :End of channel exception list")
 		, client);
-	delete exceptList;
 }
 void 		Server::showInvitationList(Channel &channel, Client *client)
 {
-	std::vector<std::string>::iterator it;
-	std::vector<std::string> *invitationList;
+	std::set<std::string>::iterator it;
+	std::set<std::string> &invitationList = channel.getInvitationList();
 
-	invitationList = channel.getExceptionList();
-	it = invitationList->begin();
-	for (; it != invitationList->end(); ++it)
+	it = invitationList.begin();
+	for (; it != invitationList.end(); ++it)
 	{
 		this->sendMessage(Message(this->prefix
 			, RPL_INVITELIST
@@ -435,16 +432,14 @@ void 		Server::showInvitationList(Channel &channel, Client *client)
 		  + " " + channel.getName()
 		  + " :End of channel invitation list")
 		, client);
-	delete invitationList;
 }
 void 		Server::showBanList(Channel &channel, Client *client)
 {
-	std::vector<std::string>::iterator it;
-	std::vector<std::string> *banList;
+	std::set<std::string>::iterator it;
+	std::set<std::string> &banList = channel.getBanList();
 
-	banList = channel.getBanList();
-	it = banList->begin();
-	for (; it != banList->end(); ++it)
+	it = banList.begin();
+	for (; it != banList.end(); ++it)
 	{
 		this->sendMessage(Message(this->prefix
 								, RPL_BANLIST
@@ -461,7 +456,6 @@ void 		Server::showBanList(Channel &channel, Client *client)
 							+ " " + channel.getName()
 							+ " :End of channel ban list")
 				   			, client);
-	delete banList;
 }
 
 // mode + channel + mode + modeparameter
@@ -473,6 +467,7 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 	char 		sign;
 	size_t      modeParamIndex;
 	size_t      modeCharIndex = 0;
+	std::string param;
 	std::map<std::string, Client>::iterator clientIter;
 	std::map<std::string, Channel>::iterator  chanIter;
 	std::vector<Client *>						joinedUsers;
@@ -577,7 +572,7 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 				break;
 
 			case 'k':
-				if (modeParamIndex >= message.getParameters().size())
+				if (isAdd && modeParamIndex >= message.getParameters().size())
 				{
 					error = ERR_NEEDMOREPARAMS;
 					return (-1); //need more params
@@ -590,25 +585,29 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 				else
 					chanIter->second.clearKey();
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
+				if (modeParamIndex >= message.getParameters().size())
+					param = "*";
+				else
+					param = message.getParameter(modeParamIndex);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
 					this->sendMessage(Message(":" + getClientPrefix(client)
 						, "MODE"
 						, chanIter->second.getName()
 						  + " " + sign + "k"
-						  + " " + message.getParameter(modeParamIndex)), joinedUsers[i]);
+						  + " " + param), joinedUsers[i]);
 				}
 				broadcastMessage(Message(":" + getClientPrefix(client)
 					, "MODE"
 					, chanIter->second.getName()
 					  + " " + sign + "k"
-					  + " " + message.getParameter(modeParamIndex)), client);
+					  + " " + param), client);
 
 				++modeParamIndex;
 				break;
 
 			case 'l':
-				if (modeParamIndex >= message.getParameters().size())
+				if (isAdd && modeParamIndex >= message.getParameters().size())
 				{
 					error = ERR_NEEDMOREPARAMS;
 					return (-1); //need more params
@@ -621,19 +620,23 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 				else
 					chanIter->second.clearLimit();
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
+				if (modeParamIndex >= message.getParameters().size())
+					param = "*";
+				else
+					param = message.getParameter(modeParamIndex);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
 					this->sendMessage(Message(":" + getClientPrefix(client)
 						, "MODE"
 						, chanIter->second.getName()
 						  + " " + sign + "l"
-						  + " " + message.getParameter(modeParamIndex)), joinedUsers[i]);
+						  + " " + param), joinedUsers[i]);
 				}
 				broadcastMessage(Message(":" + getClientPrefix(client)
 					, "MODE"
 					, chanIter->second.getName()
 					  + " " + sign + "l"
-					  + " " + message.getParameter(modeParamIndex)), client);
+					  + " " + param), client);
 				++modeParamIndex;
 				break;
 
@@ -647,25 +650,29 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 					break;
 				}
 				if (isAdd)
-					chanIter->second.setBanList(message.getParameter(modeParamIndex));
+					chanIter->second.setList(chanIter->second.getBanList(), MODE_B, message.getParameter(modeParamIndex));
 				else if (!isAdd && modeParamIndex >= message.getParameters().size())
-					chanIter->second.clearBanList();
+					chanIter->second.clearList(chanIter->second.getBanList(), MODE_B);
 				else
-					chanIter->second.eraseBanList(message.getParameter(modeParamIndex));
+					chanIter->second.eraseElement(chanIter->second.getBanList(), MODE_B, message.getParameter(modeParamIndex));
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
+				if (modeParamIndex >= message.getParameters().size())
+					param = "*";
+				else
+					param = message.getParameter(modeParamIndex);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
 					this->sendMessage(Message(":" + getClientPrefix(client)
 						, "MODE"
 						, chanIter->second.getName()
 						  + " " + sign + "b"
-						  + " " + message.getParameter(modeParamIndex)), joinedUsers[i]);
+						  + " " + param), joinedUsers[i]);
 				}
 				broadcastMessage(Message(":" + getClientPrefix(client)
 					, "MODE"
 					, chanIter->second.getName()
 					  + " " + sign + "b"
-					  + " " + message.getParameter(modeParamIndex)), client);
+					  + " " + param), client);
 				++modeParamIndex;
 				break;
 
@@ -679,25 +686,29 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 					break;
 				}
 				if (isAdd)
-					chanIter->second.setExceptionList(message.getParameter(modeParamIndex));
+					chanIter->second.setList(chanIter->second.getExceptionList(), MODE_E, message.getParameter(modeParamIndex));
 				else if (!isAdd && modeParamIndex >= message.getParameters().size())
-					chanIter->second.clearExceptionList();
+					chanIter->second.clearList(chanIter->second.getExceptionList(), MODE_E);
 				else
-					chanIter->second.eraseExceptionList(message.getParameter(modeParamIndex));
+					chanIter->second.eraseElement(chanIter->second.getExceptionList(), MODE_E, message.getParameter(modeParamIndex));
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
+				if (modeParamIndex >= message.getParameters().size())
+					param = "*";
+				else
+					param = message.getParameter(modeParamIndex);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
 					this->sendMessage(Message(":" + getClientPrefix(client)
 						, "MODE"
 						, chanIter->second.getName()
 						  + " " + sign + "e"
-						  + " " + message.getParameter(modeParamIndex)), joinedUsers[i]);
+						  + " " + param), joinedUsers[i]);
 				}
 				broadcastMessage(Message(":" + getClientPrefix(client)
 					, "MODE"
 					, chanIter->second.getName()
 					  + " " + sign + "e"
-					  + " " + message.getParameter(modeParamIndex)), client);
+					  + " " + param), client);
 				++modeParamIndex;
 				break;
 
@@ -711,25 +722,29 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 					break;
 				}
 				if (isAdd)
-					chanIter->second.setInvitationList(message.getParameter(modeParamIndex));
+					chanIter->second.setList(chanIter->second.getInvitationList(), MODE_UI, message.getParameter(modeParamIndex));
 				else if (!isAdd && modeParamIndex >= message.getParameters().size())
-					chanIter->second.clearInvitationList();
+					chanIter->second.clearList(chanIter->second.getInvitationList(), MODE_UI);
 				else
-					chanIter->second.eraseInvitationList(message.getParameter(modeParamIndex));
+					chanIter->second.eraseElement(chanIter->second.getInvitationList(), MODE_UI, message.getParameter(modeParamIndex));
 				joinedUsers = chanIter->second.getUsersList(this->serverName);
+				if (modeParamIndex >= message.getParameters().size())
+					param = "*";
+				else
+					param = message.getParameter(modeParamIndex);
 				for (int i = 0; i < (int)joinedUsers.size(); i++)
 				{
 					this->sendMessage(Message(":" + getClientPrefix(client)
 						, "MODE"
 						, chanIter->second.getName()
 						  + " " + sign + "e"
-						  + " " + message.getParameter(modeParamIndex)), joinedUsers[i]);
+						  + " " + param), joinedUsers[i]);
 				}
 				broadcastMessage(Message(":" + getClientPrefix(client)
 					, "MODE"
 					, chanIter->second.getName()
 					  + " " + sign + "e"
-					  + " " + message.getParameter(modeParamIndex)), client);
+					  + " " + param), client);
 				++modeParamIndex;
 				break;
 

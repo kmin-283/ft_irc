@@ -267,3 +267,10 @@ int		Server::eUnknownMode(const Message &message, Client *client)
 						+ " :is unknown mode char"), client);
 	return (CONNECT);
 }
+
+int		Server::eUserNotInChannel(const Message &message, Client *client)
+{
+	(void)message;
+	(void)client;
+	return (CONNECT);
+}

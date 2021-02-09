@@ -46,7 +46,6 @@ class		Channel
 	std::set<std::string>				exceptionList;
 	std::set<std::string>				invitationList;
 	std::set<std::string>				ableToJoinList;
-	//static std::set<std::string>		allUserList;
 public:
 	Channel();
 	Channel(const std::string &name);
@@ -59,20 +58,15 @@ public:
         void 								clearKey(void);
         void 								setLimit(const std::string &limit);
         void 								clearLimit(void);
-        void								setBanList(const std::string &banMask);
-        void 								eraseBanList(const std::string &banMask);
-        std::vector<std::string> 			*getBanList(void);
-        void 								clearBanList(void);
+		void 								setList(std::set<std::string> &list, const int &mode, const std::string &mask);
+        void 								eraseElement(std::set<std::string> &list, const int &mode, const std::string &mask);
 
-		void								setExceptionList(const std::string &exceptionMask);
-		void 								eraseExceptionList(const std::string &exceptionMask);
-		std::vector<std::string> 			*getExceptionList(void);
-		void 								clearExceptionList(void);
+        std::set<std::string> 				&getBanList(void);
+        void 								clearList(std::set<std::string> &list, const int &mode);
 
-		void								setInvitationList(const std::string &invitataionMask);
-		void 								eraseInvitationList(const std::string &invitationMask);
-		std::vector<std::string> 			*getInvitationList(void);
-		void 								clearInvitationList(void);
+		std::set<std::string> 				&getExceptionList(void);
+
+		std::set<std::string> 				&getInvitationList(void);
 
 	void 								setMode(const int &mode, const bool &setConfig);
         const int 							&getMode(void) const;

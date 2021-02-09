@@ -64,88 +64,38 @@ void 				Channel::clearLimit()
 	if (this->mode & MODE_L)
 		this->setMode(MODE_L, OFF);
 }
-
-void				Channel::setBanList(const std::string &banMask)
+void 				Channel::setList(std::set<std::string> &list, const int &mode, const std::string &mask)
 {
-	this->banList.insert(banMask);
-	if (!(this->mode & MODE_B))
-		this->setMode(MODE_B, ON);
+	list.insert(mask);
+	if (!(this->mode & mode))
+		this->setMode(mode, ON);
 }
 
-void 				Channel::eraseBanList(const std::string &banMask)
+std::set<std::string> &Channel::getBanList(void)
 {
-	this->banList.erase(banMask);
-}
-std::vector<std::string> *Channel::getBanList(void)
-{
-	std::set<std::string>::iterator it = this->banList.begin();
-	std::vector<std::string>		*ret = new std::vector<std::string>();
-
-	for (; it != this->banList.end(); ++it)
-		ret->push_back(*it);
-	return (ret);
+	return (this->banList);
 }
 
-void 				Channel::clearBanList()
+void 				Channel::eraseElement(std::set<std::string> &list, const int &mode, const std::string &mask)
 {
-	this->banList.clear();
-	if (this->mode & MODE_B)
-		this->setMode(MODE_B, OFF);
+	list.erase(mask);
+	if (list.empty())
+		this->setMode(mode, OFF);
 }
 
-void				Channel::setExceptionList(const std::string &exceptionMask)
+void 				Channel::clearList(std::set<std::string> &list, const int &mode)
 {
-	this->exceptionList.insert(exceptionMask);
-	if (!(this->mode & MODE_B))
-		this->setMode(MODE_B, ON);
+	list.clear();
+	if (this->mode & mode)
+		this->setMode(mode, OFF);
 }
-
-void 				Channel::eraseExceptionList(const std::string &exceptionMask)
+std::set<std::string> &Channel::getExceptionList(void)
 {
-	this->exceptionList.erase(exceptionMask);
+	return (this->exceptionList);
 }
-std::vector<std::string> *Channel::getExceptionList(void)
+std::set<std::string> &Channel::getInvitationList(void)
 {
-	std::set<std::string>::iterator it = this->exceptionList.begin();
-	std::vector<std::string>		*ret = new std::vector<std::string>();
-
-	for (; it != this->exceptionList.end(); ++it)
-		ret->push_back(*it);
-	return (ret);
-}
-
-void 				Channel::clearExceptionList()
-{
-	this->exceptionList.clear();
-	if (this->mode & MODE_B)
-		this->setMode(MODE_B, OFF);
-}
-void				Channel::setInvitationList(const std::string &exceptionMask)
-{
-	this->exceptionList.insert(exceptionMask);
-	if (!(this->mode & MODE_B))
-		this->setMode(MODE_B, ON);
-}
-
-void 				Channel::eraseInvitationList(const std::string &exceptionMask)
-{
-	this->exceptionList.erase(exceptionMask);
-}
-std::vector<std::string> *Channel::getInvitationList(void)
-{
-	std::set<std::string>::iterator it = this->exceptionList.begin();
-	std::vector<std::string>		*ret = new std::vector<std::string>();
-
-	for (; it != this->exceptionList.end(); ++it)
-		ret->push_back(*it);
-	return (ret);
-}
-
-void 				Channel::clearInvitationList()
-{
-	this->exceptionList.clear();
-	if (this->mode & MODE_B)
-		this->setMode(MODE_B, OFF);
+	return (this->invitationList);
 }
 
 const int 			&Channel::getMode() const
