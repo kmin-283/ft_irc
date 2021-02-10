@@ -118,7 +118,6 @@ int     Server::joinHandler(const Message &message, Client *client)
             targetChannel = &this->remoteChannelList[fullChannelName];
         }
         targetClient->joinChannel(targetChannel, message.getParameter(0));
-        this->sendClients[targetClient->getInfo(NICK)].joinChannel(targetChannel, fullChannelName);
         joinedUsers = targetChannel->getUsersList(this->serverName);
         for (int i = 0; i < (int)joinedUsers.size(); i++)
             this->sendMessage(Message(getClientPrefix(joinedUsers[i])
@@ -840,7 +839,8 @@ int     Server::namesHandler(const Message &message, Client *client)
         strClientPtrIter pit = this->clientList.begin();
         for (; pit != this->clientList.end(); pit++)
         {   
-            // TODO: clientList랑 client랑 채널 정보가 다름
+            // 연결된 다른 서버의 유저들도 출력이 되어야 함.
+            // TODO: clientList-> sendClients로 바꾸어야 함.
             if (pit->second->getNumbersOfJoinedChannels() == 0) 
                 noChannelUserList += (pit->first + " ");
         }
@@ -904,5 +904,26 @@ int     Server::listHandler(const Message &message, Client *client)
 
     // 323
     this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
+    return (CONNECT);
+}
+
+int     Server::inviteHandler(const Message &message, Client *client)
+{
+    Channel                                     *targetChannel;
+    std::map<std::string, Channel>::iterator    it;
+
+    if (message.getParameters().size() != 2)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+
+    // INVITE seunkim #my
+
+    // 서버의 채널이 있는지 확인
+    if ((it = this->localChannelList.find(message.getParameter(1))) != this->localChannelList.end())
+        targetChannel = &it->second;
+    else if ((it = this->remoteChannelList.find(message.getParameter(1))) != this-> remoteChannelList.end())
+        targetChannel = &it->second;
+    else
+        return (this->*(this->replies[ERR_NOSUCHNICK]))(message, client);
+
     return (CONNECT);
 }
