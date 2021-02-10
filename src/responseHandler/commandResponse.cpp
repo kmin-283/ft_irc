@@ -524,7 +524,30 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 			}
 		}
 	}
-	// join, mode보내기.....
+	// join, mode보내기....
+	std::vector<Client *>	userList;
+	std::vector<Client *>::iterator userIter;
+	std::map<std::string, Client *>::iterator operIter;
+	std::map<std::string, Channel>::iterator mapIter = this->localChannelList.begin();
+	for (; mapIter != this->localChannelList.end(); ++mapIter)
+	{
+		if (mapIter->first[0] == '#')
+		{
+			std::map<std::string, Client *> &operList = mapIter->second.getOperators();
+			userList = mapIter->second.getUsersList("all");
+			userIter = userList.begin();
+			for (; userIter != userList.end(); ++userIter) {
+				this->sendMessage(Message(":" + (*userIter)->getInfo(NICK), "JOIN", mapIter->first), client);
+			}
+			operIter = operList.begin();
+			prefix = ":" + operIter->second->getInfo(NICK);
+			parameters = "";
+			for (; operIter != operList.end(); ++operIter)
+				parameters += operIter->second->getInfo(NICK) + " ";
+			this->sendMessage(Message(prefix, "MODE", mapIter->first + " +o " + parameters), client);
+			userList.clear();
+		}
+	}
 	return (CONNECT);
 }
 

@@ -274,6 +274,11 @@ Client                  *Channel::findOperator(const std::string &userName)
 	return (NULL);
 }
 
+std::map<std::string, Client *>	&Channel::getOperators(void)
+{
+	return (this->operators);
+}
+
 std::vector<Client *> Channel::getUsersList(const std::string &mask)
 {
 	std::vector<Client *> users;
@@ -346,13 +351,19 @@ void    Channel::showUsersName(void)
 
 void 								Channel::makeUserToOper(const std::string &operName)
 {
-	this->operators[operName] = this->joinedUsers[operName];
-	this->joinedUsers.erase(operName);
+	if (!this->operators.count(operName))
+	{
+		this->operators[operName] = this->joinedUsers[operName];
+		this->joinedUsers.erase(operName);
+	}
 }
 void 								Channel::makeOperToUser(const std::string &userName)
 {
-	this->joinedUsers[userName] = this->operators[userName];
-	this->operators.erase(userName);
+	if (!this->joinedUsers.count(userName))
+	{
+		this->joinedUsers[userName] = this->operators[userName];
+		this->operators.erase(userName);
+	}
 }
 // channelPrefix   &Channel::getChannelPrefix(void) const
 // {
