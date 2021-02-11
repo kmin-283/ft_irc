@@ -203,6 +203,13 @@ int 	Client::getChannelMode() const
 	return (this->channelMode);
 }
 
+void	Client::addInvitedChannel(const std::string &channelName)
+{
+	this->invitedChannelList.insert(channelName);
+}
+
+//TODO: removeInvitedChannel
+
 void	Client::showChannel(void)
 {
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();

@@ -73,6 +73,7 @@ public:
         int 								toggleMode(std::string &successState, std::string &error, size_t &modeIndex, const Message &message);
         std::map<std::string, Client *>		&getOperators(void);
         Client                              *findOperator(const std::string &userName);
+        Client                              *findJoinedUser(const std::string &userName);
 
         std::vector<Client *>               getUsersList(const std::string &mask);
         void                                enterUser(Client *user);

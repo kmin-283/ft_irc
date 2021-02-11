@@ -170,6 +170,7 @@ private:
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitHandler(const Message &message, Client *client);
+	int																	rInviting(const Message &message, Client *client);
 
 	int																	rReplyHandler(const Message &message, Client *client);
 

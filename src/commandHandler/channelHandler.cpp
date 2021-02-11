@@ -907,21 +907,97 @@ int     Server::listHandler(const Message &message, Client *client)
 
 int     Server::inviteHandler(const Message &message, Client *client)
 {
-    Channel                                     *targetChannel;
-    std::map<std::string, Channel>::iterator    it;
-
+    Client      *targetUser;
+    Channel     *targetChannel;
+    std::string prefix;
+    
     if (message.getParameters().size() != 2)
         return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
 
     // INVITE seunkim #my
 
-    // 서버의 채널이 있는지 확인
-    if ((it = this->localChannelList.find(message.getParameter(1))) != this->localChannelList.end())
-        targetChannel = &it->second;
-    else if ((it = this->remoteChannelList.find(message.getParameter(1))) != this-> remoteChannelList.end())
-        targetChannel = &it->second;
-    else
-        return (this->*(this->replies[ERR_NOSUCHNICK]))(message, client);
+    // ngircd는 채널 확인을 안함.
+    // // 서버의 채널이 있는지 확인
+    // if (client->getStatus() == USER)
+    // {
+        // 유저가 있는지 확인
+        if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
+            targetUser = &this->sendClients[message.getParameter(0)];
+        else
+            return (this->*(this->replies[ERR_NOSUCHNICK]))(message, client);   // 401
+
+        // 채널이 서버에 있는지 확인
+        if (this->localChannelList.find(message.getParameter(1)) != this->localChannelList.end())
+            targetChannel = &this->localChannelList[message.getParameter(1)];
+        else if (this->remoteChannelList.find(message.getParameter(1)) != this-> remoteChannelList.end())
+            targetChannel = &this->remoteChannelList[message.getParameter(1)];
+        else
+        {   // 403
+            this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + message.getParameter(1) + " :No such channel"), client);
+            return (CONNECT);
+        }
+
+        // 유저가 채널에 들어가 있는지 확인
+        if (client->getStatus() == USER && !client->findChannel(message.getParameter(1)))
+        {   // 442
+            this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + message.getParameter(1) + " :You are not on that channel"), client);
+            return (CONNECT);
+        }
+
+        // 채널에 관리자인지 확인하기
+        if (client->getStatus() == USER && !targetChannel->findOperator(client->getInfo(NICK)))
+        {   // 482
+            this->sendMessage(Message(this->prefix, ERR_CHANOPRIVSNEEDED, client->getInfo(NICK) + " " + message.getParameter(1) + " :You're not channel operator"), client);
+            return (CONNECT);
+        }
+
+        // 채널에 유저가 이미 있는지 확인
+        if (targetChannel->findJoinedUser(message.getParameter(0)))
+        {   // 443
+            this->sendMessage(Message(this->prefix, ERR_USERONCHANNEL, message.getParameter(0) + " " + message.getParameter(1) + " :is already on channel"), client);
+            return (CONNECT);
+        }        
+        // 자신에게 초대장이 잘 갔다고 전송 341
+        // TODO: 여기서 처리해주면 안됨. 같은서버라면 해주지만 다른 서버면 잘 도착했다는 메시지를 받아야 함.
+
+        // 같은 서버에 유저가 있다면 메세지를 보냄
+        if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+        {   
+            //TODO: targetChannel이 i 모드 일떄만 추가해야 하는가.
+            targetUser->addInvitedChannel(message.getParameter(1));
+            prefix = getClientPrefix(&this->sendClients[message.getPrefix().substr(1)]);
+            this->sendMessage(Message(":" + prefix, "INVITE", targetUser->getInfo(NICK) + " " + message.getParameter(1)), targetUser);
+            prefix = getClientPrefix(targetUser);
+            this->sendMessage(Message(":" + prefix, RPL_INVITING, message.getPrefix().substr(1) + " " + message.getParameter(0) + " " + message.getParameter(1)), &this->sendClients[message.getPrefix().substr(1)]);
+        }
+        // 아니면 다른서버에 메시지 보냄.
+        else
+        {
+            if (message.getPrefix().empty())
+                prefix = client->getInfo(NICK);
+            else
+                prefix = message.getPrefix().substr(1);
+            this->sendMessage(Message(":" + prefix, "INVITE", message.getParameter(0) +  " " + message.getParameter(1)), targetUser);
+        }
+    // }
+    // else if (client->getStatus() == SERVER)
+    // {   // :seunkim INVITE kmin #My
+    //     std::string sendedUserName = message.getPrefix().substr(1);
+        
+    //     if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+    //     {
+    //         targetUser = this->clientList[message.getParameter(0)];
+    //         targetUser->addInvitedChannel(message.getParameter(1));
+    //         this->sendMessage(Message(":" + getClientPrefix(&this->sendClients[sendedUserName]), "INVITE", targetUser->getInfo(NICK) + " " + message.getParameter(1)), targetUser);
+    //         // :seunkim 341 kmin seunkim #2
+    //         // 잘 받았다고 다시 보내야 함.
+    //         this->sendMessage(message, &this->sendClients[message.getParameter(0)]);
+    //     }
+    //     else
+    //         this->broadcastMessage(message, client);
+    // }
+
+    // this->sendMessage(Message(":" + getClientPrefix(targetUser), RPL_INVITING, client->getInfo(NICK) + " " + message.getParameter(0) + " " + message.getParameter(1)), client);
 
     return (CONNECT);
 }
