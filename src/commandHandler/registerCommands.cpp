@@ -39,6 +39,7 @@ void	Server::registerCommands(void)
 	this->commands["NAMES"] = &Server::namesHandler;
 	this->commands["LIST"] = &Server::listHandler;
 	this->commands["INVITE"] = &Server::inviteHandler;
+	this->commands["KICK"] = &Server::kickHandler;
 
 	this->commands["ADMIN"] = &Server::adminHandler;
 	this->commands[RPL_ADMINME] = &Server::rReplyHandler;

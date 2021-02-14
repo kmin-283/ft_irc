@@ -113,6 +113,7 @@ private:
 	int     															namesHandler(const Message &message, Client *client);
 	int     															listHandler(const Message &message, Client *client);
 	int     															inviteHandler(const Message &message, Client *client);
+	int         														kickHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 
