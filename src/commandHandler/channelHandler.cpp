@@ -849,54 +849,6 @@ int         Server::modeHandler(const Message &message, Client *client)
 
 int     Server::namesHandler(const Message &message, Client *client)
 {
-<<<<<<< HEAD
-	std::string                                 noChannelUserList;
-	std::map<std::string, Channel>::iterator    it;
-	std::vector<std::string>                    channelNames;
-
-	client->setCurrentCommand("NAMES");
-	if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
-		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-
-	if (message.getParameters().size() == 0)
-	{
-		it = this->localChannelList.begin();
-		for (; it != this->localChannelList.end(); it++)
-			this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
-		it = this->remoteChannelList.begin();
-		for (; it != this->remoteChannelList.end(); it++)
-			this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
-		// 아무 채널에도 속해 있지 않는 유저들 찾기
-		strClientPtrIter pit = this->clientList.begin();
-		for (; pit != this->clientList.end(); pit++)
-		{
-			// TODO: clientList랑 client랑 채널 정보가 다름
-			if (pit->second->getNumbersOfJoinedChannels() == 0)
-				noChannelUserList += (pit->first + " ");
-		}
-		if (!noChannelUserList.empty())
-			this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " * * :" + noChannelUserList), client);
-		// 366
-		this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " * :End of NAMES list"), client);
-	}
-	else if (message.getParameters().size() == 1)
-	{
-		channelNames = getChannelNames(message.getParameter(0));
-		for (int i = 0; i < (int)channelNames.size(); i++)
-		{
-			if ((it = this->localChannelList.find(channelNames[i])) != this->localChannelList.end())
-				this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
-			else if ((it = this->remoteChannelList.find(channelNames[i])) != this->remoteChannelList.end())
-				this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
-			this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " " + channelNames[i] + " :End of NAMES list"), client);
-		}
-	}
-	else
-	{
-
-	}
-	return (CONNECT);
-=======
     std::string                                 noChannelUserList;
     std::map<std::string, Channel>::iterator    it;
     std::vector<std::string>                    channelNames;
@@ -944,48 +896,10 @@ int     Server::namesHandler(const Message &message, Client *client)
 
     }
     return (CONNECT);
->>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 }
 
 int     Server::listHandler(const Message &message, Client *client)
 {
-<<<<<<< HEAD
-	std::map<std::string, Channel>::iterator it;
-	std::vector<std::string> channelNames;
-
-	client->setCurrentCommand("LIST");
-	if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
-		return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
-
-	// 321
-	this->sendMessage(Message(this->prefix, RPL_LISTSTART, client->getInfo(NICK) + " Channel :Users  Names"), client);
-
-	if (message.getParameters().size() == 0)
-	{
-		it = this->localChannelList.begin();
-		for (; it != this->localChannelList.end(); it++)
-			this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
-		it = this->remoteChannelList.begin();
-		for (; it != this->remoteChannelList.end(); it++)
-			this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
-		this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " &SERVER 0 :Server Messages"), client);
-	}
-	else if (message.getParameters().size() == 1)
-	{
-		channelNames = getChannelNames(message.getParameter(0));
-		for (int i = 0; i < (int)channelNames.size(); i++)
-		{
-			if ((it = this->localChannelList.find(channelNames[i])) != this->localChannelList.end())
-				this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
-			else if ((it = this->remoteChannelList.find(channelNames[i])) != this->remoteChannelList.end())
-				this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
-		}
-	}
-
-	// 323
-	this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
-	return (CONNECT);
-=======
     std::map<std::string, Channel>::iterator it;
     std::vector<std::string> channelNames;
 
@@ -1174,5 +1088,4 @@ int         Server::kickHandler(const Message &message, Client *client)
     // :seunkim KICK #My kmin :seunkim
     // :seunkim!~q@localhost KICK #my kmin :seunkim
     return (CONNECT);
->>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 }

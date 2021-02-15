@@ -1,1 +1,0 @@
-CMakeLists.txt not found in /Users/kmin/42/ft_irc Select CMakeLists.txt

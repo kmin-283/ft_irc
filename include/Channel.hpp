@@ -67,24 +67,15 @@ public:
 
 	std::set<std::string> 				&getInvitationList(void);
 
+	std::vector<Client *>               getUsersList(const std::string &mask);
+	void                                enterUser(Client *user);
+	void                                leaveUser(Client *user);
 	void 								setMode(const int &mode, const bool &setConfig);
 	const int 							&getMode(void) const;
 	int 								toggleMode(std::string &successState, std::string &error, size_t &modeIndex, const Message &message);
 	std::map<std::string, Client *>		&getOperators(void);
 	Client                              *findOperator(const std::string &userName);
-
-<<<<<<< HEAD
-	std::vector<Client *>               getUsersList(const std::string &mask);
-	void                                enterUser(Client *user);
-	void                                leaveUser(Client *user);
-=======
-		void 								setMode(const int &mode, const bool &setConfig);
-        const int 							&getMode(void) const;
-        int 								toggleMode(std::string &successState, std::string &error, size_t &modeIndex, const Message &message);
-        std::map<std::string, Client *>		&getOperators(void);
-        Client                              *findOperator(const std::string &userName);
-        Client                              *findJoinedUser(const std::string &userName);
->>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
+	Client                              *findJoinedUser(const std::string &userName);
 
 	std::string                         getUserNameList(void);
 	// 임시로 만듬.
