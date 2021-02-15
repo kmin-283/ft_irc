@@ -1,3 +1,0 @@
-/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles/ft_irc.dir
