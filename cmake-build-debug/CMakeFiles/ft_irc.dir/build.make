@@ -80,405 +80,405 @@ include CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o: ../src/commandHandler/channelHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/channelHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/channelHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o: ../src/commandHandler/infoHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/infoHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/infoHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o: ../src/commandHandler/passHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/passHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/passHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o: ../src/commandHandler/privmsgHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/privmsgHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/privmsgHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o: ../src/commandHandler/registerCommands.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/registerCommands.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/registerCommands.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o: ../src/commandHandler/serverHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/serverHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/serverHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o: ../src/commandHandler/userHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/userHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/userHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o: ../src/commandHandler/wallopsHandler.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.o -c /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp
 
 CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp > CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.i
 
 CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/commandHandler/wallopsHandler.cpp -o CMakeFiles/ft_irc.dir/src/commandHandler/wallopsHandler.cpp.s
 
 CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o: ../src/responseHandler/commandResponse.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp
 
 CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.i
 
 CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/commandResponse.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/commandResponse.cpp.s
 
 CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o: ../src/responseHandler/errorResponse.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp
 
 CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.i
 
 CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/errorResponse.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/errorResponse.cpp.s
 
 CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o: ../src/responseHandler/registerReplies.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.o -c /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp
 
 CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp > CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.i
 
 CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/responseHandler/registerReplies.cpp -o CMakeFiles/ft_irc.dir/src/responseHandler/registerReplies.cpp.s
 
 CMakeFiles/ft_irc.dir/src/Channel.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/Channel.cpp.o: ../src/Channel.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ft_irc.dir/src/Channel.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Channel.cpp.o -c /Users/kmin/42/ft_irc/src/Channel.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Channel.cpp.o -c /Users/kmin/42/ft_irc/src/Channel.cpp
 
 CMakeFiles/ft_irc.dir/src/Channel.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/Channel.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Channel.cpp > CMakeFiles/ft_irc.dir/src/Channel.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Channel.cpp > CMakeFiles/ft_irc.dir/src/Channel.cpp.i
 
 CMakeFiles/ft_irc.dir/src/Channel.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/Channel.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Channel.cpp -o CMakeFiles/ft_irc.dir/src/Channel.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Channel.cpp -o CMakeFiles/ft_irc.dir/src/Channel.cpp.s
 
 CMakeFiles/ft_irc.dir/src/Client.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/Client.cpp.o: ../src/Client.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ft_irc.dir/src/Client.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Client.cpp.o -c /Users/kmin/42/ft_irc/src/Client.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Client.cpp.o -c /Users/kmin/42/ft_irc/src/Client.cpp
 
 CMakeFiles/ft_irc.dir/src/Client.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/Client.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Client.cpp > CMakeFiles/ft_irc.dir/src/Client.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Client.cpp > CMakeFiles/ft_irc.dir/src/Client.cpp.i
 
 CMakeFiles/ft_irc.dir/src/Client.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/Client.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Client.cpp -o CMakeFiles/ft_irc.dir/src/Client.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Client.cpp -o CMakeFiles/ft_irc.dir/src/Client.cpp.s
 
 CMakeFiles/ft_irc.dir/src/Info.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/Info.cpp.o: ../src/Info.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ft_irc.dir/src/Info.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Info.cpp.o -c /Users/kmin/42/ft_irc/src/Info.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Info.cpp.o -c /Users/kmin/42/ft_irc/src/Info.cpp
 
 CMakeFiles/ft_irc.dir/src/Info.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/Info.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Info.cpp > CMakeFiles/ft_irc.dir/src/Info.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Info.cpp > CMakeFiles/ft_irc.dir/src/Info.cpp.i
 
 CMakeFiles/ft_irc.dir/src/Info.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/Info.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Info.cpp -o CMakeFiles/ft_irc.dir/src/Info.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Info.cpp -o CMakeFiles/ft_irc.dir/src/Info.cpp.s
 
 CMakeFiles/ft_irc.dir/src/main.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/main.cpp.o: ../src/main.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/ft_irc.dir/src/main.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/main.cpp.o -c /Users/kmin/42/ft_irc/src/main.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/main.cpp.o -c /Users/kmin/42/ft_irc/src/main.cpp
 
 CMakeFiles/ft_irc.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/main.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/main.cpp > CMakeFiles/ft_irc.dir/src/main.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/main.cpp > CMakeFiles/ft_irc.dir/src/main.cpp.i
 
 CMakeFiles/ft_irc.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/main.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/main.cpp -o CMakeFiles/ft_irc.dir/src/main.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/main.cpp -o CMakeFiles/ft_irc.dir/src/main.cpp.s
 
 CMakeFiles/ft_irc.dir/src/Message.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/Message.cpp.o: ../src/Message.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/ft_irc.dir/src/Message.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Message.cpp.o -c /Users/kmin/42/ft_irc/src/Message.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Message.cpp.o -c /Users/kmin/42/ft_irc/src/Message.cpp
 
 CMakeFiles/ft_irc.dir/src/Message.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/Message.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Message.cpp > CMakeFiles/ft_irc.dir/src/Message.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Message.cpp > CMakeFiles/ft_irc.dir/src/Message.cpp.i
 
 CMakeFiles/ft_irc.dir/src/Message.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/Message.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Message.cpp -o CMakeFiles/ft_irc.dir/src/Message.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Message.cpp -o CMakeFiles/ft_irc.dir/src/Message.cpp.s
 
 CMakeFiles/ft_irc.dir/src/Server.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/Server.cpp.o: ../src/Server.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/ft_irc.dir/src/Server.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Server.cpp.o -c /Users/kmin/42/ft_irc/src/Server.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/Server.cpp.o -c /Users/kmin/42/ft_irc/src/Server.cpp
 
 CMakeFiles/ft_irc.dir/src/Server.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/Server.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Server.cpp > CMakeFiles/ft_irc.dir/src/Server.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/Server.cpp > CMakeFiles/ft_irc.dir/src/Server.cpp.i
 
 CMakeFiles/ft_irc.dir/src/Server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/Server.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Server.cpp -o CMakeFiles/ft_irc.dir/src/Server.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/Server.cpp -o CMakeFiles/ft_irc.dir/src/Server.cpp.s
 
 CMakeFiles/ft_irc.dir/src/ServerException.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/ServerException.cpp.o: ../src/ServerException.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/ft_irc.dir/src/ServerException.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/ServerException.cpp.o -c /Users/kmin/42/ft_irc/src/ServerException.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/ServerException.cpp.o -c /Users/kmin/42/ft_irc/src/ServerException.cpp
 
 CMakeFiles/ft_irc.dir/src/ServerException.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/ServerException.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/ServerException.cpp > CMakeFiles/ft_irc.dir/src/ServerException.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/ServerException.cpp > CMakeFiles/ft_irc.dir/src/ServerException.cpp.i
 
 CMakeFiles/ft_irc.dir/src/ServerException.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/ServerException.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/ServerException.cpp -o CMakeFiles/ft_irc.dir/src/ServerException.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/ServerException.cpp -o CMakeFiles/ft_irc.dir/src/ServerException.cpp.s
 
 CMakeFiles/ft_irc.dir/src/utils.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/src/utils.cpp.o: ../src/utils.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/ft_irc.dir/src/utils.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/utils.cpp.o -c /Users/kmin/42/ft_irc/src/utils.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/src/utils.cpp.o -c /Users/kmin/42/ft_irc/src/utils.cpp
 
 CMakeFiles/ft_irc.dir/src/utils.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/src/utils.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/utils.cpp > CMakeFiles/ft_irc.dir/src/utils.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/src/utils.cpp > CMakeFiles/ft_irc.dir/src/utils.cpp.i
 
 CMakeFiles/ft_irc.dir/src/utils.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/src/utils.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/utils.cpp -o CMakeFiles/ft_irc.dir/src/utils.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/src/utils.cpp -o CMakeFiles/ft_irc.dir/src/utils.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o: ../tests/gnl/get_next_line.c
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o   -c /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.o   -c /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.i"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c > CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c > CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.i
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.s"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/kmin/42/ft_irc/tests/gnl/get_next_line.c -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line.c.s
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o: ../tests/gnl/get_next_line_utils.c
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o   -c /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.o   -c /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.i"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c > CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c > CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.i
 
 CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.s"
-	/Library/Developer/CommandLineTools/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/kmin/42/ft_irc/tests/gnl/get_next_line_utils.c -o CMakeFiles/ft_irc.dir/tests/gnl/get_next_line_utils.c.s
 
 CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o: ../tests/AllTests.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o -c /Users/kmin/42/ft_irc/tests/AllTests.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/AllTests.cpp.o -c /Users/kmin/42/ft_irc/tests/AllTests.cpp
 
 CMakeFiles/ft_irc.dir/tests/AllTests.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/AllTests.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/AllTests.cpp > CMakeFiles/ft_irc.dir/tests/AllTests.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/AllTests.cpp > CMakeFiles/ft_irc.dir/tests/AllTests.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/AllTests.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/AllTests.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/AllTests.cpp -o CMakeFiles/ft_irc.dir/tests/AllTests.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/AllTests.cpp -o CMakeFiles/ft_irc.dir/tests/AllTests.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o: ../tests/disconnectClientTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o -c /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.o -c /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp > CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp > CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp -o CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/disconnectClientTest.cpp -o CMakeFiles/ft_irc.dir/tests/disconnectClientTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o: ../tests/messageConstructTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o -c /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.o -c /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp > CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp > CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp -o CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/messageConstructTest.cpp -o CMakeFiles/ft_irc.dir/tests/messageConstructTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o: ../tests/messageParsingTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o -c /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.o -c /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp > CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp > CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp -o CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/messageParsingTest.cpp -o CMakeFiles/ft_irc.dir/tests/messageParsingTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o: ../tests/nickHandlerTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/nickHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/nickHandlerTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o: ../tests/quitHandlerTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/quitHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/quitHandlerTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o: ../tests/registerUserTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o -c /Users/kmin/42/ft_irc/tests/registerUserTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.o -c /Users/kmin/42/ft_irc/tests/registerUserTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/registerUserTest.cpp > CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/registerUserTest.cpp > CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/registerUserTest.cpp -o CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/registerUserTest.cpp -o CMakeFiles/ft_irc.dir/tests/registerUserTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o: ../tests/serverHandlerTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/serverHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/serverHandlerTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o: ../tests/squitHandlerTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/squitHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/squitHandlerTest.cpp.s
 
 CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o: CMakeFiles/ft_irc.dir/flags.make
 CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o: ../tests/userHandlerTest.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/kmin/42/ft_irc/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.o -c /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp
 
 CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp > CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.i
 
 CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/kmin/42/ft_irc/tests/userHandlerTest.cpp -o CMakeFiles/ft_irc.dir/tests/userHandlerTest.cpp.s
 
 # Object files for target ft_irc
 ft_irc_OBJECTS = \

@@ -71,6 +71,7 @@
 
 class			Message;
 
+bool 			match(const char *first, const char *second);
 int				ft_atoi(const char *str);
 bool			isInTheMask(const std::string &mask, const char &target);
 void			*ft_memset(void *s, int c, size_t n);

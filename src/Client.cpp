@@ -2,7 +2,7 @@
 
 Client::Client()
 	: fd(0), isAuthorized(false), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
+	, currentCommand(""), prevCommand(""), waitPong(true)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -11,7 +11,7 @@ Client::Client()
 }
 Client::Client(const int fd, const bool isAuthorized)
 	: fd(fd), isAuthorized(isAuthorized), status(UNKNOWN), receivedMessageStr("")
-	, currentCommand(""), prevCommand(""), waitPong(true), channelMode(0)
+	, currentCommand(""), prevCommand(""), waitPong(true)
 {
 	this->info.assign(DEFAULT_SIZE, "");
 	this->queryData.assign(5, 0);
@@ -190,19 +190,6 @@ int			Client::getNumbersOfJoinedChannels(void)
 	return (this->subscribedChannels.size());
 }
 
-void 	Client::setChannelMode(const int &mode, const bool &isAdd)
-{
-	if (isAdd)
-		this->channelMode |= mode;
-	else
-		this->channelMode ^= mode;
-}
-
-int 	Client::getChannelMode() const
-{
-	return (this->channelMode);
-}
-
 void	Client::showChannel(void)
 {
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();
@@ -210,4 +197,19 @@ void	Client::showChannel(void)
 	for (; it != this->subscribedChannels.end(); it++)
 		std::cout << it->second->getName() << " ";
 	std::cout << "] " << std::endl;
+}
+
+bool 	Client::isInvited(const std::string &channelName)
+{
+	return  (this->invitedChannelList.count(channelName) ? true : false);
+}
+
+void 	Client::setInviteChanList(const std::string &channelName)
+{
+	this->invitedChannelList.insert(channelName);
+}
+
+void 	Client::delInviteChanList(const std::string &channelName)
+{
+	this->invitedChannelList.erase(channelName);
 }

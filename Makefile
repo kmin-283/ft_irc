@@ -3,7 +3,7 @@ CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra
 NAME = ircserv
 INCLUDE = -I ./include/
 
-SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp Channel.cpp
+SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp Channel.cpp sendInfos.cpp
 SRC_DIR = ./src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)

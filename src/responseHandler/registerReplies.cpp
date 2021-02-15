@@ -25,8 +25,9 @@ void			Server::registerReplies(void)
     this->replies[ERR_UNKNOWNMODE] = &Server::eUnknownMode;
     this->replies[ERR_USERNOTINCHANNEL] = &Server::eUserNotInChannel;
 
-
-
+    this->replies[ERR_INVITEONLYCAHN] = &Server::eInviteOnlyChan;
+    this->replies[ERR_BANNEDFROMCHAN] = &Server::eBannedFromChan;
+    this->replies[ERR_BADCHANNELKEY] = &Server::eBadChannelKey;
 
 
 	this->replies[RPL_REGISTERUSER] = &Server::rRegisterUserHandler;

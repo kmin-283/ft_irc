@@ -279,3 +279,34 @@ int		Server::eUserNotInChannel(const Message &message, Client *client)
 				, client);
 	return (CONNECT);
 }
+int 	Server::eBadChannelKey(const Message &message, Client *client)
+{
+	sendMessage(Message(this->prefix
+					 ,ERR_BADCHANNELKEY
+					 , client->getInfo(NICK)
+					 + " " + message.getParameter(0)
+					 + " :Cannot join Channel (+k) -- Wrong Channel Key")
+			 		 , client);
+	return (CONNECT);
+}
+int		Server::eInviteOnlyChan(const Message &message, Client *client)
+{
+	sendMessage(Message(this->prefix
+				, ERR_INVITEONLYCAHN
+				, client->getInfo(NICK)
+				+ " " + message.getParameter(0)
+				+ " :Cannot join Channel (+i) -- Invited Users Only")
+			 	, client);
+	return (CONNECT);
+}
+
+int 	Server::eBannedFromChan(const Message &message, Client *client)
+{
+	sendMessage(Message(this->prefix
+				, ERR_BANNEDFROMCHAN
+			 	, client->getInfo(NICK)
+			 	+ " " + message.getParameter(0)
+			 	+ " :Cannot join Channel (+b) -- You are banned")
+				, client);
+	return (CONNECT);
+}
