@@ -40,28 +40,13 @@ std::string     Server::getClientPrefix(Client *client)
 
 int     Server::privmsgHandler(const Message &message, Client *client)
 {
-    Client *targetClient;
+    Client                  *sender;
+    Client                  *targetClient;
+    Channel                 *targetChannel;
+    std::vector<Client *>   joinedUsers;
 
     client->setCurrentCommand("PRIVMSG");
     
-    // std::map<std::string, Client >::iterator it = this->sendClients.begin();
-    // std::cout << "sendClients [ ";
-    // for (; it != this->sendClients.end(); it++)
-    //     std::cout << it->first << " ";
-    // std::cout << "]" << std::endl;
-
-    // std::map<std::string, Client *>::iterator it2 = this->serverList.begin();
-    // std::cout << "serverList [ ";
-    // for (; it2 != this->serverList.end(); it2++)
-    //     std::cout << it2->first << " ";
-    // std::cout << "]" << std::endl;
-
-    // std::map<std::string, Client *>::iterator it3 = this->clientList.begin();
-    // std::cout << "clientList [ ";
-    // for (; it3 != this->clientList.end(); it3++)
-    //     std::cout << it3->first << " ";
-    // std::cout << "]" << std::endl;
-
     if (message.getParameters().size() == 0)        // 인자가 아무것도 없을 때 privmsg
         return ((this->*(this->replies[ERR_NORECIPIENT]))(message, client));
     else if (message.getParameters().size() == 1)   // 인자가 한개 있을 때 privmsg seun
@@ -70,36 +55,55 @@ int     Server::privmsgHandler(const Message &message, Client *client)
         return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
     else
     {   
-        /* 클라이언트 일때
-        먼저 같은 서버에서 확인을 하고 없다면
-        다른 서버에 클라이언트를 확인
-        */
-        // clientList 비어 있을 수도 있음.
-        
-        // 같은 서버안에 있는 유저에게 보내는 경우
-        if ((this->clientList.size() != 0) && (this->clientList.find(message.getParameter(0)) != this->clientList.end()))
+        // privmsg #my hello
+        if (message.getParameter(0).at(0) == '#' || message.getParameter(0).at(0) == '&')
         {   
-            targetClient = this->clientList[message.getParameter(0)];
-            // 클라이언트가 보냈을 때
-            if (message.getPrefix().empty())
-                this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", getTextMessage(message)), targetClient);
-            // 서버가 보냈을 때
+            if (this->localChannelList.find(message.getParameter(0)) != this->localChannelList.end())
+                targetChannel = &this->localChannelList[message.getParameter(0)];
+            else if (this->remoteChannelList.find(message.getParameter(0)) != this->remoteChannelList.end())
+                targetChannel = &this->remoteChannelList[message.getParameter(0)];
+            else    // 401
+                return ((this->*(this->replies[ERR_NOSUCHNICK]))(message, client));
+
+            if (client->getStatus() == USER)
+                sender = client;
             else
-                this->sendMessage(Message(message.getPrefix(), "PRIVMSG", getTextMessage(message)), targetClient);
-        }
-        // 같은 서버에 없어서 다른 서버로 보내는 경우
-        else if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
-        {
-            targetClient = &this->sendClients[message.getParameter(0)];
-            if (message.getPrefix().empty())
-                this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", getTextMessage(message)), targetClient);
-            else
-                this->sendMessage(Message(message.getPrefix(), "PRIVMSG", getTextMessage(message)), targetClient);
+                sender = &this->sendClients[message.getPrefix().substr(1)];
+
+            // 지금 채널에 있는 유저들에게 메세지 보냄
+            // :kmin!~q@localhost PRIVMSG #my :hello
+            joinedUsers = targetChannel->getUsersList(this->serverName);
+            for (int i = 0; i < (int)joinedUsers.size(); i++)
+                this->sendMessage(Message(":" + getClientPrefix(sender), "PRIVMSG", getTextMessage(message)), joinedUsers[i]);
+
+            // 다른 서버에 메시지 보냄
+            // :seunkim PRIVMSG #my :hello 
+            this->broadcastMessage(Message(":" + sender->getInfo(NICK), "PRIVMSG", getTextMessage(message)), client);
         }
         else
-            return ((this->*(this->replies[ERR_NOSUCHNICK]))(message, client));
-        
-        // 첫번째 파라미터 맨 앞글자에 '#'이 들어오면 채널!
+        {
+            if ((this->clientList.size() != 0) && (this->clientList.find(message.getParameter(0)) != this->clientList.end()))
+            {       
+                targetClient = this->clientList[message.getParameter(0)];
+                if (message.getPrefix().empty())
+                    this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", getTextMessage(message)), targetClient);
+                else
+                    this->sendMessage(Message(message.getPrefix(), "PRIVMSG", getTextMessage(message)), targetClient);
+            }
+            else if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
+            {
+                targetClient = &this->sendClients[message.getParameter(0)];
+                if (message.getPrefix().empty())
+                    this->sendMessage(Message(":" + getClientPrefix(client), "PRIVMSG", getTextMessage(message)), targetClient);
+                else
+                    this->sendMessage(Message(message.getPrefix(), "PRIVMSG", getTextMessage(message)), targetClient);
+            }
+            else
+                return ((this->*(this->replies[ERR_NOSUCHNICK]))(message, client));
+            }
     }
     return (CONNECT);
 }
+
+// 채널 모드가 n 이고 그 채널에 없을 때
+// :irc.example.net 404 kmin #my :Cannot send to channel
