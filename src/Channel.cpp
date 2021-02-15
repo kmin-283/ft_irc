@@ -279,6 +279,16 @@ std::map<std::string, Client *>	&Channel::getOperators(void)
 	return (this->operators);
 }
 
+Client	*Channel::findJoinedUser(const std::string &userName)
+{
+	for (strClientIter it = this->joinedUsers.begin(); it != this->joinedUsers.end(); it++)
+	{	
+		if (userName == it->second->getInfo(NICK))
+			return (it->second);
+	}
+	return (NULL);
+}
+
 std::vector<Client *> Channel::getUsersList(const std::string &mask)
 {
 	std::vector<Client *> users;

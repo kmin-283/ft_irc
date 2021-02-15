@@ -748,3 +748,18 @@ int				Server::rEndOfLinks(const Message &message, Client *client)
 						, client);
 	return (CONNECT);
 }
+
+int				Server::rInviting(const Message &message, Client *client)
+{	
+	Client	*targetUser;
+
+	(void) client;
+	if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+	{
+		targetUser = this->clientList[message.getParameter(0)];
+		this->sendMessage(message, targetUser);
+	}
+	else
+		this->sendMessage(message, &this->sendClients[message.getParameter(0)]);
+	return (CONNECT);
+}

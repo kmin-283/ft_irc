@@ -102,6 +102,7 @@ private:
 
 	std::map<std::string, Channel *>	subscribedChannels;
 	int 								channelMode;
+	std::set<std::string>				invitedChannelList;
 
 public:
 	Client(void);
@@ -147,6 +148,8 @@ public:
 	int									getNumbersOfJoinedChannels(void);
 	void 								setChannelMode(const int &mode, const bool &isAdd);
 	int 								getChannelMode(void) const;
+
+	void								addInvitedChannel(const std::string &channelName);
 
 	// 디버깅
 	void								showChannel(void);
