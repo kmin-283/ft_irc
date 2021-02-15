@@ -74,6 +74,8 @@
 # define RPL_TOPIC "332"
 # define RPL_TOPICWHOTIME "333"
 
+# define RPL_INVITING "341"
+
 # define RPL_INVITELIST "346"
 # define RPL_ENDOFINVITELIST "347"
 

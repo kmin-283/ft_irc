@@ -112,6 +112,8 @@ private:
 
 	int     															namesHandler(const Message &message, Client *client);
 	int     															listHandler(const Message &message, Client *client);
+	int     															inviteHandler(const Message &message, Client *client);
+	int         														kickHandler(const Message &message, Client *client);
 
 	int                                                                 adminHandler(const Message &message, Client *client);
 
@@ -171,6 +173,7 @@ private:
 	int																	rSquitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitBroadcastHandler(const Message &message, Client *client);
 	int																	rQuitHandler(const Message &message, Client *client);
+	int																	rInviting(const Message &message, Client *client);
 
 	int																	rReplyHandler(const Message &message, Client *client);
 

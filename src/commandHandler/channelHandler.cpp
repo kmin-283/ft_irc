@@ -849,6 +849,7 @@ int         Server::modeHandler(const Message &message, Client *client)
 
 int     Server::namesHandler(const Message &message, Client *client)
 {
+<<<<<<< HEAD
 	std::string                                 noChannelUserList;
 	std::map<std::string, Channel>::iterator    it;
 	std::vector<std::string>                    channelNames;
@@ -895,10 +896,60 @@ int     Server::namesHandler(const Message &message, Client *client)
 
 	}
 	return (CONNECT);
+=======
+    std::string                                 noChannelUserList;
+    std::map<std::string, Channel>::iterator    it;
+    std::vector<std::string>                    channelNames;
+
+    client->setCurrentCommand("NAMES");
+    if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
+        return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+    
+    if (message.getParameters().size() == 0)
+    {
+        it = this->localChannelList.begin();
+        for (; it != this->localChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
+        it = this->remoteChannelList.begin();
+        for (; it != this->remoteChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
+        // 아무 채널에도 속해 있지 않는 유저들 찾기
+        strClientPtrIter pit = this->clientList.begin();
+        for (; pit != this->clientList.end(); pit++)
+        {   
+            // 연결된 다른 서버의 유저들도 출력이 되어야 함.
+            // TODO: clientList-> sendClients로 바꾸어야 함.
+            if (pit->second->getNumbersOfJoinedChannels() == 0) 
+                noChannelUserList += (pit->first + " ");
+        }
+        if (!noChannelUserList.empty())
+            this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " * * :" + noChannelUserList), client);
+        // 366
+        this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " * :End of NAMES list"), client);
+    }
+    else if (message.getParameters().size() == 1)
+    {
+        channelNames = getChannelNames(message.getParameter(0));
+        for (int i = 0; i < (int)channelNames.size(); i++)
+        {
+            if ((it = this->localChannelList.find(channelNames[i])) != this->localChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
+            else if ((it = this->remoteChannelList.find(channelNames[i])) != this->remoteChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_NAMREPLY, client->getInfo(NICK) + " = " + it->first + " :" + it->second.getUserNameList()), client);
+            this->sendMessage(Message(this->prefix, RPL_ENDOFNAMES, client->getInfo(NICK) + " " + channelNames[i] + " :End of NAMES list"), client);            
+        }
+    }
+    else
+    {
+
+    }
+    return (CONNECT);
+>>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 }
 
 int     Server::listHandler(const Message &message, Client *client)
 {
+<<<<<<< HEAD
 	std::map<std::string, Channel>::iterator it;
 	std::vector<std::string> channelNames;
 
@@ -934,4 +985,194 @@ int     Server::listHandler(const Message &message, Client *client)
 	// 323
 	this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
 	return (CONNECT);
+=======
+    std::map<std::string, Channel>::iterator it;
+    std::vector<std::string> channelNames;
+
+    client->setCurrentCommand("LIST");
+    if (!(message.getParameters().size() >= 0 && message.getParameters().size() <= 2))
+        return ((this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client));
+
+    // 321
+    this->sendMessage(Message(this->prefix, RPL_LISTSTART, client->getInfo(NICK) + " Channel :Users  Names"), client);
+
+    if (message.getParameters().size() == 0)
+    {
+        it = this->localChannelList.begin();
+        for (; it != this->localChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
+        it = this->remoteChannelList.begin();
+        for (; it != this->remoteChannelList.end(); it++)
+            this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
+        this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " &SERVER 0 :Server Messages"), client);
+    }
+    else if (message.getParameters().size() == 1)
+    {
+        channelNames = getChannelNames(message.getParameter(0));
+        for (int i = 0; i < (int)channelNames.size(); i++)
+        {
+            if ((it = this->localChannelList.find(channelNames[i])) != this->localChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
+            else if ((it = this->remoteChannelList.find(channelNames[i])) != this->remoteChannelList.end())
+                this->sendMessage(Message(this->prefix, RPL_LIST, client->getInfo(NICK) + " " + it->first + " " + std::to_string(it->second.getNumbersOfUsers()) + " :" + it->second.getTopic()), client);
+        }
+    }
+
+    // 323
+    this->sendMessage(Message(this->prefix, RPL_LISTEND, client->getInfo(NICK) + " :End of LIST"), client);
+    return (CONNECT);
+}
+
+int     Server::inviteHandler(const Message &message, Client *client)
+{
+    Client      *targetUser;
+    Channel     *targetChannel;
+    std::string prefix;
+    
+    if (message.getParameters().size() != 2)
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+
+    // INVITE seunkim #my
+
+    // ngircd는 채널 확인을 안함.
+    // // 서버의 채널이 있는지 확인
+    // if (client->getStatus() == USER)
+    // {
+    // 유저가 있는지 확인
+    if (this->sendClients.find(message.getParameter(0)) != this->sendClients.end())
+        targetUser = &this->sendClients[message.getParameter(0)];
+    else
+        return (this->*(this->replies[ERR_NOSUCHNICK]))(message, client);   // 401
+    // 채널이 서버에 있는지 확인
+    if (this->localChannelList.find(message.getParameter(1)) != this->localChannelList.end())
+        targetChannel = &this->localChannelList[message.getParameter(1)];
+    else if (this->remoteChannelList.find(message.getParameter(1)) != this-> remoteChannelList.end())
+        targetChannel = &this->remoteChannelList[message.getParameter(1)];
+    else
+    {   // 403
+        this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + message.getParameter(1) + " :No such channel"), client);
+        return (CONNECT);
+    }
+    // 유저가 채널에 들어가 있는지 확인
+    if (client->getStatus() == USER && !client->findChannel(message.getParameter(1)))
+    {   // 442
+        this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + message.getParameter(1) + " :You are not on that channel"), client);
+        return (CONNECT);
+    }
+    // 채널에 관리자인지 확인하기
+    if (client->getStatus() == USER && !targetChannel->findOperator(client->getInfo(NICK)))
+    {   // 482
+        this->sendMessage(Message(this->prefix, ERR_CHANOPRIVSNEEDED, client->getInfo(NICK) + " " + message.getParameter(1) + " :You're not channel operator"), client);
+        return (CONNECT);
+    }
+    // 채널에 유저가 이미 있는지 확인
+    if (targetChannel->findJoinedUser(message.getParameter(0)))
+    {   // 443
+        this->sendMessage(Message(this->prefix, ERR_USERONCHANNEL, message.getParameter(0) + " " + message.getParameter(1) + " :is already on channel"), client);
+        return (CONNECT);
+    }        
+    // 같은 서버에 유저가 있다면 메세지를 보냄
+    if (this->clientList.find(message.getParameter(0)) != this->clientList.end())
+    {   
+        //TODO: targetChannel이 i 모드 일떄만 추가해야 하는가.
+        targetUser->addInvitedChannel(message.getParameter(1));
+        prefix = getClientPrefix(&this->sendClients[message.getPrefix().substr(1)]);
+        this->sendMessage(Message(":" + prefix, "INVITE", targetUser->getInfo(NICK) + " " + message.getParameter(1)), targetUser);
+        prefix = getClientPrefix(targetUser);
+        this->sendMessage(Message(":" + prefix, RPL_INVITING, message.getPrefix().substr(1) + " " + message.getParameter(0) + " " + message.getParameter(1)), &this->sendClients[message.getPrefix().substr(1)]);
+    }
+    // 아니면 다른서버에 메시지 보냄.
+    else
+    {
+        if (message.getPrefix().empty())
+            prefix = client->getInfo(NICK);
+        else
+            prefix = message.getPrefix().substr(1);
+        this->sendMessage(Message(":" + prefix, "INVITE", message.getParameter(0) +  " " + message.getParameter(1)), targetUser);
+    }
+    return (CONNECT);
+}
+
+int         Server::kickHandler(const Message &message, Client *client)
+{
+    Channel                 *targetChannel;
+    Client                  *targetUser;
+    std::string             prefix;
+    std::string             kickMessage;
+    std::vector<Client *>   joinedUsers;
+
+    if (!(message.getParameters().size() >= 2 && message.getParameters().size() <= 3))
+        return (this->*(this->replies[ERR_NEEDMOREPARAMS]))(message, client);
+
+    // KICK #my kmin hello
+
+    // 403 ERR_NOSUCHCHANNEL "<channel name> :No such channel"
+    if (this->localChannelList.find(message.getParameter(0)) != this->localChannelList.end())
+        targetChannel = &this->localChannelList[message.getParameter(0)];
+    else if (this->remoteChannelList.find(message.getParameter(0)) != this->remoteChannelList.end())
+        targetChannel = &this->remoteChannelList[message.getParameter(0)];
+    else
+    {
+        this->sendMessage(Message(this->prefix, ERR_NOSUCHCHANNEL, client->getInfo(NICK) + " " + message.getParameter(0) + " :No such channel"), client);
+        return (CONNECT);
+    }
+    // 401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
+    if (this->sendClients.find(message.getParameter(1)) != this->sendClients.end())
+        targetUser = &this->sendClients[message.getParameter(1)];
+    else
+    {
+        this->sendMessage(Message(this->prefix, ERR_NOSUCHNICK, client->getInfo(NICK) + " " + message.getParameter(1) + " :No such nick or channel name"), client);
+        return (CONNECT);
+    }
+    // 442 ERR_NOTONCHANNEL "<channel> :You're not on that channel"
+    if (client->getStatus() == USER && !(targetChannel->findJoinedUser(client->getInfo(NICK)) || targetChannel->findOperator(client->getInfo(NICK))))
+    {
+        this->sendMessage(Message(this->prefix, ERR_NOTONCHANNEL, client->getInfo(NICK) + " " + message.getParameter(0) + " :You are not on that channel"), client);
+        return (CONNECT);
+    }
+    // 482 ERR_CHANOPRIVSNEEDED "<channel> :You're not channel operator"
+    if (client->getStatus() == USER && !targetChannel->findOperator(client->getInfo(NICK)))
+    {
+        this->sendMessage(Message(this->prefix, ERR_CHANOPRIVSNEEDED, client->getInfo(NICK) + " " + message.getParameter(0) + " :You're not channel operator"), client);
+        return (CONNECT);
+    }
+    // 441 ERR_USERNOTINCHANNEL "<nick> <channel> :They aren't on that channel"
+    if (!(targetChannel->findOperator(message.getParameter(1)) || targetChannel->findJoinedUser(message.getParameter(1))))
+    {
+        this->sendMessage(Message(this->prefix, ERR_USERNOTINCHANNEL, message.getParameter(1) + " " + message.getParameter(0) + " :They aren't on that channel"), client);
+        return (CONNECT);
+    }
+    // 같은 서버에 유저가 있을 때
+    
+    if (message.getPrefix().empty())
+        prefix = client->getInfo(NICK);
+    else
+        prefix = message.getPrefix().substr(1);
+    if (message.getParameters().size() > 2)
+        kickMessage = message.getParameter(2);
+    else
+        kickMessage = ":" + prefix;
+
+    joinedUsers = targetChannel->getUsersList(this->serverName);
+    for (int i = 0; i < (int)joinedUsers.size(); i++)
+        this->sendMessage(Message(getClientPrefix(&this->sendClients[prefix])
+                                    , "KICK"
+                                    , message.getParameter(0)
+                                    + " " + message.getParameter(1)
+                                    + " " + kickMessage)
+                                    , joinedUsers[i]);
+
+    targetChannel->leaveUser(targetUser);
+    targetUser->leaveChannel(message.getParameter(0));
+
+    this->broadcastMessage(Message(":" + prefix
+                                    , "KICK"
+                                    , message.getParameter(0)
+                                    + " " + message.getParameter(1)
+                                    + " " + kickMessage), client);
+    
+    // :seunkim KICK #My kmin :seunkim
+    // :seunkim!~q@localhost KICK #my kmin :seunkim
+    return (CONNECT);
+>>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 }

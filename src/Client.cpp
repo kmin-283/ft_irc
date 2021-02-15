@@ -190,6 +190,29 @@ int			Client::getNumbersOfJoinedChannels(void)
 	return (this->subscribedChannels.size());
 }
 
+<<<<<<< HEAD
+=======
+void 	Client::setChannelMode(const int &mode, const bool &isAdd)
+{
+	if (isAdd)
+		this->channelMode |= mode;
+	else
+		this->channelMode ^= mode;
+}
+
+int 	Client::getChannelMode() const
+{
+	return (this->channelMode);
+}
+
+void	Client::addInvitedChannel(const std::string &channelName)
+{
+	this->invitedChannelList.insert(channelName);
+}
+
+//TODO: removeInvitedChannel
+
+>>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 void	Client::showChannel(void)
 {
 	std::map<std::string, Channel *>::iterator it = this->subscribedChannels.begin();

@@ -101,7 +101,11 @@ private:
 	std::time_t         pingLimit;
 
 	std::map<std::string, Channel *>	subscribedChannels;
+<<<<<<< HEAD
 
+=======
+	int 								channelMode;
+>>>>>>> ac5f76677edd2b9e6abb0923e9952741aecdb1c4
 	std::set<std::string>				invitedChannelList;
 
 public:
@@ -146,6 +150,8 @@ public:
 	Channel*							findChannel(const std::string &channelName);
 
 	int									getNumbersOfJoinedChannels(void);
+
+	void								addInvitedChannel(const std::string &channelName);
 
 	// 디버깅
 	void								showChannel(void);
