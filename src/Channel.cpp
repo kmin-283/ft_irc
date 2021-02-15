@@ -44,6 +44,11 @@ void 				Channel::setKey(const std::string &key)
 		this->setMode(MODE_K, ON);
 }
 
+bool 	Channel::checkKey(const std::string &key)
+{
+	return (this->key == key ? true : false);
+}
+
 void 				Channel::clearKey(void)
 {
 	this->key.clear();
@@ -64,6 +69,7 @@ void 				Channel::clearLimit()
 	if (this->mode & MODE_L)
 		this->setMode(MODE_L, OFF);
 }
+
 void 				Channel::setList(std::set<std::string> &list, const int &mode, const std::string &mask)
 {
 	list.insert(mask);
@@ -135,7 +141,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_LI)
+					if (!(this->mode & MODE_LI))
 						break;
 					this->mode ^= MODE_LI;
 				}
@@ -151,7 +157,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_M)
+					if (!(this->mode & MODE_M))
 						break;
 					this->mode ^= MODE_M;
 				}
@@ -167,7 +173,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_N)
+					if (!(this->mode & MODE_N))
 						break;
 					this->mode ^= MODE_N;
 				}
@@ -183,7 +189,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_Q)
+					if (!(this->mode & MODE_Q))
 						break;
 					this->mode ^= MODE_Q;
 				}
@@ -199,7 +205,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_P)
+					if (!(this->mode & MODE_P))
 						break;
 					this->mode ^= MODE_P;
 				}
@@ -215,7 +221,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_S)
+					if (!(this->mode & MODE_S))
 						break;
 					this->mode ^= MODE_S;
 				}
@@ -234,7 +240,7 @@ int					Channel::toggleMode(std::string &successState, std::string &error, size_
 				}
 				else
 				{
-					if (this->mode ^ MODE_T)
+					if (!(this->mode & MODE_T))
 						break;
 					this->mode ^= MODE_T;
 				}
@@ -374,6 +380,28 @@ void 								Channel::makeOperToUser(const std::string &userName)
 		this->joinedUsers[userName] = this->operators[userName];
 		this->operators.erase(userName);
 	}
+}
+
+bool 			Channel::isMatchMask(const std::set<std::string> &list, const std::string &mask)
+{
+	std::set<std::string>::iterator it;
+
+	for (it = list.begin(); it != list.end(); ++it)
+	{
+		if (match((*it).c_str(), mask.c_str()))
+			return (true);
+	}
+	return (false);
+}
+
+bool 		Channel::isBanned(const std::string &userName)
+{
+	return isMatchMask(this->banList, userName);
+}
+
+bool 		Channel::isExcept(const std::string &userName)
+{
+	return isMatchMask(this->exceptionList, userName);
 }
 // channelPrefix   &Channel::getChannelPrefix(void) const
 // {

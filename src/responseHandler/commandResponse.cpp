@@ -1,13 +1,29 @@
 #include "Server.hpp"
 
-int		Server::rRegisterUserHandler(const Message &message, Client *client)
-{
+int		Server::rRegisterUserHandler(const Message &message, Client *client) {
+	std::map<std::string, Channel>::iterator chanIt;
+	Client *targetClient;
+
 	(this->*(this->replies[RPL_NICKBROADCAST]))(message, client);
 	(this->*(this->replies[RPL_USERBROADCAST]))(message, client);
 	if (client->getInfo(USERMODE) != "")
 		(this->*(this->replies[RPL_USERMODEBROADCAST]))(message, client);
 	client->setStatus(USER);
-	this->sendClients[client->getInfo(NICK)].setStatus(USER);
+	targetClient = &this->sendClients[client->getInfo(NICK)];
+	targetClient->setStatus(USER);
+	// localchannel / remotechannel list를 돌면서
+	// 그 안에 invitationlist를 돌면서 userprefix가 매칭되면
+	// abletojoin에 추가하기
+	for (chanIt = this->localChannelList.begin(); chanIt != this->localChannelList.end(); ++chanIt)
+	{
+		if (chanIt->second.isMatchMask(chanIt->second.getInvitationList(), getClientPrefix(targetClient)))
+			targetClient->setInviteChanList(chanIt->first);
+	}
+	for (chanIt = this->remoteChannelList.begin(); chanIt != this->remoteChannelList.end(); ++chanIt)
+	{
+		if (chanIt->second.isMatchMask(chanIt->second.getInvitationList(), getClientPrefix(targetClient)))
+			targetClient->setInviteChanList(chanIt->first);
+	}
 	return (CONNECT);
 }
 
@@ -21,6 +37,7 @@ int		Server::rWelcomeMessageHandler(const Message &message, Client *client)
 	(this->*(this->replies[RPL_LUSERCHANNELS]))(message, client);
 	(this->*(this->replies[RPL_LUSERME]))(message, client);
 	(this->*(this->replies[RPL_MOTD]))(message, client);
+	sendChannelLists(client);
 	return (CONNECT);
 }
 
@@ -525,29 +542,7 @@ int		Server::rOtherServerHandler(const Message &message, Client *client)
 		}
 	}
 	// join, mode보내기....
-	std::vector<Client *>	userList;
-	std::vector<Client *>::iterator userIter;
-	std::map<std::string, Client *>::iterator operIter;
-	std::map<std::string, Channel>::iterator mapIter = this->localChannelList.begin();
-	for (; mapIter != this->localChannelList.end(); ++mapIter)
-	{
-		if (mapIter->first[0] == '#')
-		{
-			std::map<std::string, Client *> &operList = mapIter->second.getOperators();
-			userList = mapIter->second.getUsersList("all");
-			userIter = userList.begin();
-			for (; userIter != userList.end(); ++userIter) {
-				this->sendMessage(Message(":" + (*userIter)->getInfo(NICK), "JOIN", mapIter->first), client);
-			}
-			operIter = operList.begin();
-			prefix = ":" + operIter->second->getInfo(NICK);
-			parameters = "";
-			for (; operIter != operList.end(); ++operIter)
-				parameters += operIter->second->getInfo(NICK) + " ";
-			this->sendMessage(Message(prefix, "MODE", mapIter->first + " +o " + parameters), client);
-			userList.clear();
-		}
-	}
+	sendChannelLists(client);
 	return (CONNECT);
 }
 

@@ -9,6 +9,23 @@ static int			ft_check_range(unsigned long long number, int sign)
 	return (number * sign);
 }
 
+bool 		match(const char *first, const char *second)
+{
+	if (*first == 0 && *second == 0)
+		return (true);
+	if (*first == '*' && *(first + 1) != '\0' && *second == '\0')
+		return (false);
+	if (*first == '?' || *first == *second)
+		return match(first + 1, second + 1);
+	if (*first == '*')
+		return match(first + 1, second) || match(first, second + 1);
+	if (*first == '&' && (*(first + 1) == '.' || *(first + 1) == 0) && *second != '.' && *second != 0)
+		return match(first, second + 1);
+	if (*first == '&' && (*(first + 1) == '.' || *(first + 1) == 0) && (*second == '.' || *second == 0))
+		return match(first + 1, second);
+	return (false);
+}
+
 int					ft_atoi(const char *str)
 {
 	unsigned long long	number_value;

@@ -105,7 +105,7 @@ private:
 	int     															partHandler(const Message &message, Client *client);
 	int     															topicHandler(const Message &message, Client *client);
 	int                                                                 modeHandler(const Message &message, Client *client);
-	int 																modeHelper(std::string &error, size_t &modeIndex, const Message &message, Client *client);
+	int 																modeHelper(std::string &error, size_t &modeIndex, const Message &message, Client *client, Client *exceptClient);
 	void																showBanList(Channel &channel, Client *client);
 	void																showExceptionList(Channel &channel, Client *client);
 	void 																showInvitationList(Channel &channel, Client *client);
@@ -143,7 +143,9 @@ private:
 	int                                                                 eNoOrigin(const Message &message, Client *client);
 	int 																eUnknownMode(const Message &message, Client *client);
 	int																	eUserNotInChannel(const Message &message, Client *client);
-
+	int 																eBadChannelKey(const Message &message, Client *client);
+	int																	eInviteOnlyChan(const Message &message, Client *client);
+	int																	eBannedFromChan(const Message &message, Client *client);
 
 	int																	rRegisterUserHandler(const Message &message, Client *client);
 	int																	rWelcomeMessageHandler(const Message &message, Client *client);
@@ -208,6 +210,8 @@ private:
 
 	// privmsgHandler에 있음 join도 사용
 	std::string     													getClientPrefix(Client *client);
+
+	void 																sendChannelLists(Client *client);
 
 	// 디버깅용!
 	int																	show(const Message &message, Client *client);

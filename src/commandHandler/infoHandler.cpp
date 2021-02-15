@@ -39,23 +39,6 @@ void		Server::incrementRemoteByte(Client *client, const Message &message)
     this->infosPerCommand[client->getCurrentCommand()].incrementBytes(message.getTotalMessage().length());
 }
 
-static bool match(char *first, char *second)
-{
-    if (*first == 0 && *second == 0)
-        return true;
-    if (*first == '*' && *(first + 1) != '\0' && *second == '\0')
-        return false;
-    if (*first == '?' || *first == *second)
-        return match(first + 1, second + 1);
-    if (*first == '*')
-        return match(first + 1, second) || match(first, second + 1);
-    if (*first == '&' && (*(first + 1) == '.' || *(first + 1) == 0) && *second != '.' && *second != 0)
-        return match(first, second + 1);
-    if (*first == '&' && (*(first + 1) == '.' || *(first + 1) == 0) && (*second == '.' || *second == 0))
-        return match(first + 1, second);
-    return false;
-}
-
 std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
 {
     std::vector<std::string> *ret = new std::vector<std::string>;
@@ -64,10 +47,10 @@ std::vector<std::string> *Server::getInfoFromWildcard(const std::string &info)
     ret->reserve(10);
     for (it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
     {
-        if (it->second.getStatus() == SERVER && match(const_cast<char *>(info.c_str()), const_cast<char *>(it->second.getInfo(SERVERNAME).c_str())))
+        if (it->second.getStatus() == SERVER && match(info.c_str(), it->second.getInfo(SERVERNAME).c_str()))
             ret->push_back(it->second.getInfo(SERVERNAME));
     }
-    if (match(const_cast<char *>(info.c_str()), const_cast<char *>(this->serverName.c_str())))
+    if (match(info.c_str(), this->serverName.c_str()))
         ret->push_back(this->serverName);
     if (ret->empty())
     {
