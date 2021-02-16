@@ -2,8 +2,10 @@
 
 Server::Server(const char *pass, const char *port)
 	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
-	, port(port), mainSocket(0), maxFd(0), run(true), adminLoc1("kmin"), adminLoc2("Seoul"), adminEmail("admin@admin.irc")
+	  , port(port), mainSocket(0), maxFd(0), run(true), adminLoc1("kmin"), adminLoc2("Seoul"), adminEmail("admin@admin.irc")
+	  , ctx(NULL)
 {
+	this->tlsPort = std::to_string(ft_atoi(port) + 1);
 	FD_ZERO(&this->readFds);
 	this->prefix = std::string(":localhost.") + std::string(this->port);
 
@@ -33,34 +35,57 @@ void					Server::renewFd(const int fd)
 		this->maxFd = fd;
 }
 
-void					Server::init(void)
+void					Server::init(const char *port)
 {
+	int 			retSocket;
 	int				flag;
 	struct addrinfo	hints;
 	struct addrinfo	*addrInfo;
 	struct addrinfo	*addrInfoIterator;
 
+	/*
+	 * TLS SETTING
+	 */
+	if (std::string(port) == this->tlsPort) {
+		std::cout << "tls setting start..." << port << std::endl;
+		char CertFile[] = "ft_irc.pem";
+		char KeyFile[] = "ft_irc_key.pem";
+
+		SSL_library_init();
+		SSL_load_error_strings();
+
+		this->ctx = InitCTX();
+		if (this->ctx == NULL)
+			exit(0);
+		LoadCertificates(this->ctx, CertFile, KeyFile, true);
+	}
 	flag = 1;
 	ft_memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	if (getaddrinfo(NULL, this->port, &hints, &addrInfo) != 0)
+	if (getaddrinfo(NULL, port, &hints, &addrInfo) != 0)
 		throw Server::GetAddressFailException();
 	for (addrInfoIterator = addrInfo; addrInfoIterator != NULL ; addrInfoIterator = addrInfoIterator->ai_next)
 	{
 		if (addrInfoIterator->ai_family == AF_INET6)
 		{
-			if (ERROR == (this->mainSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
+			if (ERROR == (retSocket = socket(addrInfoIterator->ai_family, addrInfoIterator->ai_socktype, addrInfoIterator->ai_protocol)))
 				throw Server::SocketOpenFailException();
-			setsockopt(this->mainSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
-			if (ERROR == (bind(this->mainSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
+			setsockopt(retSocket, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
+			if (ERROR == (bind(retSocket, addrInfoIterator->ai_addr, addrInfoIterator->ai_addrlen)))
 				throw Server::SocketBindFailException();
-			if (ERROR == (listen(this->mainSocket, SOMAXCONN)))
+			if (ERROR == (listen(retSocket, SOMAXCONN)))
 				throw Server::SocketListenFailException();
 		}
 	}
-	this->renewFd(this->mainSocket);
+	this->renewFd(retSocket);
+	if (std::string(port) != this->tlsPort) {
+		this->mainSocket = retSocket;
+		this->init(this->tlsPort.c_str());
+	}
+	else
+		this->tlsMainSocket = retSocket;
 	freeaddrinfo(addrInfo);
 }
 
@@ -68,85 +93,109 @@ void					Server::start(void)
 {
 	struct timeval timeout;
 	std::map<int, Client>::iterator next;
+	int listenFd;
 	clientIter it;
+	bool isSSL = false;
 
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
 	while(run)
 	{
-	    FD_SET(mainSocket, &readFds);
-	    it = this->acceptClients.begin();
+		FD_SET(this->mainSocket, &readFds);
+		FD_SET(this->tlsMainSocket, &readFds);
+		it = this->acceptClients.begin();
 		next = this->acceptClients.begin();
 		if (!this->acceptClients.empty())
 			++next;
-	    while (it != this->acceptClients.end())
-	    {
-	        isDeletedClient = false;
-	        if (it->second.getStatus() != UNKNOWN && it->second.getWaitPong() && it->second.getLastPing() >= PING_CYCLE)
-            {
-                it->second.setWaitPong(false);
-                sendMessage(Message(""
-                                    , "PING"
-                                    , this->prefix)
-                                    , &it->second);
-                it->second.setPingLimit(std::time(NULL));
-            }
-	        if (!it->second.getWaitPong() && it->second.getPingLimit() > PING_LIMIT)
-            {
-	            this->disconnectClient(Message(":" + it->second.getInfo(1)
-                        , TIMEOUT // timeout
-                        , it->second.getInfo(1)
-                        + " :ERROR: ping timeout"), &it->second);
+		while (it != this->acceptClients.end())
+		{
+			isDeletedClient = false;
+			if (it->second.getStatus() != UNKNOWN && it->second.getWaitPong() && it->second.getLastPing() >= PING_CYCLE)
+			{
+				it->second.setWaitPong(false);
+				sendMessage(Message(""
+					, "PING"
+					, this->prefix)
+					, &it->second);
+				it->second.setPingLimit(std::time(NULL));
+			}
+			if (!it->second.getWaitPong() && it->second.getPingLimit() > PING_LIMIT)
+			{
+				this->disconnectClient(Message(":" + it->second.getInfo(1)
+					, TIMEOUT // timeout
+					, it->second.getInfo(1)
+					  + " :ERROR: ping timeout"), &it->second);
 				if (this->acceptClients.empty())
 					break;
 				isDeletedClient = true;
 				it = next;
-	            // user를 삭제하는 경우에 다른 서버로 quit이 전송 안됨.
+				// user를 삭제하는 경우에 다른 서버로 quit이 전송 안됨.
 			}
 			if (!isDeletedClient)
-	        {
+			{
 				FD_SET(it->second.getFd(), &readFds);
 				if (next != this->acceptClients.end())
 					++next;
 				++it;
 			}
-        }
+		}
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cout << ERROR_SELECT_FAIL << std::endl;
 		it = this->acceptClients.begin();
-		for (int listenFd = this->mainSocket; listenFd <= this->maxFd; ++it)
+		if (FD_ISSET(this->tlsMainSocket, &readFds))
+			listenFd = this->tlsMainSocket;
+		if (FD_ISSET(this->mainSocket, &readFds))
+			listenFd = this->mainSocket;
+		for (; listenFd <= this->maxFd; ++it)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
-				if (listenFd == this->mainSocket)
-					this->connectClient();
-				else
-					this->receiveMessage(listenFd);
+				if (listenFd == this->mainSocket || listenFd == this->tlsMainSocket)
+					this->connectClient(listenFd);
+				else {
+					if (listenFd == SSL_get_fd(this->ssl))
+						isSSL = true;
+					this->receiveMessage(listenFd, isSSL);
+				}
 			}
 			if (it == acceptClients.end() || !run)
-				break ;
+				break;
 			listenFd = it->second.getFd();
 		}
 	}
+	SSL_CTX_free(this->ctx);
 }
 
-void					Server::connectClient(void)
+void					Server::connectClient(const int &listenFd)
 {
 	int					newFd;
 	struct sockaddr_in6	remoteAddress;
 	socklen_t			addressLen;
 
 	addressLen = sizeof(struct sockaddr_in);
-	if (ERROR == (newFd = accept(this->mainSocket, (struct sockaddr*)&remoteAddress, &addressLen)))
+	if (ERROR == (newFd = accept(listenFd, (struct sockaddr*)&remoteAddress, &addressLen)))
 		throw Server::AcceptFailException();
 	fcntl(newFd, F_SETFL, O_NONBLOCK);
 	this->renewFd(newFd);
 	this->acceptClients.insert(std::pair<int, Client>(newFd, Client(newFd)));
+	if (listenFd == this->tlsMainSocket)
+	{
+		this->ssl = SSL_new(this->ctx);
+		SSL_set_fd(this->ssl, newFd);
+		if ( SSL_accept(this->ssl) == -1 )     /* do SSL-protocol accept */
+			ERR_print_errors_fp(stderr);
+	}
+
 	std::cout << "Connect client. fd is " << newFd << std::endl;
 }
 
-void					Server::receiveMessage(const int fd)
+void					Server::receiveMessage(const int &fd, const bool &isSSL)
 {
+//	char buf[1024];
+//	char reply[1024];
+//	int sd, bytes;
+//	const char* HTMLecho="<html><body><pre>%s</pre></body></html>\n\n";
+
 	char		buffer;
 	int			readResult;
 	int			connectionStatus;
@@ -155,15 +204,30 @@ void					Server::receiveMessage(const int fd)
 
 	readResult = 0;
 	connectionStatus = CONNECT;
-	while (0 < (readResult = recv(sender.getFd(), &buffer, 1, 0)))
-	{
+//	if (fd == 6) {
+//		bytes = SSL_read(this->ssl, buf, sizeof(buf)); /* get request */
+//		if (bytes > 0) {
+//			buf[bytes] = 0;
+//			std::cout << "Received ssl message: " << buf << std::endl;
+//			sprintf(reply, HTMLecho, buf);   /* construct reply */
+//			SSL_write(this->ssl, reply, std::strlen(reply)); /* send reply */
+//		} else
+//			ERR_print_errors_fp(stderr);
+//		sd = SSL_get_fd(this->ssl);       /* get socket connection */
+//		SSL_free(this->ssl);         /* release SSL state */
+//		close(sd);          /* close connection */
+	while (42) {
+//		if (isSSL)
+//			readResult = SSL_read(this->ssl, &buffer, 1); /* get request */
+//		else
+			readResult = recv(sender.getFd(), &buffer, 1, 0);
+		if (readResult <= 0)
+			break;
 		sender.addReceivedMessageStr(buffer);
-		if (buffer == '\n')
-		{
+		if (buffer == '\n') {
 			sendMessage = Message(sender.getReceivedMessageStr());
 			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
-			if (this->commands.find(sendMessage.getCommand()) != this->commands.end())
-			{
+			if (this->commands.find(sendMessage.getCommand()) != this->commands.end()) {
 				sender.incrementQueryData(SENDMSG, 1);
 				sender.incrementQueryData(SENDBYTES, sendMessage.getTotalMessage().length());
 				connectionStatus = (this->*(this->commands[sendMessage.getCommand()]))(sendMessage, &sender);
@@ -171,7 +235,7 @@ void					Server::receiveMessage(const int fd)
 			sender.clearReceivedMessageStr();
 		}
 		if (connectionStatus == DISCONNECT || connectionStatus == TOTALDISCONNECT)
-			break ;
+			break;
 	}
 	if (readResult == 0)
 		this->disconnectClient(sendMessage, &sender);
@@ -252,12 +316,12 @@ void					Server::connectServer(std::string address)
 
 void					Server::clearClient(void)
 {
-    for (int i = this->mainSocket; i < this->maxFd; ++i)
-    {
-        close(i);
-        FD_CLR(i, &this->readFds);
-    }
-    this->sendClients.clear();
+	for (int i = this->mainSocket; i < this->maxFd; ++i)
+	{
+		close(i);
+		FD_CLR(i, &this->readFds);
+	}
+	this->sendClients.clear();
 	this->serverList.clear();
 	this->clientList.clear();
 	this->acceptClients.clear();
@@ -280,8 +344,8 @@ void				Server::getChildServer(std::list<std::string> &serverList, std::string k
 std::string				Server::getParentServer(std::string key)
 {
 	if (!this->sendClients.count(key)
-	|| this->serverList.count(key)
-	|| this->serverName == key)
+		|| this->serverList.count(key)
+		|| this->serverName == key)
 		return (key);
 	return (this->getParentServer(this->sendClients[key].getInfo(UPLINKSERVER)));
 }
@@ -339,7 +403,7 @@ void					Server::sendMessage(const Message &message, Client *client)
 	client->incrementQueryData(RECVMSG, 1);
 	client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
 	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
-	    std::cerr << ERROR_SEND_FAIL << std::endl;
+		std::cerr << ERROR_SEND_FAIL << std::endl;
 }
 
 void					Server::broadcastMessage(const Message &message, Client *client)
@@ -349,7 +413,7 @@ void					Server::broadcastMessage(const Message &message, Client *client)
 	for (iterator = this->serverList.begin(); iterator != this->serverList.end(); ++iterator)
 	{
 		if (client == NULL || iterator->second->getInfo(SERVERNAME) != client->getInfo(SERVERNAME))
-            this->sendMessage(message, iterator->second);
+			this->sendMessage(message, iterator->second);
 	}
 }
 
@@ -365,7 +429,7 @@ int		Server::show(const Message &message, Client *client)
 		std::cout << iter->first << " ";
 	std::cout << ")" << std::endl;
 	std::cout << "\033[0;32m== server (" << this->serverName << ") channelList ==\033[0m" << std::endl;
-	
+
 	// 이 서버에 있는 채널들의 유저들 출력
 	std::map<std::string, Channel>::iterator	it = this->localChannelList.begin();
 	for (; it != this->localChannelList.end(); ++it)
@@ -379,7 +443,7 @@ int		Server::show(const Message &message, Client *client)
 	{
 		std::cout << "R " << it->first << " ";
 		it->second.showUsersName();
- 	}
+	}
 	// 메시지를 보낸 유저의 채널 목록들 출력
 	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") subscribedChannels --\033[0m" << std::endl;
 	client->showChannel();
