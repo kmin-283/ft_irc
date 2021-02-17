@@ -53,8 +53,8 @@
 
 
 # define TIMEOUT "T"
-# define PING_LIMIT 140
-# define PING_CYCLE 140
+# define PING_LIMIT 150
+# define PING_CYCLE 150
 
 # define ON true
 # define OFF false

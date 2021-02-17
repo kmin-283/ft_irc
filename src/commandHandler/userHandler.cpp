@@ -403,6 +403,21 @@ int					Server::remoteQuitHandler(const Message &message, Client *client)
 
 int					Server::quitHandler(const Message &message, Client *client)
 {
+	if (client->getStatus() == SERVER) {
+		std::cout << "in quit " << message.getTotalMessage();
+		Client *targetUser =  &this->sendClients[message.getPrefix().substr(1)];
+		std::vector<std::string> *channelList = targetUser->getSubscribedChannelList();
+		if (channelList != NULL) {
+			for (size_t i = 0; i < channelList->size(); ++i) {
+				if (this->localChannelList.count((*channelList)[i])) {
+					this->localChannelList[(*channelList)[i]].leaveUser(targetUser);
+				}
+				if (this->remoteChannelList.count((*channelList)[i]))
+					this->remoteChannelList[(*channelList)[i]].leaveUser(targetUser);
+			}
+		}
+		delete channelList;
+	}
 	if (client->getStatus() == SERVER)
 		return (this->remoteQuitHandler(message, client));
 	return (this->localQuitHandler(message, client));
