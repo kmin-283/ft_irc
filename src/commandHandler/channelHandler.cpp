@@ -786,6 +786,7 @@ int			Server::modeHelper(std::string &error, size_t &modeIndex, const Message &m
 
 int         Server::modeHandler(const Message &message, Client *client)
 {
+	std::string msg;
 	std::string check;
 	size_t parameterSize;
 	std::map<std::string, Channel>::iterator targetChannel;
@@ -839,10 +840,17 @@ int         Server::modeHandler(const Message &message, Client *client)
 		joinedUsers = targetChannel->second.getUsersList(this->serverName);
 		for (int i = 0; i < (int) joinedUsers.size(); i++) {
 			this->sendMessage(Message(":" + getClientPrefix(targetClient), "MODE",
-									  targetChannel->second.getName() + " " + successState + " " +
+									  targetChannel->first + " " + successState + " " +
 									  targetClient->getInfo(NICK)), joinedUsers[i]);
 		}
-		broadcastMessage(message, client);
+		std::cout << message.getTotalMessage();
+		if (message.getPrefix().empty()) {
+			msg = ":" + client->getInfo(NICK) + " ";
+			msg += message.getTotalMessage();
+		}
+		else
+			msg = message.getTotalMessage();
+		broadcastMessage(Message(msg), client);
 	}
 	return (CONNECT);
 }
@@ -1069,7 +1077,7 @@ int         Server::kickHandler(const Message &message, Client *client)
 
     joinedUsers = targetChannel->getUsersList(this->serverName);
     for (int i = 0; i < (int)joinedUsers.size(); i++)
-        this->sendMessage(Message(getClientPrefix(&this->sendClients[prefix])
+        this->sendMessage(Message(":"+getClientPrefix(&this->sendClients[prefix])
                                     , "KICK"
                                     , message.getParameter(0)
                                     + " " + message.getParameter(1)

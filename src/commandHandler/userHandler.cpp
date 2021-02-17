@@ -411,9 +411,14 @@ int					Server::quitHandler(const Message &message, Client *client)
 			for (size_t i = 0; i < channelList->size(); ++i) {
 				if (this->localChannelList.count((*channelList)[i])) {
 					this->localChannelList[(*channelList)[i]].leaveUser(targetUser);
+					if (this->localChannelList[(*channelList)[i]].getNumbersOfUsers() == 0)
+						this->localChannelList.erase((*channelList)[i]);
 				}
-				if (this->remoteChannelList.count((*channelList)[i]))
+				if (this->remoteChannelList.count((*channelList)[i])) {
 					this->remoteChannelList[(*channelList)[i]].leaveUser(targetUser);
+					if (this->remoteChannelList[(*channelList)[i]].getNumbersOfUsers() == 0)
+						this->remoteChannelList.erase((*channelList)[i]);
+				}
 			}
 		}
 		delete channelList;

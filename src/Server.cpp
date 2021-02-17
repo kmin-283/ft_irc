@@ -380,7 +380,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 
 	stringKey = client->getInfo(1);
 	// stringKey가 empty가 아니어야만 client는 정상적인 정보를 가진 상태이다.₩:
-	if (!stringKey.empty() && client->getStatus() == USER) {
+	if (!stringKey.empty()) {
 		std::cout << "connect end" << std::endl;
 		std::vector<std::string> *channelList = client->getSubscribedChannelList();
 		if (channelList != NULL) {
