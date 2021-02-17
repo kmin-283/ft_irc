@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 			server = new Server(argv[passIndex], argv[portIndex]);
 			try
 			{
-				server->init();
+				server->init(argv[portIndex]);
 				if (argc == 4)
 					server->connectServer(argv[networkIndex]);
 				server->start();

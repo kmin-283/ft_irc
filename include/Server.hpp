@@ -6,6 +6,8 @@
 # include "Channel.hpp"
 # include "Message.hpp"
 # include "Replies.hpp"
+# include <openssl/ssl.h>
+# include <openssl/err.h>
 
 class																	Server
 {
@@ -48,7 +50,9 @@ private:
 	std::string															pass;
 	std::string															info;
 	const char															*port;
+	std::string 														tlsPort;
 	int																	mainSocket;
+	int 																tlsMainSocket;
 	int																	maxFd;
 
 	fd_set																readFds;
@@ -72,6 +76,14 @@ private:
 
 	time_t                                                              pingTime;
 	bool                                                                isDeletedClient;
+	SSL_CTX																*ctx;
+	SSL																	*ssl;
+	bool																isSSL;
+	int																	sslFd;
+
+
+	SSL_CTX																*InitCTX(void);
+	void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile, bool serv);
 
 	std::map<std::string, int (Server::*)(const Message &, Client *)>	commands;
 	void																registerCommands(void);
@@ -190,13 +202,13 @@ private:
 	void																getChildServer(std::list<std::string> &serverList, std::string key);
 	std::string															getParentServer(std::string key);
 
-	void																connectClient(void);
+	void																connectClient(const int &listenFd);
 	void																disconnectClient(const Message &message, Client *client);
 	void																disconnectChild(const Message &message, Client *client);
 	void																clearClient(void);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
-	void																receiveMessage(const int fd);
+	void																receiveMessage(const int &fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
@@ -218,7 +230,7 @@ private:
 public:
 																		Server(const char *pass, const char *port);
 																		~Server(void);
-	void																init(void);
+	void																init(const char *port);
 	void																start(void);
 	void																connectServer(const std::string address);
 

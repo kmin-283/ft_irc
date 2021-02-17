@@ -3,7 +3,13 @@ CFLAGS = -g3 -fsanitize=address -Wall -Werror -Wextra
 NAME = ircserv
 INCLUDE = -I ./include/
 
-SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp Channel.cpp sendInfos.cpp
+SSL = -L /usr/local/Cellar/openssl@1.1/1.1.1i/lib -lssl -lcrypto
+SSLI = -I/usr/local/Cellar/openssl@1.1/1.1.1i/include/openssl/
+#-L/Users/${USER}/.brew/Cellar/openssl@1.1/1.1.1g/lib -lssl -lcrypto
+#SSLI = -I/Users/${USER}/.brew/Cellar/openssl@1.1/1.1.1g/include
+
+
+SRC = main.cpp Server.cpp ServerException.cpp Client.cpp utils.cpp Message.cpp Info.cpp Channel.cpp sendInfos.cpp TLS.cpp
 SRC_DIR = ./src/
 SRCS = $(addprefix $(SRC_DIR), $(SRC))
 OBJS = $(SRCS:%.cpp=%.o)
@@ -24,7 +30,7 @@ OBJS_RE = $(SRCS_RE:%.cpp=%.o)
 all : $(NAME)
 
 $(NAME) : $(OBJS) $(OBJS_COM) $(OBJS_RE)
-	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS) $(OBJS_COM) $(OBJS_RE) -o $(NAME)
+	$(CC) $(CFLAGS) $(INCLUDE) $(SSLI) $(SSL) $(OBJS) $(OBJS_COM) $(OBJS_RE) -o $(NAME)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
