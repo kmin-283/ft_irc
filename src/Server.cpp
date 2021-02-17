@@ -3,7 +3,7 @@
 Server::Server(const char *pass, const char *port)
 	: ipAddress("127.0.0.1"), version("ft-irc1.0"), pass(std::string(pass)), info(":kmin seunkim dakim made this server.")
 	  , port(port), mainSocket(0), maxFd(0), run(true), adminLoc1("kmin"), adminLoc2("Seoul"), adminEmail("admin@admin.irc")
-	  , ctx(NULL)
+	  , ctx(NULL), isSSL(false)
 {
 	this->tlsPort = std::to_string(ft_atoi(port) + 1);
 	FD_ZERO(&this->readFds);
@@ -93,9 +93,7 @@ void					Server::start(void)
 {
 	struct timeval timeout;
 	std::map<int, Client>::iterator next;
-	int listenFd;
 	clientIter it;
-	bool isSSL = false;
 
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
@@ -142,25 +140,36 @@ void					Server::start(void)
 		if (ERROR == select(this->maxFd + 1, &this->readFds, NULL, NULL, &timeout))
 			std::cout << ERROR_SELECT_FAIL << std::endl;
 		it = this->acceptClients.begin();
-		if (FD_ISSET(this->tlsMainSocket, &readFds))
-			listenFd = this->tlsMainSocket;
-		if (FD_ISSET(this->mainSocket, &readFds))
-			listenFd = this->mainSocket;
-		for (; listenFd <= this->maxFd; ++it)
+		for (int listenFd = this->mainSocket; listenFd <= this->maxFd;)
 		{
 			if (FD_ISSET(listenFd, &this->readFds))
 			{
 				if (listenFd == this->mainSocket || listenFd == this->tlsMainSocket)
 					this->connectClient(listenFd);
-				else {
-					if (listenFd == SSL_get_fd(this->ssl))
-						isSSL = true;
-					this->receiveMessage(listenFd, isSSL);
+				else
+				{
+					// 3000 -- tls통신을 하지 않는 유저를 먼저 접속할 경우
+					// ssl이 초기화되지 않아서 터짐
+					// 고쳐야됨
+					std::cout << "listenFD " << listenFd << std::endl;
+					if (listenFd == this->sslFd)
+						this->isSSL = true;
+					else
+						this->isSSL = false;
+					this->receiveMessage(listenFd);
 				}
 			}
-			if (it == acceptClients.end() || !run)
+			if ((!this->acceptClients.empty() && it == acceptClients.end()) || !run)
+				break;	
+			if (listenFd < this->tlsMainSocket)
+				++listenFd;
+			else if (this->acceptClients.empty())
 				break;
-			listenFd = it->second.getFd();
+			else
+			{
+				listenFd = it->second.getFd();
+				++it;
+			}
 		}
 	}
 	SSL_CTX_free(this->ctx);
@@ -182,14 +191,14 @@ void					Server::connectClient(const int &listenFd)
 	{
 		this->ssl = SSL_new(this->ctx);
 		SSL_set_fd(this->ssl, newFd);
-		if ( SSL_accept(this->ssl) == -1 )     /* do SSL-protocol accept */
+		if (SSL_accept(this->ssl) == -1)     /* do SSL-protocol accept */
 			ERR_print_errors_fp(stderr);
+		this->sslFd = newFd;
 	}
-
 	std::cout << "Connect client. fd is " << newFd << std::endl;
 }
 
-void					Server::receiveMessage(const int &fd, const bool &isSSL)
+void					Server::receiveMessage(const int &fd)
 {
 //	char buf[1024];
 //	char reply[1024];
@@ -217,14 +226,16 @@ void					Server::receiveMessage(const int &fd, const bool &isSSL)
 //		SSL_free(this->ssl);         /* release SSL state */
 //		close(sd);          /* close connection */
 	while (42) {
-//		if (isSSL)
-//			readResult = SSL_read(this->ssl, &buffer, 1); /* get request */
-//		else
+		if (isSSL)
+			readResult = SSL_read(this->ssl, &buffer, 1); /* get request */
+		else
 			readResult = recv(sender.getFd(), &buffer, 1, 0);
 		if (readResult <= 0)
 			break;
 		sender.addReceivedMessageStr(buffer);
 		if (buffer == '\n') {
+			if (isSSL)
+				std::cout << "SSL ";
 			sendMessage = Message(sender.getReceivedMessageStr());
 			std::cout << "Reveive message = " << sendMessage.getTotalMessage();
 			if (this->commands.find(sendMessage.getCommand()) != this->commands.end()) {
@@ -385,6 +396,10 @@ void					Server::disconnectClient(const Message &message, Client *client)
 			(this->*(this->replies[RPL_SQUITBROADCAST]))(message, client);
 			this->serverList.erase(stringKey);
 		}
+		if (isSSL) {
+			SSL_free(this->ssl);
+			this->sslFd = INT_MAX;
+		}
 		close(client->getFd());
 		FD_CLR(client->getFd(), &this->readFds);
 		this->acceptClients.erase(client->getFd());
@@ -402,8 +417,16 @@ void					Server::sendMessage(const Message &message, Client *client)
 		incrementRemoteByte(client, message);
 	client->incrementQueryData(RECVMSG, 1);
 	client->incrementQueryData(RECVBYTES, message.getTotalMessage().length());
-	if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
-		std::cerr << ERROR_SEND_FAIL << std::endl;
+	if (client->getFd() == this->sslFd)
+	{
+		if (ERROR == SSL_write(this->ssl, message.getTotalMessage().c_str(), message.getTotalMessage().length()))
+			std::cerr << ERROR_SEND_FAIL << std::endl;
+	}
+	else
+	{
+		if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
+			std::cerr << ERROR_SEND_FAIL << std::endl;
+	}
 }
 
 void					Server::broadcastMessage(const Message &message, Client *client)

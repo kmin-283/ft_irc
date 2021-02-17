@@ -78,6 +78,8 @@ private:
 	bool                                                                isDeletedClient;
 	SSL_CTX																*ctx;
 	SSL																	*ssl;
+	bool																isSSL;
+	int																	sslFd;
 
 
 	SSL_CTX																*InitCTX(void);
@@ -206,7 +208,7 @@ private:
 	void																clearClient(void);
 	void																deleteSubServers(const std::string &targetServer, const std::string &info);
 
-	void																receiveMessage(const int &fd, const bool &isSSL);
+	void																receiveMessage(const int &fd);
 	void																sendMessage(const Message &message, Client *client);
 	void																broadcastMessage(const Message &message, Client *client);
 	void																settingClient(const Message &message, Client *client);
