@@ -14,6 +14,7 @@ void 	Server::sendChannelLists(Client *client)
 
 	for (; mapIter != this->localChannelList.end(); ++mapIter)
 	{
+		std::cout << "111111111111!" << std::endl;
 		if (mapIter->first[0] == '#')
 		{
 			std::map<std::string, Client *> &operList = mapIter->second.getOperators();

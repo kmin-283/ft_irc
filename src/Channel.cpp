@@ -326,8 +326,11 @@ void    Channel::enterUser(Client *user)
 void    Channel::leaveUser(Client *user)
 {
 	// 관리자에 있으면 관리자에서 삭제
-	if (this->operators.find(user->getInfo(NICK)) != this->operators.end())
+	if (this->operators.find(user->getInfo(NICK)) != this->operators.end()) {
 		this->operators.erase(user->getInfo(NICK));
+		if (this->operators.empty() && !this->joinedUsers.empty())
+			makeUserToOper(this->joinedUsers.begin()->first);
+	}
 	else
 		this->joinedUsers.erase(user->getInfo(NICK));
 }

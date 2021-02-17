@@ -218,3 +218,17 @@ void 	Client::delInviteChanList(const std::string &channelName)
 {
 	this->invitedChannelList.erase(channelName);
 }
+
+std::vector<std::string>	*Client::getSubscribedChannelList(void)
+{
+	if (this->subscribedChannels.empty())
+		return (NULL);
+	std::map<std::string, Channel*>::iterator it = this->subscribedChannels.begin();
+	std::vector<std::string> *subscribedChannelList = new std::vector<std::string>();
+
+	for (; it != this->subscribedChannels.end(); ++it)
+	{
+		subscribedChannelList->push_back(it->first);
+	}
+	return (subscribedChannelList);
+}

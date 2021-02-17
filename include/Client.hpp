@@ -150,10 +150,12 @@ public:
 
 	// 디버깅
 	void								showChannel(void);
+	//
 	bool 								isInvited(const std::string &channelName);
 	void 								setInviteChanList(const std::string &channelName);
 
 	void 								delInviteChanList(const std::string &channelName);
+	std::vector<std::string>			*getSubscribedChannelList(void);
 };
 
 #endif

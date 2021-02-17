@@ -20,6 +20,8 @@ void	Server::registerCommands(void)
 
 	this->commands["LINKS"] = &Server::linksHandler;
 
+	this->commands["QUIT"] = &Server::quitHandler;
+
 	this->commands["TIME"] = &Server::timeHandler;
 	this->commands[RPL_TIME] = &Server::rReplyHandler;
 
@@ -32,6 +34,7 @@ void	Server::registerCommands(void)
 
 
 	this->commands["PRIVMSG"] = &Server::privmsgHandler;
+	this->commands["NOTICE"] = &Server::noticeHandler;
 
 	this->commands["JOIN"] = &Server::joinHandler;
 	this->commands["PART"] = &Server::partHandler;

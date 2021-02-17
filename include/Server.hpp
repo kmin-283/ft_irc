@@ -112,6 +112,7 @@ private:
 
 	int																	traceHandler(const Message &message, Client *client);
 	int																	privmsgHandler(const Message &message, Client *client);
+	int 																noticeHandler(const Message &message, Client *client);
 
 	int     															joinHandler(const Message &message, Client *client);
 	int     															partHandler(const Message &message, Client *client);

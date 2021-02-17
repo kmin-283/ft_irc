@@ -148,10 +148,6 @@ void					Server::start(void)
 					this->connectClient(listenFd);
 				else
 				{
-					// 3000 -- tls통신을 하지 않는 유저를 먼저 접속할 경우
-					// ssl이 초기화되지 않아서 터짐
-					// 고쳐야됨
-					std::cout << "listenFD " << listenFd << std::endl;
 					if (listenFd == this->sslFd)
 						this->isSSL = true;
 					else
@@ -383,6 +379,26 @@ void					Server::disconnectClient(const Message &message, Client *client)
 	std::string stringKey;
 
 	stringKey = client->getInfo(1);
+	// stringKey가 empty가 아니어야만 client는 정상적인 정보를 가진 상태이다.₩:
+	if (!stringKey.empty() && client->getStatus() == USER) {
+		std::cout << "connect end" << std::endl;
+		std::vector<std::string> *channelList = client->getSubscribedChannelList();
+		if (channelList != NULL) {
+			for (size_t i = 0; i < channelList->size(); ++i) {
+				if (this->localChannelList.count((*channelList)[i])) {
+					this->localChannelList[(*channelList)[i]].leaveUser(client);
+					if (this->localChannelList[(*channelList)[i]].getNumbersOfUsers() == 0)
+						this->localChannelList.erase((*channelList)[i]);
+				}
+				if (this->remoteChannelList.count((*channelList)[i])) {
+					this->remoteChannelList[(*channelList)[i]].leaveUser(client);
+					if (this->remoteChannelList[(*channelList)[i]].getNumbersOfUsers() == 0)
+						this->remoteChannelList.erase((*channelList)[i]);
+				}
+			}
+		}
+		delete channelList;
+	}
 	if (this->acceptClients.count(client->getFd()))
 	{
 		if (this->clientList.count(stringKey))
@@ -406,7 +422,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 	}
 	if (this->sendClients.count(stringKey))
 		this->sendClients.erase(stringKey);
-}
+	}
 
 void					Server::sendMessage(const Message &message, Client *client)
 {
@@ -424,7 +440,7 @@ void					Server::sendMessage(const Message &message, Client *client)
 	}
 	else
 	{
-		if (ERROR == write(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length()))
+		if (ERROR == send(client->getFd(), message.getTotalMessage().c_str(), message.getTotalMessage().length(), 0))
 			std::cerr << ERROR_SEND_FAIL << std::endl;
 	}
 }
