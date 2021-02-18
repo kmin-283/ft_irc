@@ -156,7 +156,7 @@ void					Server::start(void)
 				}
 			}
 			if ((!this->acceptClients.empty() && it == acceptClients.end()) || !run)
-				break;	
+				break;
 			if (listenFd < this->tlsMainSocket)
 				++listenFd;
 			else if (this->acceptClients.empty())
@@ -209,18 +209,6 @@ void					Server::receiveMessage(const int &fd)
 
 	readResult = 0;
 	connectionStatus = CONNECT;
-//	if (fd == 6) {
-//		bytes = SSL_read(this->ssl, buf, sizeof(buf)); /* get request */
-//		if (bytes > 0) {
-//			buf[bytes] = 0;
-//			std::cout << "Received ssl message: " << buf << std::endl;
-//			sprintf(reply, HTMLecho, buf);   /* construct reply */
-//			SSL_write(this->ssl, reply, std::strlen(reply)); /* send reply */
-//		} else
-//			ERR_print_errors_fp(stderr);
-//		sd = SSL_get_fd(this->ssl);       /* get socket connection */
-//		SSL_free(this->ssl);         /* release SSL state */
-//		close(sd);          /* close connection */
 	while (42) {
 		if (isSSL)
 			readResult = SSL_read(this->ssl, &buffer, 1); /* get request */
@@ -381,7 +369,6 @@ void					Server::disconnectClient(const Message &message, Client *client)
 	stringKey = client->getInfo(1);
 	// stringKey가 empty가 아니어야만 client는 정상적인 정보를 가진 상태이다.₩:
 	if (!stringKey.empty()) {
-		std::cout << "connect end" << std::endl;
 		std::vector<std::string> *channelList = client->getSubscribedChannelList();
 		if (channelList != NULL) {
 			for (size_t i = 0; i < channelList->size(); ++i) {
@@ -401,6 +388,7 @@ void					Server::disconnectClient(const Message &message, Client *client)
 	}
 	if (this->acceptClients.count(client->getFd()))
 	{
+		close(client->getFd()); // 다른 메시지가 먼저 오기전에 미리 소켓을 끊어야한다.
 		if (this->clientList.count(stringKey))
 		{
 			(this->*(this->replies[RPL_QUITBROADCAST]))(message, client);
@@ -416,13 +404,12 @@ void					Server::disconnectClient(const Message &message, Client *client)
 			SSL_free(this->ssl);
 			this->sslFd = INT_MAX;
 		}
-		close(client->getFd());
 		FD_CLR(client->getFd(), &this->readFds);
 		this->acceptClients.erase(client->getFd());
 	}
 	if (this->sendClients.count(stringKey))
 		this->sendClients.erase(stringKey);
-	}
+}
 
 void					Server::sendMessage(const Message &message, Client *client)
 {
@@ -486,6 +473,20 @@ int		Server::show(const Message &message, Client *client)
 	// 메시지를 보낸 유저의 채널 목록들 출력
 	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") subscribedChannels --\033[0m" << std::endl;
 	client->showChannel();
+	std::cout << "======================================================================================" << std::endl;
+
+	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") sendClient --\033[0m" << std::endl;
+	for (std::map<std::string, Client>::iterator it = this->sendClients.begin(); it != this->sendClients.end(); ++it)
+	{
+		std::cout << it->first << " ";
+	}
+	std::cout << std::endl;
+	std::cout << "\033[0;32m-- user (" << client->getInfo(NICK) << ") serverList --\033[0m" << std::endl;
+	for (std::map<std::string, Client*>::iterator it = this->serverList.begin(); it != this->serverList.end(); ++it)
+	{
+		std::cout << it->first << " ";
+	}
+	std::cout << std::endl;
 	std::cout << "======================================================================================" << std::endl;
 	return (CONNECT);
 }

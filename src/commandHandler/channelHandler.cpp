@@ -843,7 +843,6 @@ int         Server::modeHandler(const Message &message, Client *client)
 									  targetChannel->first + " " + successState + " " +
 									  targetClient->getInfo(NICK)), joinedUsers[i]);
 		}
-		std::cout << message.getTotalMessage();
 		if (message.getPrefix().empty()) {
 			msg = ":" + client->getInfo(NICK) + " ";
 			msg += message.getTotalMessage();

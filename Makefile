@@ -4,7 +4,7 @@ NAME = ircserv
 INCLUDE = -I ./include/
 
 SSL = -L /usr/local/Cellar/openssl@1.1/1.1.1i/lib -lssl -lcrypto
-SSLI = -I/usr/local/Cellar/openssl@1.1/1.1.1i/include/openssl/
+SSLI = -I /usr/local/Cellar/openssl@1.1/1.1.1i/include/openssl/
 #-L/Users/${USER}/.brew/Cellar/openssl@1.1/1.1.1g/lib -lssl -lcrypto
 #SSLI = -I/Users/${USER}/.brew/Cellar/openssl@1.1/1.1.1g/include
 

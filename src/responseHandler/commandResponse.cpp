@@ -564,11 +564,6 @@ int		Server::rServerBroadcastHandler(const Message &message, Client *client)
 	parameters += client->getInfo(SERVERINFO);
 	sendMessage = Message(prefix, RPL_SERVER, parameters);
 	this->broadcastMessage(sendMessage, client);
-
-	for(std::map<std::string, Client*>::iterator it = this->serverList.begin(); it!= this->serverList.end(); ++it)
-		std::cout << it->first << std::endl;
-
-
 	return (CONNECT);
 }
 
