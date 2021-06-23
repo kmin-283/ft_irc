@@ -404,7 +404,6 @@ int					Server::remoteQuitHandler(const Message &message, Client *client)
 int					Server::quitHandler(const Message &message, Client *client)
 {
 	if (client->getStatus() == SERVER) {
-		std::cout << "in quit " << message.getTotalMessage();
 		Client *targetUser =  &this->sendClients[message.getPrefix().substr(1)];
 		std::vector<std::string> *channelList = targetUser->getSubscribedChannelList();
 		if (channelList != NULL) {

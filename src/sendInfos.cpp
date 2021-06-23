@@ -14,7 +14,6 @@ void 	Server::sendChannelLists(Client *client)
 
 	for (; mapIter != this->localChannelList.end(); ++mapIter)
 	{
-		std::cout << "111111111111!" << std::endl;
 		if (mapIter->first[0] == '#')
 		{
 			std::map<std::string, Client *> &operList = mapIter->second.getOperators();
@@ -35,7 +34,6 @@ void 	Server::sendChannelLists(Client *client)
 	mapIter = this->remoteChannelList.begin();
 	for (; mapIter != this->remoteChannelList.end(); ++mapIter)
 	{
-		std::cout << "22222222222222" << std::endl;
 		std::map<std::string, Client *> &operList = mapIter->second.getOperators();
 		userList = mapIter->second.getUsersList("all");
 		userIter = userList.begin();
